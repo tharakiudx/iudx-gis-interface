@@ -1,20 +1,29 @@
 package iudx.gis.server.apiserver;
 
+import io.netty.handler.codec.http.HttpConstants;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.Future;
+import io.vertx.core.MultiMap;
+import io.vertx.core.http.*;
+import io.vertx.core.json.DecodeException;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.JksOptions;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
+import iudx.gis.server.apiserver.handlers.ValidationHandler;
+import iudx.gis.server.apiserver.response.ResponseType;
+import iudx.gis.server.apiserver.response.RestResponse;
+import iudx.gis.server.apiserver.validation.ValidationFailureHandler;
 import iudx.gis.server.authenticate.AuthenticatorService;
 import iudx.gis.server.database.DatabaseService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static iudx.gis.server.apiserver.Constants.*;
 
@@ -36,7 +45,15 @@ public class ApiServerVerticle extends AbstractVerticle {
     private DatabaseService database;
     private AuthenticatorService authenticator;
     // private ParamsValidator validator;
-
+    private static Set<String> validParams = new HashSet<String>();
+    private static Set<String> validHeaders = new HashSet<String>();
+    static {
+        validParams.add(NGSILDQUERY_ID);
+        validParams.add(NGSILDQUERY_IDPATTERN);
+        validHeaders.add(HEADER_TOKEN);
+        validHeaders.add("User-Agent");
+        validHeaders.add("Content-Type");
+    }
 
     @Override
     public void start() throws Exception {
@@ -115,5 +132,171 @@ public class ApiServerVerticle extends AbstractVerticle {
 
         database = DatabaseService.createProxy(vertx, DATABASE_SERVICE_ADDRESS);
         authenticator = AuthenticatorService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
+
+        ValidationHandler entityValidationHandler = new ValidationHandler(vertx);
+        ValidationFailureHandler validationsFailureHandler = new ValidationFailureHandler();
+
+        router.get(NGSILD_ENTITIES_URL)
+                .handler(entityValidationHandler)
+                .handler(this::handleEntitiesQuery)
+                .failureHandler(validationsFailureHandler);
+
+        ValidationHandler latestValidationHandler = new ValidationHandler(vertx);
+        router.get(NGSILD_ENTITIES_URL + "/:domain/:userSha/:resourceServer/:resourceGroup/:resourceName")
+                .handler(latestValidationHandler)
+                .handler(this::handleEntitiesPath).failureHandler(validationsFailureHandler);
+
+    }
+
+    private void handleEntitiesPath(RoutingContext routingContext) {
+        LOGGER.debug("Info:handleLatestEntitiesQuery method started.;");
+        /* Handles HTTP request from client */
+        JsonObject authInfo = (JsonObject) routingContext.data().get("authInfo");
+        LOGGER.debug("authInfo : " + authInfo);
+        HttpServerRequest request = routingContext.request();
+        /* Handles HTTP response from server to client */
+        HttpServerResponse response = routingContext.response();
+        // get query paramaters
+        MultiMap params = getQueryParams(routingContext, response).get();
+        if (!params.isEmpty()) {
+            RuntimeException ex =
+                    new RuntimeException("Query parameters are not allowed with latest query");
+            routingContext.fail(ex);
+        }
+        String domain = request.getParam(JSON_DOMAIN);
+        String userSha = request.getParam(JSON_USERSHA);
+        String resourceServer = request.getParam(JSON_RESOURCE_SERVER);
+        String resourceGroup = request.getParam(JSON_RESOURCE_GROUP);
+        String resourceName = request.getParam(JSON_RESOURCE_NAME);
+        String id = domain + "/" + userSha + "/" + resourceServer + "/" + resourceGroup + "/"
+                + resourceName;
+        JsonObject json = new JsonObject();
+        /* HTTP request instance/host details */
+        String instanceID = request.getHeader(HEADER_HOST);
+        json.put(JSON_INSTANCEID, instanceID);
+        json.put(JSON_ID, id);
+        LOGGER.debug("Info: IUDX query json;" + json);
+        // check Catalogue Cache before search
+        executeSearchQuery(json,response);
+    }
+
+    private void handleEntitiesQuery(RoutingContext routingContext) {
+        LOGGER.debug("Info:handleEntitiesQuery method started.;");
+        /* Handles HTTP request from client */
+        JsonObject authInfo = (JsonObject) routingContext.data().get("authInfo");
+        LOGGER.debug("authInfo : " + authInfo);
+        HttpServerRequest request = routingContext.request();
+        /* Handles HTTP response from server to client */
+        HttpServerResponse response = routingContext.response();
+        // get query paramaters
+        MultiMap params = getQueryParams(routingContext, response).get();
+        MultiMap headerParams = request.headers();
+        // validate request parameters
+        if(validateParams(params)){
+            JsonObject json = new JsonObject();
+            json.put(ID, params.entries().get(0));
+            // check Catalogue Cache before calling search
+            executeSearchQuery(json,response);
+        }
+        else {
+            LOGGER.error("Fail: Validation failed");
+            handleResponse(response, ResponseType.BadRequestData,
+                    MSG_BAD_QUERY);
+        }
+    }
+
+    /**
+     * Execute a search query in DB
+     *
+     * @param json valid json query
+     * @param response
+     */
+    private void executeSearchQuery(JsonObject json, HttpServerResponse response) {
+        database.searchQuery(json, handler -> {
+            if (handler.succeeded()) {
+                LOGGER.info("Success: Search Success");
+                handleSuccessResponse(response, ResponseType.Ok.getCode(),
+                        handler.result().toString());
+            } else if (handler.failed()) {
+                LOGGER.error("Fail: Search Fail");
+                processBackendResponse(response, handler.cause().getMessage());
+            }
+        });
+    }
+
+    private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
+        response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
+    }
+
+    private void processBackendResponse(HttpServerResponse response, String failureMessage) {
+        LOGGER.debug("Info : " + failureMessage);
+        try {
+            JsonObject json = new JsonObject(failureMessage);
+            int type = json.getInteger(JSON_TYPE);
+            ResponseType responseType = ResponseType.fromCode(type);
+            response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(type)
+                    .end(generateResponse(responseType).toString());
+        } catch (DecodeException ex) {
+            LOGGER.error("ERROR : Expecting Json received else from backend service");
+            handleResponse(response, ResponseType.BadRequestData);
+        }
+
+    }
+
+    private void handleResponse(HttpServerResponse response, ResponseType responseType) {
+        response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(responseType.getCode())
+                .end(generateResponse(responseType).toString());
+    }
+
+    private void handleResponse(HttpServerResponse response, ResponseType responseType,
+                                String message) {
+        response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(responseType.getCode())
+                .end(generateResponse(responseType, message).toString());
+    }
+
+    private JsonObject generateResponse(ResponseType responseType) {
+        int type = responseType.getCode();
+        return new RestResponse.Builder().withType(type)
+                .withTitle(ResponseType.fromCode(type).getMessage())
+                .withMessage(ResponseType.fromCode(type).getMessage()).build().toJson();
+    }
+
+    private JsonObject generateResponse(ResponseType responseType, String message) {
+        int type = responseType.getCode();
+        return new RestResponse.Builder().withType(type)
+                .withTitle(ResponseType.fromCode(type).getMessage()).withMessage(message).build().toJson();
+
+    }
+
+    private Optional<MultiMap> getQueryParams(RoutingContext routingContext,
+                                              HttpServerResponse response) {
+        MultiMap queryParams = null;
+        try {
+            queryParams = MultiMap.caseInsensitiveMultiMap();
+            String uri = routingContext.request().uri();
+            Map<String, List<String>> decodedParams =
+                    new QueryStringDecoder(uri, HttpConstants.DEFAULT_CHARSET, true, 1024, true).parameters();
+            for (Map.Entry<String, List<String>> entry : decodedParams.entrySet()) {
+                LOGGER.debug("Info: param :" + entry.getKey() + " value : " + entry.getValue());
+                queryParams.add(entry.getKey(), entry.getValue());
+            }
+        } catch (IllegalArgumentException ex) {
+            response.putHeader(CONTENT_TYPE, APPLICATION_JSON)
+                    .setStatusCode(ResponseType.BadRequestData.getCode())
+                    .end(generateResponse(ResponseType.BadRequestData, MSG_BAD_QUERY).toString());
+
+
+        }
+        return Optional.of(queryParams);
+    }
+    private boolean validateParams(MultiMap parameterMap) {
+        final List<Map.Entry<String, String>> entries = parameterMap.entries();
+        for (final Map.Entry<String, String> entry : entries) {
+            // System.out.println(entry.getKey());
+            if (!validParams.contains(entry.getKey())) {
+                return false;
+            }
+        }
+        return true;
     }
 }

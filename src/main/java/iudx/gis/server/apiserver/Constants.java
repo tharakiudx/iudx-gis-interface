@@ -58,18 +58,15 @@ public class Constants {
 
     // json fields
     public static final String JSON_INSTANCEID = "instanceID";
-    public static final String JSON_CONSUMER = "consumer";
-    public static final String JSON_PROVIDER = "provider";
     public static final String JSON_TYPE = "type";
+    public static final String JSON_DOMAIN = "domain";
+    public static final String JSON_USERSHA = "userSHA";
     public static final String JSON_NAME = "name";
     public static final String JSON_ENTITIES = "entities";
     public static final String JSON_ID = "id";
     public static final String JSON_VALUE = "value";
     public static final String JSON_TITLE = "title";
     public static final String JSON_DETAIL = "detail";
-    public static final String JSON_URL = "url";
-    public static final String JSON_METHOD = "method";
-    public static final String JSON_PASSWORD = "password";
     public static final String JSON_RESOURCE_SERVER = "resourceServer";
     public static final String JSON_RESOURCE_GROUP = "resourceGroup";
     public static final String JSON_RESOURCE_NAME = "resourceName";
