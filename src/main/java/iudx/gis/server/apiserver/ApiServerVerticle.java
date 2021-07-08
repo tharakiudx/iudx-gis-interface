@@ -7,7 +7,6 @@ import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.http.*;
 import io.vertx.core.json.DecodeException;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.JksOptions;
 import io.vertx.ext.web.Router;
@@ -17,6 +16,8 @@ import io.vertx.ext.web.handler.CorsHandler;
 import iudx.gis.server.apiserver.handlers.ValidationHandler;
 import iudx.gis.server.apiserver.response.ResponseType;
 import iudx.gis.server.apiserver.response.RestResponse;
+import iudx.gis.server.apiserver.service.CatalogueService;
+import iudx.gis.server.apiserver.util.RequestType;
 import iudx.gis.server.apiserver.validation.ValidationFailureHandler;
 import iudx.gis.server.authenticate.AuthenticatorService;
 import iudx.gis.server.database.DatabaseService;
@@ -25,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
-import static iudx.gis.server.apiserver.Constants.*;
+import static iudx.gis.server.apiserver.util.Constants.*;
 
 public class ApiServerVerticle extends AbstractVerticle {
     private static final Logger LOGGER = LogManager.getLogger(ApiServerVerticle.class);
@@ -40,7 +41,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     private boolean isSSL, isProduction;
     private String keystore;
     private String keystorePassword;
-    // private CatalogueService catalogueService;
+    private CatalogueService catalogueService;
 
     private DatabaseService database;
     private AuthenticatorService authenticator;
@@ -133,19 +134,21 @@ public class ApiServerVerticle extends AbstractVerticle {
         database = DatabaseService.createProxy(vertx, DATABASE_SERVICE_ADDRESS);
         authenticator = AuthenticatorService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
 
-        ValidationHandler entityValidationHandler = new ValidationHandler(vertx);
+        ValidationHandler entityQueryValidationHandler = new ValidationHandler(vertx, RequestType.ENTITY_QUERY);
         ValidationFailureHandler validationsFailureHandler = new ValidationFailureHandler();
 
         router.get(NGSILD_ENTITIES_URL)
-                .handler(entityValidationHandler)
+                .handler(entityQueryValidationHandler)
                 .handler(this::handleEntitiesQuery)
                 .failureHandler(validationsFailureHandler);
 
-        ValidationHandler latestValidationHandler = new ValidationHandler(vertx);
+        ValidationHandler entityPathValidationHandler = new ValidationHandler(vertx, RequestType.ENTITY_PATH);
         router.get(NGSILD_ENTITIES_URL + "/:domain/:userSha/:resourceServer/:resourceGroup/:resourceName")
-                .handler(latestValidationHandler)
-                .handler(this::handleEntitiesPath).failureHandler(validationsFailureHandler);
+                .handler(entityPathValidationHandler)
+                .handler(this::handleEntitiesPath)
+                .failureHandler(validationsFailureHandler);
 
+        catalogueService = new CatalogueService(vertx, config());
     }
 
     private void handleEntitiesPath(RoutingContext routingContext) {
@@ -177,7 +180,8 @@ public class ApiServerVerticle extends AbstractVerticle {
         json.put(JSON_ID, id);
         LOGGER.debug("Info: IUDX query json;" + json);
         // check Catalogue Cache before search
-        executeSearchQuery(json,response);
+        Future<Boolean> isIdPresent = catalogueService.isIdPresent(id);
+        isIdPresent.onComplete(handler -> executeSearchQuery(json,response));
     }
 
     private void handleEntitiesQuery(RoutingContext routingContext) {
@@ -194,10 +198,10 @@ public class ApiServerVerticle extends AbstractVerticle {
         // validate request parameters
         if(validateParams(params)){
             JsonObject json = new JsonObject();
-            json.put(ID, params.entries().get(0));
+            json.put(ID, params.entries().get(0).toString());
             // check Catalogue Cache before calling search
-            executeSearchQuery(json,response);
-        }
+            Future<Boolean> isIdPresent = catalogueService.isIdPresent(params.entries().get(0).toString());
+            isIdPresent.onComplete(handler -> executeSearchQuery(json,response));        }
         else {
             LOGGER.error("Fail: Validation failed");
             handleResponse(response, ResponseType.BadRequestData,

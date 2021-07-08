@@ -1,7 +1,7 @@
 package iudx.gis.server.apiserver.response;
 
 import io.vertx.core.json.JsonObject;
-import iudx.gis.server.apiserver.Constants;
+import iudx.gis.server.apiserver.util.Constants;
 
 public class RestResponse {
     private int type;

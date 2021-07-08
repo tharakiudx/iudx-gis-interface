@@ -7,7 +7,7 @@ import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static iudx.gis.server.apiserver.Constants.*;
+import static iudx.gis.server.apiserver.util.Constants.*;
 
 public class ValidationFailureHandler  implements Handler<RoutingContext> {
     private static final Logger LOGGER = LogManager.getLogger(ValidationFailureHandler.class);

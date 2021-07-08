@@ -1,4 +1,4 @@
-package iudx.gis.server.apiserver;
+package iudx.gis.server.apiserver.util;
 
 import java.util.List;
 

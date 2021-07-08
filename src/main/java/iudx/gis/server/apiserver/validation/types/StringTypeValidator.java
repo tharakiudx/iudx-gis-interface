@@ -3,31 +3,17 @@ package iudx.gis.server.apiserver.validation.types;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.regex.Pattern;
+public class StringTypeValidator implements Validator {
 
-import static iudx.gis.server.apiserver.util.Constants.*;
-
-public class IdTypeValidator implements Validator {
-    private static final Logger LOGGER = LogManager.getLogger(IdTypeValidator.class);
-
-    private Integer maxLength = VALIDATION_ID_MAX_LEN;
-    private static final Pattern regexIDPattern =
-            Pattern.compile(
-                    "^[a-zA-Z0-9.]{4,100}/{1}[a-zA-Z0-9.]{4,100}/{1}[a-zA-Z.]{4,100}/{1}[a-zA-Z-_.]{4,100}/{1}[a-zA-Z0-9-_.]{4,100}$");
+    private static final Logger LOGGER = LogManager.getLogger(StringTypeValidator.class);
 
     private String value;
     private boolean required;
 
-    public IdTypeValidator(String value, boolean required){
+    public StringTypeValidator(String value, boolean required) {
         this.value = value;
         this.required = required;
     }
-
-    public boolean isvalidIUDXId(String value) {
-        return regexIDPattern.matcher(value).matches();
-    }
-
-
     @Override
     public boolean isValid() {
         LOGGER.debug("value : " + value + "required : " + required);
@@ -43,16 +29,11 @@ public class IdTypeValidator implements Validator {
                 return false;
             }
         }
-        if (value.length() > maxLength) {
-            LOGGER.error("Validation error : Value exceed max character limit.");
+        if(value.length()>100) {
+            LOGGER.error("Validation error : length >100 not allowed");
             return false;
         }
-        if (!isvalidIUDXId(value)) {
-            LOGGER.error("Validation error : Invalid id.");
-            return false;
-        }
-        return true;
-    }
+        return true;    }
 
     @Override
     public int failureCode() {
@@ -61,6 +42,6 @@ public class IdTypeValidator implements Validator {
 
     @Override
     public String failureMessage() {
-        return "Invalid id.";
+        return "Invalid string";
     }
 }

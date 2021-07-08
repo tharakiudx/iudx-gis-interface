@@ -5,22 +5,27 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import iudx.gis.server.apiserver.util.RequestType;
 import iudx.gis.server.apiserver.validation.ValidatorsHandlersFactory;
 import iudx.gis.server.apiserver.validation.types.Validator;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ValidationHandler implements Handler<RoutingContext> {
 
     private static final Logger LOGGER = LogManager.getLogger(ValidationHandler.class);
     private Vertx vertx;
+    private RequestType type;
 
 
-    public ValidationHandler(Vertx vertx) {
-        this.vertx=vertx;
+    public ValidationHandler(Vertx vertx, RequestType type) {
+        this.vertx = vertx;
+        this.type = type;
     }
 
     @Override
@@ -30,12 +35,16 @@ public class ValidationHandler implements Handler<RoutingContext> {
         MultiMap headers = context.request().headers();
         Map<String, String> pathParams = context.pathParams();
         parameters.addAll(pathParams);
+        List<Validator> validations = null;
 
-        Validator validator = validationFactory.build(vertx, parameters, headers);
+        validations = validationFactory.build(vertx, type, parameters, headers);
 
-        if (!validator.isValid()) {
-            error(context);
-            return;
+        for (Validator validator : Optional.ofNullable(validations).orElse(Collections.emptyList())) {
+            LOGGER.debug("validator :" + validator.getClass().getName());
+            if (!validator.isValid()) {
+                error(context);
+                return;
+            }
         }
         context.next();
         return;
