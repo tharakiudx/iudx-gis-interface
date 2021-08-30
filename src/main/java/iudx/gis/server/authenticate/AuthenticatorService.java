@@ -13,12 +13,12 @@ import io.vertx.core.json.JsonObject;
 @ProxyGen
 public interface AuthenticatorService {
 
-    @GenIgnore
-    static AuthenticatorService createProxy(Vertx vertx, String address) {
-        return new AuthenticatorServiceVertxEBProxy(vertx, address);
-    }
+  @GenIgnore
+  static AuthenticatorService createProxy(Vertx vertx, String address) {
+    return new AuthenticatorServiceVertxEBProxy(vertx, address);
+  }
 
-    @Fluent
-    AuthenticatorService tokenInterospect(JsonObject request, JsonObject authenticationInfo,
-                                           Handler<AsyncResult<JsonObject>> handler);
+  @Fluent
+  AuthenticatorService tokenInterospect(JsonObject request, JsonObject authenticationInfo,
+      Handler<AsyncResult<JsonObject>> handler);
 }

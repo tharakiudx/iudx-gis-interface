@@ -1,9 +1,9 @@
 package iudx.gis.server.apiserver.validation.types;
 
 public interface Validator {
-    boolean isValid();
+  boolean isValid();
 
-    int failureCode();
+  int failureCode();
 
-    String failureMessage();
+  String failureMessage();
 }

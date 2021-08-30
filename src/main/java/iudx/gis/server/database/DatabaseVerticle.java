@@ -6,24 +6,23 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ServiceBinder;
 
 public class DatabaseVerticle extends AbstractVerticle {
-    private DatabaseService database;
-    private static final String DATABASE_SERVICE_ADDRESS = "iudx.gis.database.service";
-    private ServiceBinder binder;
-    private MessageConsumer<JsonObject> consumer;
+  private DatabaseService database;
+  private static final String DATABASE_SERVICE_ADDRESS = "iudx.gis.database.service";
+  private ServiceBinder binder;
+  private MessageConsumer<JsonObject> consumer;
 
-    @Override
-    public void start() throws Exception {
+  @Override
+  public void start() throws Exception {
 
-        binder = new ServiceBinder(vertx);
-        // database = new DatabaseServiceImpl(client, timeLimit);
-        consumer =
-                binder.setAddress(DATABASE_SERVICE_ADDRESS)
-                        .register(DatabaseService.class, database);
-    }
+    binder = new ServiceBinder(vertx);
+    // database = new DatabaseServiceImpl(client, timeLimit);
+    consumer =
+        binder.setAddress(DATABASE_SERVICE_ADDRESS).register(DatabaseService.class, database);
+  }
 
 
-    @Override
-    public void stop() {
-        binder.unregister(consumer);
-    }
+  @Override
+  public void stop() {
+    binder.unregister(consumer);
+  }
 }

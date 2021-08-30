@@ -12,14 +12,14 @@ import io.vertx.core.json.JsonObject;
 @VertxGen
 @ProxyGen
 public interface DatabaseService {
-    @GenIgnore
-    static DatabaseService createProxy(Vertx vertx, String address) {
-        return new DatabaseServiceVertxEBProxy(vertx, address);
-    }
+  @GenIgnore
+  static DatabaseService createProxy(Vertx vertx, String address) {
+    return new DatabaseServiceVertxEBProxy(vertx, address);
+  }
 
-    @Fluent
-    DatabaseService searchQuery(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  @Fluent
+  DatabaseService searchQuery(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
-    @Fluent
-    DatabaseService insertIntoDb(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  @Fluent
+  DatabaseService insertIntoDb(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 }
