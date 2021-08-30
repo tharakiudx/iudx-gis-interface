@@ -18,48 +18,45 @@ import java.util.Optional;
 
 public class ValidationHandler implements Handler<RoutingContext> {
 
-    private static final Logger LOGGER = LogManager.getLogger(ValidationHandler.class);
-    private Vertx vertx;
-    private RequestType type;
+  private static final Logger LOGGER = LogManager.getLogger(ValidationHandler.class);
+  private Vertx vertx;
+  private RequestType type;
 
 
-    public ValidationHandler(Vertx vertx, RequestType type) {
-        this.vertx = vertx;
-        this.type = type;
-    }
+  public ValidationHandler(Vertx vertx, RequestType type) {
+    this.vertx = vertx;
+    this.type = type;
+  }
 
-    @Override
-    public void handle(RoutingContext context) {
-        ValidatorsHandlersFactory validationFactory = new ValidatorsHandlersFactory();
-        MultiMap parameters = context.request().params();
-        MultiMap headers = context.request().headers();
-        Map<String, String> pathParams = context.pathParams();
-        parameters.addAll(pathParams);
-        List<Validator> validations = null;
+  @Override
+  public void handle(RoutingContext context) {
+    ValidatorsHandlersFactory validationFactory = new ValidatorsHandlersFactory();
+    MultiMap parameters = context.request().params();
+    MultiMap headers = context.request().headers();
+    Map<String, String> pathParams = context.pathParams();
+    parameters.addAll(pathParams);
+    List<Validator> validations = null;
 
-        validations = validationFactory.build(vertx, type, parameters, headers);
+    validations = validationFactory.build(vertx, type, parameters, headers);
 
-        for (Validator validator : Optional.ofNullable(validations).orElse(Collections.emptyList())) {
-            LOGGER.debug("validator :" + validator.getClass().getName());
-            if (!validator.isValid()) {
-                error(context);
-                return;
-            }
-        }
-        context.next();
+    for (Validator validator : Optional.ofNullable(validations).orElse(Collections.emptyList())) {
+      LOGGER.debug("validator :" + validator.getClass().getName());
+      if (!validator.isValid()) {
+        error(context);
         return;
+      }
     }
+    context.next();
+    return;
+  }
 
-    private void error(RoutingContext context) {
-        context.response().putHeader("content-type", "application/json")
-                .setStatusCode(HttpStatus.SC_BAD_REQUEST)
-                .end(getBadRequestMessage().toString());
-    }
+  private void error(RoutingContext context) {
+    context.response().putHeader("content-type", "application/json")
+        .setStatusCode(HttpStatus.SC_BAD_REQUEST).end(getBadRequestMessage().toString());
+  }
 
-    private JsonObject getBadRequestMessage() {
-        return new JsonObject()
-                .put("type", 400)
-                .put("title", "Bad Request")
-                .put("details", "Bad query");
-    }
+  private JsonObject getBadRequestMessage() {
+    return new JsonObject().put("type", 400).put("title", "Bad Request").put("details",
+        "Bad query");
+  }
 }
