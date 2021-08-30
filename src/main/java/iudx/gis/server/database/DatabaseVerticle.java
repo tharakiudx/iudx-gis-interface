@@ -15,7 +15,7 @@ public class DatabaseVerticle extends AbstractVerticle {
   public void start() throws Exception {
 
     binder = new ServiceBinder(vertx);
-    // database = new DatabaseServiceImpl(client, timeLimit);
+    database = new DatabaseServiceImpl();
     consumer =
         binder.setAddress(DATABASE_SERVICE_ADDRESS).register(DatabaseService.class, database);
   }
