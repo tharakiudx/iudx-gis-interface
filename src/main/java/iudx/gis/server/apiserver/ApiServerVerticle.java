@@ -37,7 +37,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   private HttpServer server;
   private Router router;
-  private int port = 18443;
+  private int port = 11111;
   private boolean isSSL, isProduction;
   private String keystore;
   private String keystorePassword;
@@ -158,13 +158,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     HttpServerRequest request = routingContext.request();
     /* Handles HTTP response from server to client */
     HttpServerResponse response = routingContext.response();
-    // get query paramaters
-    MultiMap params = getQueryParams(routingContext, response).get();
-    if (!params.isEmpty()) {
-      RuntimeException ex =
-          new RuntimeException("Query parameters are not allowed with latest query");
-      routingContext.fail(ex);
-    }
+
     String domain = request.getParam(JSON_DOMAIN);
     String userSha = request.getParam(JSON_USERSHA);
     String resourceServer = request.getParam(JSON_RESOURCE_SERVER);
@@ -179,8 +173,8 @@ public class ApiServerVerticle extends AbstractVerticle {
     json.put(JSON_ID, id);
     LOGGER.debug("Info: IUDX query json;" + json);
     // check Catalogue Cache before search
-    Future<Boolean> isIdPresent = catalogueService.isIdPresent(id);
-    isIdPresent.onComplete(handler -> executeSearchQuery(json, response));
+    Future<Boolean> isIdPresent = catalogueService.isItemExist(id);
+    isIdPresent.onSuccess(handler -> executeSearchQuery(json, response)).onFailure(handler -> handleResponse(response, ResponseType.NotFound));
   }
 
   private void handleEntitiesQuery(RoutingContext routingContext) {
