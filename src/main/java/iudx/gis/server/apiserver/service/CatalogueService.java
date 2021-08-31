@@ -169,7 +169,7 @@ public class CatalogueService {
             JsonObject responseBody = response.bodyAsJsonObject();
             if (responseBody.getString("status").equalsIgnoreCase("success")
                 && responseBody.getInteger("totalHits") > 0) {
-              if(responseBody.getJsonArray("results").getJsonObject(0).getJsonArray("type").contains("iudx:GISResource")) {
+              if(responseBody.getJsonArray("results").getJsonObject(0).getJsonArray("type").contains("iudx:Resource")) {
                 promise.complete(true);
               } else {
                 promise.fail(responseHandler.cause());                
