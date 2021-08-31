@@ -5,8 +5,10 @@ import com.google.common.cache.CacheBuilder;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.client.predicate.ResponsePredicate;
@@ -71,7 +73,8 @@ public class CatalogueService {
               String[] idArray = id.split("/");
               groupCache.put(id, res.getString("accessPolicy", "SECURE"));
             });
-            LOGGER.debug("Cache has been populated!");
+            LOGGER.debug("Cache has been populated!"); 
+            LOGGER.info(groupCache.size());
             promise.complete(true);
           } else if (handler.failed()) {
             promise.fail(handler.cause());
@@ -103,11 +106,13 @@ public class CatalogueService {
 
   public Future<Boolean> isIdPresent(String id) {
     Promise<Boolean> promise = Promise.promise();
-    if (id.equalsIgnoreCase(idCache.getIfPresent(id)))
+    if (id.equalsIgnoreCase(idCache.getIfPresent(id))) {
       promise.complete(true);
-    else
+    }
+    else {
       callCatalogueItemApi(id).onSuccess(handler -> promise.complete(true))
           .onFailure(handler -> promise.fail("Invalid id"));
+    }
     return promise.future();
   }
 
@@ -116,7 +121,10 @@ public class CatalogueService {
     String groupId = id.substring(0, id.lastIndexOf("/"));
     catWebClient.get(catPort, catHost, catItemPath).addQueryParam("id", id).send(catHandler -> {
       if (catHandler.succeeded()) {
+        System.out.println("++++++++++++++");
+        System.out.println(id);
         JsonArray response = catHandler.result().bodyAsJsonObject().getJsonArray("results");
+        System.out.println(response);
         response.forEach(json -> {
           JsonObject res = (JsonObject) json;
           if (res.containsKey("accessPolicy"))
@@ -149,4 +157,30 @@ public class CatalogueService {
       return (List<T>) arr.getList();
     }
   }
+  
+  public Future<Boolean> isItemExist(String id) {
+    LOGGER.debug("isItemExist() started");
+    Promise<Boolean> promise = Promise.promise();
+    LOGGER.info("id : " + id);
+    catWebClient.get(catPort, catHost, catItemPath).addQueryParam("id", id)
+        .expect(ResponsePredicate.JSON).send(responseHandler -> {
+          if (responseHandler.succeeded()) {
+            HttpResponse<Buffer> response = responseHandler.result();
+            JsonObject responseBody = response.bodyAsJsonObject();
+            if (responseBody.getString("status").equalsIgnoreCase("success")
+                && responseBody.getInteger("totalHits") > 0) {
+              if(responseBody.getJsonArray("results").getJsonObject(0).getJsonArray("type").contains("iudx:GISResource")) {
+                promise.complete(true);
+              } else {
+                promise.fail(responseHandler.cause());                
+              }
+            } else {
+              promise.fail(responseHandler.cause());
+            }
+          } else {
+            promise.fail(responseHandler.cause());
+          }
+        });
+    return promise.future();
+  }  
 }
