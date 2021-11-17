@@ -1,0 +1,80 @@
+{
+  "type": "object",
+  "title": "Admin Crud API's Schema",
+  "properties": {
+    "id": {
+      "$id": "#root/properties/id",
+      "type": "string",
+      "title": "Id",
+      "pattern": "^[a-zA-Z0-9.]{4,100}/{1}[a-zA-Z0-9.]{4,100}/{1}[a-zA-Z.]{4,100}/{1}[a-zA-Z-_.]{4,100}/{1}[a-zA-Z0-9-_.]{4,100}$",
+      "maxLength": 512
+    },
+    "server-url": {
+      "$id": "#root/properties/server-url",
+      "type": "string",
+      "title": "Server Url",
+      "pattern": "^.*$",
+      "maxLength": 512
+    },
+    "server-port": {
+      "$id": "#root/properties/server-port",
+      "type": "integer",
+      "title": "Server Port"
+    },
+    "isSecure": {
+      "$id": "#root/properties/isSecure",
+      "type": "boolean",
+      "title": "Is Secure"
+    },
+    "accessInfo": {
+      "$id": "#root/properties/accessInfo",
+      "if" : {
+        "properties" : {"isSecure" :  {"const" :  true}}
+      },
+      "then": {
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "else": {
+        "required": []
+      },
+      "title": "Access Info",
+      "type": "object",
+      "properties": {
+        "username": {
+          "$id": "#root/properties/accessInfo/properties/username",
+          "type": "string",
+          "title": "Username",
+          "pattern": "^.*$"
+        },
+        "password": {
+          "$id": "#root/properties/accessInfo/properties/password",
+          "type": "string",
+          "title": "Password"
+        }
+      }
+    }
+  },
+  "if" : {
+    "properties" : {"isSecure" :  {"const" :  true}}
+  },
+  "then": {
+    "required": [
+      "id",
+      "server-url",
+      "server-port",
+      "isSecure",
+      "accessInfo"
+    ]
+  },
+  "else": {
+    "required": [
+      "id",
+      "server-url",
+      "server-port",
+      "isSecure"
+    ]
+  }
+}
