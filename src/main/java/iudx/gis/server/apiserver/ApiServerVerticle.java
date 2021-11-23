@@ -164,7 +164,6 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     router
         .delete(ADMIN_BASE_PATH)
-        .handler(adminCrudPathValidationHandler)
         .handler(this::handleDeleteAdminPath)
         .failureHandler(validationsFailureHandler);
 
