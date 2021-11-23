@@ -265,7 +265,7 @@
 				<version>1.5.0</version>
 				<executions>
 					<execution>
-						<id>resource-server</id>
+						<id>gis-server</id>
 						<configuration>
 							<mainClass>iudx.gis.server.deploy.DeployerDev</mainClass>
 							<arguments>
