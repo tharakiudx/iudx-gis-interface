@@ -25,6 +25,7 @@ public final class JsonSchemaTypeValidator implements Validator {
       LOGGER.error("Json schema validation failed due to: {}", e.getMessage());
       return false;
     }
+    LOGGER.debug("Json request body validated");
     return true;
 //    try {
 //      schema.validateSync(value);

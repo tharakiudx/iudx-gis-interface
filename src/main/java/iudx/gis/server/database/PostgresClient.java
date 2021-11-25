@@ -15,33 +15,26 @@ import io.vertx.sqlclient.SqlConnection;
 public class PostgresClient {
   private static final Logger LOGGER = LogManager.getLogger(PostgresClient.class);
 
-  private PgPool pgPool;
+  private static PgPool pgPool;
 
   public PostgresClient(Vertx vertx, PgConnectOptions pgConnectOptions,
       PoolOptions connectionPoolOptions) {
-    this.pgPool = PgPool.pool(vertx, pgConnectOptions, connectionPoolOptions);  
+      pgPool = PgPool.pool(vertx, pgConnectOptions, connectionPoolOptions);
   }
 
   public Future<RowSet<Row>> executeAsync(String preparedQuerySQL) {
     LOGGER.debug("Info : PostgresQLClient#executeAsync() started");
-    LOGGER.debug("Info : Query is : " + preparedQuerySQL);
+    LOGGER.debug("Info : Executing query: {}", preparedQuerySQL);
     Promise<RowSet<Row>> promise = Promise.promise();
-    pgPool.getConnection(connectionHandler -> {
-      if (connectionHandler.succeeded()) {
-        LOGGER.debug("Info : connectionHandler.succeeded()");
-        SqlConnection pgConnection = connectionHandler.result();
-        pgConnection.query(preparedQuerySQL).execute(handler -> {
-          if (handler.succeeded()) {
-            pgConnection.close();
-            promise.complete(handler.result());
-          } else {
-            pgConnection.close();
-            LOGGER.fatal("Fail : " + handler.cause());
-            promise.fail(handler.cause());
-          }          
+    pgPool.withConnection(connection -> connection.query(preparedQuerySQL).execute())
+        .onSuccess(ar -> {
+          LOGGER.debug("Info : connectionHandler.succeeded()");
+          promise.complete(ar);
+        })
+        .onFailure(ar -> {
+          LOGGER.error("Could not execute query due to: {}", ar.getLocalizedMessage());
+          promise.fail(ar);
         });
-      }
-    });
     
     return promise.future();
   }

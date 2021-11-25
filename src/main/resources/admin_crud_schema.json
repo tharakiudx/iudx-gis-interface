@@ -1,6 +1,7 @@
 {
   "type": "object",
   "title": "Admin Crud API's Schema",
+  "additionalProperties": false,
   "properties": {
     "id": {
       "$id": "#root/properties/id",
@@ -28,26 +29,7 @@
     },
     "accessInfo": {
       "$id": "#root/properties/accessInfo",
-      "if" : {
-        "properties" : {"isSecure" :  {"const" :  true}}
-      },
-      "then": {
-        "required": [
-          "username",
-          "password"
-        ],
-        "properties": {
-          "username": {
-            "minLength": 1
-          },
-          "password" : {
-            "minLength": 1
-          }
-        }
-      },
-      "else": {
-        "required": []
-      },
+      "additionalProperties": false,
       "title": "Access Info",
       "type": "object",
       "properties": {
@@ -65,24 +47,10 @@
       }
     }
   },
-  "if" : {
-    "properties" : {"isSecure" :  {"const" :  true}}
-  },
-  "then": {
-    "required": [
-      "id",
-      "server-url",
-      "server-port",
-      "isSecure",
-      "accessInfo"
-    ]
-  },
-  "else": {
-    "required": [
-      "id",
-      "server-url",
-      "server-port",
-      "isSecure"
-    ]
-  }
+  "required": [
+    "id",
+    "server-port",
+    "server-url",
+    "isSecure"
+  ]
 }

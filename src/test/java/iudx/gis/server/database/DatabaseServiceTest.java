@@ -2,6 +2,7 @@ package iudx.gis.server.database;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
@@ -9,10 +10,8 @@ import io.vertx.sqlclient.PoolOptions;
 import iudx.gis.server.configuration.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -20,6 +19,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import static iudx.gis.server.database.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(VertxExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DatabaseServiceTest {
   private static DatabaseService database;
 

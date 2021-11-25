@@ -14,19 +14,19 @@
       "keystorePassword": "password",
       "verticleInstances": 2,
       "serverMode": "testing",
-      "authServerHost": "<<authserver-ip>>",
-      "catServerHost": "<<catalogue-ip>>",
+      "authServerHost": "AUTH_VERTICLE",
+      "catServerHost": "CAT_VERTICLE",
       "catServerPort": 443,
       "resourceServerId": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/rs.iudx.io"
     },
     {
       "id": "iudx.gis.server.database.DatabaseVerticle",
       "verticleInstances": 2,
-      "databaseIP": "<<database-ip>>",
-      "databasePort": 123,
-      "dbUser": "<<postgres_user_name>>",
-      "dbPassword": "<<postgres_user_password>>",
-      "dbDatabaseName": "<<postgres_db_name>>",
+      "databaseIP": "localhost",
+      "databasePort": 5432,
+      "dbUser": "postgres",
+      "dbPassword": "password",
+      "dbDatabaseName": "iudx",
       "dbClientPoolSize": 25
     }
   ]

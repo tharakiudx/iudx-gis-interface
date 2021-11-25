@@ -56,6 +56,10 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     Optional<JsonObject> accessInfo = Optional.ofNullable(request.getJsonObject(ACCESS_INFO));
 
+    if (isRequestInvalid(isSecure, accessInfo, handler)) {
+      return this;
+    }
+
     String query = INSERT_ADMIN_DETAILS_QUERY.replace("$1", resourceId)
         .replace("$2", serverUrl)
         .replace("$3", serverPort.toString())
@@ -72,13 +76,14 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     pgSQLClient.executeAsync(query)
         .onSuccess(ar -> {
-          LOGGER.debug("Insert admin details operation successful!");
+          LOGGER.debug("Insert admin details operation successful");
           handler.handle(Future.succeededFuture(new JsonObject().put(TYPE, SUCCESS)));
         })
         .onFailure(ar -> {
-          LOGGER.error("Insert admin operation failed due to: {}", ar.toString());
-          handler.handle(Future.failedFuture(ar));
+          LOGGER.error("Insert admin operation failed due to: {}", ar.getLocalizedMessage());
+          handler.handle(Future.failedFuture(ar.getCause()));
         });
+
     return this;
   }
 
@@ -90,6 +95,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     Boolean isSecure = request.getBoolean(SECURE);
 
     Optional<JsonObject> accessInfo = Optional.ofNullable(request.getJsonObject(ACCESS_INFO));
+
+    if (isRequestInvalid(isSecure, accessInfo, handler)) {
+      return this;
+    }
 
     String query = UPDATE_ADMIN_DETAILS_QUERY.replace("$1", serverUrl)
         .replace("$2", serverPort.toString())
@@ -111,7 +120,7 @@ public class DatabaseServiceImpl implements DatabaseService {
           handler.handle(Future.succeededFuture(new JsonObject().put(TYPE, SUCCESS)));
         })
         .onFailure(ar -> {
-          LOGGER.error("Update admin operation failed due to: {}", ar.toString());
+          LOGGER.error("Update admin operation failed due to: {}", ar.getLocalizedMessage());
           handler.handle(Future.failedFuture(ar));
         });
 
@@ -120,15 +129,22 @@ public class DatabaseServiceImpl implements DatabaseService {
 
   @Override
   public DatabaseService deleteAdminDetails(String resourceId, Handler<AsyncResult<JsonObject>> handler) {
-    String query = DELETE_ADMIN_DETAILS_QUERY.replace("$1", resourceId);
+    String searchQuery = SELECT_ADMIN_DETAILS_QUERY.replace("$1", resourceId);
+    String deleteQuery = DELETE_ADMIN_DETAILS_QUERY.replace("$1", resourceId);
 
-    pgSQLClient.executeAsync(query)
+    pgSQLClient.executeAsync(searchQuery)
+        .compose(ar -> {
+          if (ar.size() < 1) {
+            return Future.failedFuture("Given resource ID does not exist in DB");
+          }
+          return pgSQLClient.executeAsync(deleteQuery);
+        })
         .onSuccess(ar -> {
           LOGGER.debug("Delete admin details operation successful!");
           handler.handle(Future.succeededFuture(new JsonObject().put(TYPE, SUCCESS)));
         })
         .onFailure(ar -> {
-          LOGGER.error("Delete admin operation failed due to: {}", ar.toString());
+          LOGGER.error("Delete admin operation failed due to: {}", ar.getLocalizedMessage());
           handler.handle(Future.failedFuture(ar));
         });
 
@@ -167,5 +183,27 @@ public class DatabaseServiceImpl implements DatabaseService {
     return promise.future();
   }
 
+  private boolean isRequestInvalid(Boolean isSecure,
+                                   Optional<JsonObject> accessInfo,
+                                   Handler<AsyncResult<JsonObject>> handler) {
+    if (!isSecure) {
+      return false;
+    }
+    String errorMessage = "";
+    if (accessInfo.isPresent() && !accessInfo.get().isEmpty()) {
+      JsonObject accessObject = accessInfo.get();
+      String username = accessObject.getString(USERNAME);
+      String password = accessObject.getString(PASSWORD);
+      if (!username.isEmpty() && !password.isEmpty()) {
+        return false;
+      } else {
+        errorMessage = "'Username and Password cannot be empty fields'";
+      }
+    } else {
+      errorMessage = "'Access Info cannot be an empty object'";
+    }
+    handler.handle(Future.failedFuture("Json Schema validation failed because " + errorMessage));
+    return true;
+  }
 
 }
