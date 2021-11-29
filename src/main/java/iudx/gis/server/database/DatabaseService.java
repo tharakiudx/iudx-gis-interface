@@ -22,4 +22,13 @@ public interface DatabaseService {
 
   @Fluent
   DatabaseService insertIntoDb(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  DatabaseService insertAdminDetails(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  DatabaseService updateAdminDetails(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  DatabaseService deleteAdminDetails(String resourceId, Handler<AsyncResult<JsonObject>> handler);
 }

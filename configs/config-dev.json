@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "zookeepers": [
+    "zookeeper"
+  ],
+  "clusterId": "iudx-gis-server-cluster",
+  "host": "rs.iudx.io",
+  "modules": [
+    {
+      "id": "iudx.gis.server.apiserver.ApiServerVerticle",
+      "ssl": true,
+      "production": false,
+      "keystore": "configs/keystore.jks",
+      "keystorePassword": "password",
+      "verticleInstances": 2,
+      "serverMode": "testing",
+      "authServerHost": "AUTH_VERTICLE",
+      "catServerHost": "CAT_VERTICLE",
+      "catServerPort": 443,
+      "resourceServerId": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/rs.iudx.io"
+    },
+    {
+      "id": "iudx.gis.server.database.DatabaseVerticle",
+      "verticleInstances": 2,
+      "databaseIP": "localhost",
+      "databasePort": 5432,
+      "dbUser": "postgres",
+      "dbPassword": "password",
+      "dbDatabaseName": "iudx",
+      "dbClientPoolSize": 25
+    }
+  ]
+}

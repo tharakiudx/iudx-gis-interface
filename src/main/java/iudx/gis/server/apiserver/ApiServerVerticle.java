@@ -147,7 +147,77 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(entityPathValidationHandler).handler(this::handleEntitiesPath)
         .failureHandler(validationsFailureHandler);
 
+    ValidationHandler adminCrudPathValidationHandler =
+        new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH);
+
+    router
+        .post(ADMIN_BASE_PATH)
+        .handler(adminCrudPathValidationHandler)
+        .handler(this::handlePostAdminPath)
+        .failureHandler(validationsFailureHandler);
+
+    router
+        .put(ADMIN_BASE_PATH)
+        .handler(adminCrudPathValidationHandler)
+        .handler(this::handlePutAdminPath)
+        .failureHandler(validationsFailureHandler);
+
+    router
+        .delete(ADMIN_BASE_PATH)
+        .handler(this::handleDeleteAdminPath)
+        .failureHandler(validationsFailureHandler);
+
     catalogueService = new CatalogueService(vertx, config());
+  }
+
+  private void handleDeleteAdminPath(RoutingContext routingContext) {
+    LOGGER.debug("Info:handleDeleteAdminPath method started.;");
+    HttpServerResponse response = routingContext.response();
+    String resourceId = routingContext.queryParams().get("id");
+
+    database.deleteAdminDetails(resourceId, ar -> {
+      if (ar.succeeded()) {
+        LOGGER.debug("Success: Delete operation successful");
+        handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
+      } else {
+        LOGGER.error("Fail: Delete operation Failed");
+        processBackendResponse(response, ar.cause().getMessage());
+      }
+    });
+  }
+
+  private void handlePutAdminPath(RoutingContext routingContext) {
+    LOGGER.debug("Info:handlePutAdminPath method started.;");
+    HttpServerResponse response = routingContext.response();
+
+    JsonObject requestBody = routingContext.getBodyAsJson();
+
+    database.updateAdminDetails(requestBody, ar -> {
+      if (ar.succeeded()) {
+        LOGGER.debug("Success: Update operation successful");
+        handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
+      } else {
+        LOGGER.error("Fail: Update operation Failed");
+        processBackendResponse(response, ar.cause().getMessage());
+      }
+    });
+  }
+
+  private void handlePostAdminPath(RoutingContext routingContext) {
+    LOGGER.debug("Info:handlePostAdminPath method started.;");
+    HttpServerResponse response = routingContext.response();
+
+    JsonObject requestBody = routingContext.getBodyAsJson();
+
+    database.insertAdminDetails(requestBody, ar -> {
+      if (ar.succeeded()) {
+        LOGGER.debug("Success: Insert operation successful");
+        handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
+      } else {
+        LOGGER.error("Fail: Insert operation Failed");
+        processBackendResponse(response, ar.cause().getMessage());
+      }
+    });
   }
 
   private void handleEntitiesPath(RoutingContext routingContext) {
