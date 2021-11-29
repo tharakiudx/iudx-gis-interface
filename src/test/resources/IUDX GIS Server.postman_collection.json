@@ -1,0 +1,127 @@
+{
+	"info": {
+		"_postman_id": "c67c4692-51bc-4acd-b16a-9df44d5a77ef",
+		"name": "IUDX GIS Server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "200 (success) Valid Method, JSON object",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"datakaveri.org/facec5182e3bf44cc3ac42b0b611263676d668a2/rs.iudx.org.in/agartala-point-of-interests/wifi\",\r\n    \"server-url\": \"localhost\",\r\n    \"server-port\": 1234,\r\n    \"isSecure\": true,\r\n    \"accessInfo\": {\r\n        \"username\": \"test\",\r\n        \"password\": \"test\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{host}}:{{port}}/{{admin_base_path}}",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{admin_base_path}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "405 (Method Not Allowed), Invalid API method",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"a\": b\r\n}",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{host}}:{{port}}/{{admin_base_path}}",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{admin_base_path}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "400 (Bad Request) Valid Method, Invalid JSON Schema",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"datakaveri.org/facec5182e3bf44cc3ac42b0b611263676d668a2/rs.iudx.org.in/agartala-point-of-interests/wifi\",\r\n    \"server-url\": \"localhost\",\r\n    \"server-port\": 1234,\r\n    \"isSecure\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{host}}:{{port}}/{{admin_base_path}}",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{admin_base_path}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 (Not Found) Endpoint not found",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"a\" : \"b\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{host}}:{{port}}/notfound-endpoint",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"notfound-endpoint"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

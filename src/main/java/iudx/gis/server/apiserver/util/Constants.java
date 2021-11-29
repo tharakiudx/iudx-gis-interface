@@ -19,6 +19,9 @@ public class Constants {
   public static final String NGSILD_BASE_PATH = "/ngsi-ld/v1";
   public static final String NGSILD_ENTITIES_URL = NGSILD_BASE_PATH + "/entities";
 
+  // admin API endpoints
+  public static final String ADMIN_BASE_PATH = "/admin/gis/serverInfo";
+
   /** API Documentation endpoint */
   public static final String ROUTE_STATIC_SPEC = "/apis/spec";
   public static final String ROUTE_DOC = "/apis";
