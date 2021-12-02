@@ -158,6 +158,10 @@ public class ApiServerVerticle extends AbstractVerticle {
         new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH_DELETE);
 
     router
+        .get(ADMIN_BASE_PATH)
+        .handler(this::handleGetAdminPath);
+
+    router
         .post(ADMIN_BASE_PATH)
         .handler(adminCrudPathValidationHandler)
         .handler(this::handlePostAdminPath)
@@ -183,6 +187,10 @@ public class ApiServerVerticle extends AbstractVerticle {
     });
 
     catalogueService = new CatalogueService(vertx, config());
+  }
+
+  private void handleGetAdminPath(RoutingContext routingContext) {
+    handleResponse(routingContext.response(), HttpStatusCode.METHOD_NOT_ALLOWED, METHOD_NOT_FOUND);
   }
 
   private void handleDeleteAdminPath(RoutingContext routingContext) {
@@ -308,7 +316,9 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
-    response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
+    response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(
+        generateResponse(HttpStatusCode.SUCCESS, SUCCESS, result).toString()
+    );
   }
 
   private void processBackendResponse(HttpServerResponse response, String failureMessage) {

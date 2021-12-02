@@ -13,6 +13,8 @@ public enum ResponseUrn {
   MISSING_TOKEN("urn:dx:gis:missingAuthorizationToken", "Token needed and not present"),
   INVALID_TOKEN("urn:dx:gis:invalidAuthorizationToken", "Token is invalid"),
 
+  RESOURCE_ALREADY_EXISTS("urn:dx:gis:resourceAlreadyExists", "Document of given ID already exists"),
+
   INVALID_PAYLOAD_FORMAT("urn:dx:gis:invalidPayloadFormat", "Invalid json format in post request [schema mismatch]"),
   RESOURCE_NOT_FOUND("urn:dx:gis:resourceNotFound", "Document of given id does not exist"),
   METHOD_NOT_FOUND("urn:dx:gis:MethodNotAllowed", "Method not allowed for given endpoint"),
