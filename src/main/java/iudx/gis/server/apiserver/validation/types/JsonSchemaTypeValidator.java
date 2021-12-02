@@ -28,10 +28,10 @@ public final class JsonSchemaTypeValidator implements Validator {
       schema.validateSync(value);
     } catch (ValidationException e) {
       LOGGER.error("Validation error :" + e.getMessage());
-      throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT, failureMessage(value.toString()));
+      throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT, e.getLocalizedMessage());
     } catch (NoSyncValidationException e) {
       LOGGER.error("Validation error :" + e.getMessage());
-      throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT, failureMessage(value.toString()));
+      throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT, e.getLocalizedMessage());
     }
     return true;
   }
