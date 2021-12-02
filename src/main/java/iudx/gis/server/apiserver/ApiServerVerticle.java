@@ -188,7 +188,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void handleDeleteAdminPath(RoutingContext routingContext) {
     LOGGER.debug("Info:handleDeleteAdminPath method started.;");
     HttpServerResponse response = routingContext.response();
-    String resourceId = routingContext.queryParams().get("id");
+    String resourceId = routingContext.queryParams().get(ID);
 
     database.deleteAdminDetails(resourceId, ar -> {
       if (ar.succeeded()) {
@@ -324,10 +324,15 @@ public class ApiServerVerticle extends AbstractVerticle {
       } else {
         urn = ResponseUrn.fromCode(type + "");
       }
-      // return urn in body
+      String errorMessage = json.getString(ERROR_MESSAGE);
       response.putHeader(CONTENT_TYPE, APPLICATION_JSON)
-          .setStatusCode(type)
-          .end(generateResponse(status, urn).toString());
+          .setStatusCode(type);
+      if (errorMessage==null || errorMessage.isEmpty()) {
+        response.end(generateResponse(status, urn).toString());
+      }
+      else {
+        response.end(generateResponse(status, urn, errorMessage).toString());
+      }
     } catch (DecodeException ex) {
       LOGGER.error("ERROR : Expecting Json from backend service [ jsonFormattingException ]");
       handleResponse(response, HttpStatusCode.BAD_REQUEST, BACKING_SERVICE_FORMAT);

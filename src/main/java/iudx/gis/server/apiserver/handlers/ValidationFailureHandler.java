@@ -28,7 +28,7 @@ public class ValidationFailureHandler implements Handler<RoutingContext> {
       JsonObject response = new RestResponse.Builder()
           .withType(exception.getUrn().getUrn())
           .withTitle(code.getDescription())
-          .withMessage(code.getDescription())
+          .withMessage(exception.getLocalizedMessage())
           .build()
           .toJson();
 

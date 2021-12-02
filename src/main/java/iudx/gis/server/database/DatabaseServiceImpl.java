@@ -1,6 +1,13 @@
 package iudx.gis.server.database;
 
 import static iudx.gis.server.database.util.Constants.*;
+
+import iudx.gis.server.apiserver.ApiServerVerticle;
+import iudx.gis.server.apiserver.exceptions.DxRuntimeException;
+import iudx.gis.server.apiserver.response.ResponseUrn;
+import iudx.gis.server.apiserver.util.HttpStatusCode;
+import iudx.gis.server.database.util.Util;
+import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import io.vertx.core.AsyncResult;
@@ -135,7 +142,12 @@ public class DatabaseServiceImpl implements DatabaseService {
     pgSQLClient.executeAsync(searchQuery)
         .compose(ar -> {
           if (ar.size() < 1) {
-            return Future.failedFuture("Given resource ID does not exist in DB");
+            return Future.failedFuture(Util.getResponse(
+                HttpStatusCode.BAD_REQUEST,
+                ResponseUrn.RESOURCE_NOT_FOUND.getUrn(),
+                "Given resource ID does not exist in DB")
+                .toString()
+            );
           }
           return pgSQLClient.executeAsync(deleteQuery);
         })
@@ -194,16 +206,20 @@ public class DatabaseServiceImpl implements DatabaseService {
       JsonObject accessObject = accessInfo.get();
       String username = accessObject.getString(USERNAME);
       String password = accessObject.getString(PASSWORD);
-      if (!username.isEmpty() && !password.isEmpty()) {
-        return false;
+      if (username==null || username.isEmpty() || password==null || password.isEmpty()) {
+        errorMessage = "Username and Password cannot be empty fields";
       } else {
-        errorMessage = "'Username and Password cannot be empty fields'";
+        return false;
       }
     } else {
-      errorMessage = "'Access Info cannot be an empty object'";
+      errorMessage = "Access Info cannot be an empty object";
     }
-    handler.handle(Future.failedFuture("Json Schema validation failed because " + errorMessage));
+    handler.handle(Future.failedFuture(Util.getResponse(
+        HttpStatusCode.BAD_REQUEST,
+        ResponseUrn.INVALID_PAYLOAD_FORMAT.getUrn(),
+        errorMessage)
+        .toString()
+    ));
     return true;
   }
-
 }
