@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS gis
    url varchar NOT NULL,
    isOpen BOOLEAN NOT NULL,
    api varchar NOT NULL,
-   port NUMBER NOT NULL,
+   port integer NOT NULL,
    created_at timestamp without time zone NOT NULL,
    modified_at timestamp without time zone NOT NULL,
    CONSTRAINT gis_pk PRIMARY KEY (_id)
