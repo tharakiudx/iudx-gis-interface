@@ -18,23 +18,22 @@ public class Constants {
   // NGSI-LD endpoints
   public static final String NGSILD_BASE_PATH = "/ngsi-ld/v1";
   public static final String NGSILD_ENTITIES_URL = NGSILD_BASE_PATH + "/entities";
-
+  // path regex
+  public static final String ENTITITES_URL_REGEX = NGSILD_ENTITIES_URL + "(.*)";
   // admin API endpoints
   public static final String ADMIN_BASE_PATH = "/admin/gis/serverInfo";
-
   /** API Documentation endpoint */
   public static final String ROUTE_STATIC_SPEC = "/apis/spec";
   public static final String ROUTE_DOC = "/apis";
-
   public static final List<String> bypassEndpoint = List.of(ROUTE_STATIC_SPEC, ROUTE_DOC);
-  public static final List<String> openEndPoints = List.of("/ngsi-ld/v1/temporal/entities",
-      "/ngsi-ld/v1/entities", "/ngsi-ld/v1/entityOperations/query");
-
-  // path regex
-  public static final String ENTITITES_URL_REGEX = NGSILD_ENTITIES_URL + "(.*)";
-
+  public static final List<String> openEndPoints =
+      List.of(
+          "/ngsi-ld/v1/temporal/entities",
+          "/ngsi-ld/v1/entities",
+          "/ngsi-ld/v1/entityOperations/query");
   /** Accept Headers and CORS */
   public static final String MIME_APPLICATION_JSON = "application/json";
+
   public static final String MIME_TEXT_HTML = "text/html";
 
   // ngsi-ld/IUDX query paramaters
@@ -43,6 +42,8 @@ public class Constants {
   public static final String NGSILDQUERY_TYPE = "type";
   public static final String IUDXQUERY_OPTIONS = "options";
   public static final String NGSILDQUERY_ENTITIES = "entities";
+  public static final String USER_ID = "userid";
+  public static final String API = "api";
 
   // Header params
   public static final String HEADER_TOKEN = "token";
@@ -75,7 +76,6 @@ public class Constants {
   public static final String JSON_RESOURCE_GROUP = "resourceGroup";
   public static final String JSON_RESOURCE_NAME = "resourceName";
 
-
   // messages (Error, Exception, messages..)
   public static final String MSG_INVALID_PARAM = "Invalid parameter in request.";
   public static final String MSG_PARAM_DECODE_ERROR = "Error while decoding query params.";
@@ -100,14 +100,12 @@ public class Constants {
   // Validations
   public static final int VALIDATION_ID_MIN_LEN = 0;
   public static final int VALIDATION_ID_MAX_LEN = 512;
-  public static final String VALIDATION_ID_PATTERN = ".*";// TODO : create a regex for IUDX ID
-                                                          // pattern
+  public static final String VALIDATION_ID_PATTERN = ".*"; // TODO : create a regex for IUDX ID
+  // pattern
   public static final int VALIDATION_MAX_ATTRS = 5;
   public static final int VALIDATION_MAX_DAYS_INTERVAL_ALLOWED = 10;
   public static final int VALIDATION_COORDINATE_PRECISION_ALLOWED = 6;
   public static final int VALIDATIONS_MAX_ATTR_LENGTH = 100;
   public static final int VALIDATION_ALLOWED_COORDINATES = 10;
   public static final List<String> VALIDATION_ALLOWED_HEADERS = List.of("token", "options");
-
-
 }

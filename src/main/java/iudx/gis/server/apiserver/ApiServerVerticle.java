@@ -5,6 +5,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
+import io.vertx.core.Promise;
 import io.vertx.core.http.*;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
@@ -25,10 +26,12 @@ import iudx.gis.server.apiserver.util.RequestType;
 import iudx.gis.server.apiserver.handlers.ValidationFailureHandler;
 import iudx.gis.server.authenticate.AuthenticatorService;
 import iudx.gis.server.database.DatabaseService;
+import iudx.gis.server.metering.MeteringService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import org.checkerframework.checker.units.qual.A;
 
 import static iudx.gis.server.apiserver.util.Constants.*;
 
@@ -38,6 +41,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   /** Service addresses */
   private static final String DATABASE_SERVICE_ADDRESS = "iudx.gis.database.service";
   private static final String AUTH_SERVICE_ADDRESS = "iudx.gis.authentication.service";
+  public static final String METERING_SERVICE_ADDRESS="iudx.gis.metering.service";
 
   private HttpServer server;
   private Router router;
@@ -46,6 +50,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private String keystore;
   private String keystorePassword;
   private CatalogueService catalogueService;
+  private MeteringService meteringService;
 
   private DatabaseService database;
   private AuthenticatorService authenticator;
@@ -136,6 +141,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     database = DatabaseService.createProxy(vertx, DATABASE_SERVICE_ADDRESS);
     authenticator = AuthenticatorService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
+    meteringService=MeteringService.createProxy(vertx,METERING_SERVICE_ADDRESS);
 
     ValidationHandler entityQueryValidationHandler =
         new ValidationHandler(vertx, RequestType.ENTITY_QUERY);
@@ -308,6 +314,7 @@ public class ApiServerVerticle extends AbstractVerticle {
       if (handler.succeeded()) {
         LOGGER.info("Success: Search Success");
         handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result().toString());
+        LOGGER.info("CONTEXT "+context);
       } else if (handler.failed()) {
         LOGGER.error("Fail: Search Fail");
         processBackendResponse(response, handler.cause().getMessage());
@@ -408,4 +415,28 @@ public class ApiServerVerticle extends AbstractVerticle {
     }
     return true;
   }
+
+  private Future<Void> updateAuditTable(RoutingContext context) {
+    Promise<Void> promise = Promise.promise();
+    JsonObject authInfo = (JsonObject) context.data().get("authInfo");
+
+    JsonObject request = new JsonObject();
+    request.put(USER_ID, authInfo.getValue(USER_ID));
+    request.put(ID, authInfo.getValue(ID));
+    request.put(API, authInfo.getValue(API_ENDPOINT));
+    meteringService.executeWriteQuery(
+        request,
+        handler -> {
+          if (handler.succeeded()) {
+            LOGGER.info("audit table updated");
+            promise.complete();
+          } else {
+            LOGGER.error("failed to update audit table");
+            promise.complete();
+          }
+        });
+
+    return promise.future();
+  }
+
 }
