@@ -28,6 +28,16 @@
       "dbPassword": "password",
       "dbDatabaseName": "iudx",
       "dbClientPoolSize": 25
+    },
+    {
+      "id": "iudx.gis.server.metering.MeteringVerticle",
+      "verticleInstances": 1,
+      "meteringDatabaseIP": "",
+      "meteringDatabasePort": 0,
+      "meteringDatabaseName": "",
+      "meteringDatabaseUserName": "",
+      "meteringDatabasePassword": "",
+      "meteringPoolSize": 2
     }
   ]
 }

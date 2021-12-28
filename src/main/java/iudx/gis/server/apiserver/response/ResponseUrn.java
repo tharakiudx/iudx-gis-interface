@@ -7,6 +7,7 @@ public enum ResponseUrn {
   INVALID_ATTR_PARAM("urn:dx:gis:invalidAttributeParam", "Invalid attribute param"),
   INVALID_ATTR_VALUE("urn:dx:gis:invalidAttributeValue", "Invalid attribute value"),
   INVALID_OPERATION("urn:dx:gis:invalidOperation", "Invalid operation"),
+  BAD_REQUEST_URN("urn:dx:rs:badRequest","bad request parameter"),
   UNAUTHORIZED_ENDPOINT("urn:dx:gis:unauthorizedEndpoint", "Access to endpoint is not available"),
   UNAUTHORIZED_RESOURCE("urn:dx:gis:unauthorizedResource", "Access to resource is not available"),
   EXPIRED_TOKEN("urn:dx:gis:expiredAuthorizationToken", "Token has expired"),
