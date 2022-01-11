@@ -49,6 +49,7 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.DecodeException;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.JksOptions;
 import io.vertx.ext.web.Router;
@@ -445,7 +446,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     return new JsonObject()
         .put(JSON_TYPE, urn.getUrn())
         .put(JSON_TITLE, statusCode.getDescription())
-        .put(JSON_RESULT, message)
+        .put(JSON_RESULT, new JsonArray().add(message))
         .toString();
   }
 
