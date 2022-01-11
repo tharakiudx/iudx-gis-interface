@@ -12,7 +12,7 @@ import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.client.predicate.ResponsePredicate;
-import iudx.gis.server.authenticate.Constants;
+import iudx.gis.server.authenticator.Constants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,7 +40,7 @@ public class CatalogueService {
   public CatalogueService(Vertx vertx, JsonObject config) {
     this.vertx = vertx;
     catHost = config.getString("catServerHost");
-    catPort = Integer.parseInt(config.getString("catServerPort"));
+    catPort = config.getInteger("catServerPort");
     catSearchPath = Constants.CAT_RSG_PATH;
     catItemPath = Constants.CAT_ITEM_PATH;
 
@@ -121,8 +121,6 @@ public class CatalogueService {
     String groupId = id.substring(0, id.lastIndexOf("/"));
     catWebClient.get(catPort, catHost, catItemPath).addQueryParam("id", id).send(catHandler -> {
       if (catHandler.succeeded()) {
-        System.out.println("++++++++++++++");
-        System.out.println(id);
         JsonArray response = catHandler.result().bodyAsJsonObject().getJsonArray("results");
         System.out.println(response);
         response.forEach(json -> {
@@ -166,8 +164,9 @@ public class CatalogueService {
         .expect(ResponsePredicate.JSON).send(responseHandler -> {
           if (responseHandler.succeeded()) {
             HttpResponse<Buffer> response = responseHandler.result();
+            LOGGER.info("RES "+ response.bodyAsString());
             JsonObject responseBody = response.bodyAsJsonObject();
-            if (responseBody.getString("status").equalsIgnoreCase("success")
+            if (responseBody.getString("type").equalsIgnoreCase("urn:dx:cat:Success")
                 && responseBody.getInteger("totalHits") > 0) {
               if(responseBody.getJsonArray("results").getJsonObject(0).getJsonArray("type").contains("iudx:Resource")) {
                 promise.complete(true);

@@ -1,12 +1,52 @@
 package iudx.gis.server.apiserver;
 
+import static iudx.gis.server.apiserver.response.ResponseUrn.BACKING_SERVICE_FORMAT;
+import static iudx.gis.server.apiserver.response.ResponseUrn.INVALID_ATTR_PARAM;
+import static iudx.gis.server.apiserver.response.ResponseUrn.METHOD_NOT_FOUND;
+import static iudx.gis.server.apiserver.response.ResponseUrn.SUCCESS;
+import static iudx.gis.server.apiserver.response.ResponseUrn.YET_NOT_IMPLEMENTED;
+import static iudx.gis.server.apiserver.util.Constants.ADMIN_BASE_PATH;
+import static iudx.gis.server.apiserver.util.Constants.API;
+import static iudx.gis.server.apiserver.util.Constants.API_ENDPOINT;
+import static iudx.gis.server.apiserver.util.Constants.APPLICATION_JSON;
+import static iudx.gis.server.apiserver.util.Constants.CONTENT_TYPE;
+import static iudx.gis.server.apiserver.util.Constants.ERROR_MESSAGE;
+import static iudx.gis.server.apiserver.util.Constants.HEADER_ACCEPT;
+import static iudx.gis.server.apiserver.util.Constants.HEADER_ALLOW_ORIGIN;
+import static iudx.gis.server.apiserver.util.Constants.HEADER_CONTENT_LENGTH;
+import static iudx.gis.server.apiserver.util.Constants.HEADER_CONTENT_TYPE;
+import static iudx.gis.server.apiserver.util.Constants.HEADER_HOST;
+import static iudx.gis.server.apiserver.util.Constants.HEADER_ORIGIN;
+import static iudx.gis.server.apiserver.util.Constants.HEADER_REFERER;
+import static iudx.gis.server.apiserver.util.Constants.HEADER_TOKEN;
+import static iudx.gis.server.apiserver.util.Constants.ID;
+import static iudx.gis.server.apiserver.util.Constants.JSON_DETAIL;
+import static iudx.gis.server.apiserver.util.Constants.JSON_DOMAIN;
+import static iudx.gis.server.apiserver.util.Constants.JSON_ID;
+import static iudx.gis.server.apiserver.util.Constants.JSON_INSTANCEID;
+import static iudx.gis.server.apiserver.util.Constants.JSON_RESOURCE_GROUP;
+import static iudx.gis.server.apiserver.util.Constants.JSON_RESOURCE_NAME;
+import static iudx.gis.server.apiserver.util.Constants.JSON_RESOURCE_SERVER;
+import static iudx.gis.server.apiserver.util.Constants.JSON_TITLE;
+import static iudx.gis.server.apiserver.util.Constants.JSON_TYPE;
+import static iudx.gis.server.apiserver.util.Constants.JSON_USERSHA;
+import static iudx.gis.server.apiserver.util.Constants.MIME_APPLICATION_JSON;
+import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_ID;
+import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_IDPATTERN;
+import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
+import static iudx.gis.server.apiserver.util.Constants.USER_ID;
+
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
-import io.vertx.core.http.*;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.JksOptions;
@@ -14,34 +54,43 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
+import iudx.gis.server.apiserver.handlers.AuthHandler;
+import iudx.gis.server.apiserver.handlers.ValidationFailureHandler;
 import iudx.gis.server.apiserver.handlers.ValidationHandler;
 import iudx.gis.server.apiserver.response.ResponseType;
-import static iudx.gis.server.apiserver.response.ResponseUrn.*;
-
 import iudx.gis.server.apiserver.response.ResponseUrn;
-import iudx.gis.server.apiserver.response.RestResponse;
 import iudx.gis.server.apiserver.service.CatalogueService;
 import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.apiserver.util.RequestType;
-import iudx.gis.server.apiserver.handlers.ValidationFailureHandler;
-import iudx.gis.server.authenticate.AuthenticatorService;
+import iudx.gis.server.authenticator.AuthenticationService;
 import iudx.gis.server.database.DatabaseService;
 import iudx.gis.server.metering.MeteringService;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
-import org.checkerframework.checker.units.qual.A;
-
-import static iudx.gis.server.apiserver.util.Constants.*;
-
 public class ApiServerVerticle extends AbstractVerticle {
+  public static final String METERING_SERVICE_ADDRESS = "iudx.gis.metering.service";
   private static final Logger LOGGER = LogManager.getLogger(ApiServerVerticle.class);
-
   /** Service addresses */
   private static final String DATABASE_SERVICE_ADDRESS = "iudx.gis.database.service";
+
   private static final String AUTH_SERVICE_ADDRESS = "iudx.gis.authentication.service";
-  public static final String METERING_SERVICE_ADDRESS="iudx.gis.metering.service";
+  // private ParamsValidator validator;
+  private static final Set<String> validParams = new HashSet<String>();
+  private static final Set<String> validHeaders = new HashSet<String>();
+
+  static {
+    validParams.add(NGSILDQUERY_ID);
+    validParams.add(NGSILDQUERY_IDPATTERN);
+    validHeaders.add(HEADER_TOKEN);
+    validHeaders.add("User-Agent");
+    validHeaders.add("Content-Type");
+  }
 
   private HttpServer server;
   private Router router;
@@ -51,19 +100,8 @@ public class ApiServerVerticle extends AbstractVerticle {
   private String keystorePassword;
   private CatalogueService catalogueService;
   private MeteringService meteringService;
-
   private DatabaseService database;
-  private AuthenticatorService authenticator;
-  // private ParamsValidator validator;
-  private static Set<String> validParams = new HashSet<String>();
-  private static Set<String> validHeaders = new HashSet<String>();
-  static {
-    validParams.add(NGSILDQUERY_ID);
-    validParams.add(NGSILDQUERY_IDPATTERN);
-    validHeaders.add(HEADER_TOKEN);
-    validHeaders.add("User-Agent");
-    validHeaders.add("Content-Type");
-  }
+  private AuthenticationService authenticator;
 
   @Override
   public void start() throws Exception {
@@ -84,18 +122,23 @@ public class ApiServerVerticle extends AbstractVerticle {
     allowedMethods.add(HttpMethod.PUT);
 
     router = Router.router(vertx);
+    router
+        .route()
+        .handler(
+            CorsHandler.create("*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods));
 
-    router = Router.router(vertx);
-    router.route().handler(
-        CorsHandler.create("*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods));
-
-    router.route().handler(requestHandler -> {
-      requestHandler.response()
-          .putHeader("Cache-Control", "no-cache, no-store,  must-revalidate,max-age=0")
-          .putHeader("Pragma", "no-cache").putHeader("Expires", "0")
-          .putHeader("X-Content-Type-Options", "nosniff");
-      requestHandler.next();
-    });
+    router
+        .route()
+        .handler(
+            requestHandler -> {
+              requestHandler
+                  .response()
+                  .putHeader("Cache-Control", "no-cache, no-store,  must-revalidate,max-age=0")
+                  .putHeader("Pragma", "no-cache")
+                  .putHeader("Expires", "0")
+                  .putHeader("X-Content-Type-Options", "nosniff");
+              requestHandler.next();
+            });
 
     router.route().handler(BodyHandler.create());
 
@@ -117,7 +160,8 @@ public class ApiServerVerticle extends AbstractVerticle {
 
       /* Setup the HTTPs server properties, APIs and port. */
 
-      serverOptions.setSsl(true)
+      serverOptions
+          .setSsl(true)
           .setKeyStoreOptions(new JksOptions().setPath(keystore).setPassword(keystorePassword));
 
     } else {
@@ -140,21 +184,26 @@ public class ApiServerVerticle extends AbstractVerticle {
     /* Get a handler for the Service Discovery interface. */
 
     database = DatabaseService.createProxy(vertx, DATABASE_SERVICE_ADDRESS);
-    authenticator = AuthenticatorService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
-    meteringService=MeteringService.createProxy(vertx,METERING_SERVICE_ADDRESS);
+    authenticator = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
+    meteringService = MeteringService.createProxy(vertx, METERING_SERVICE_ADDRESS);
 
     ValidationHandler entityQueryValidationHandler =
         new ValidationHandler(vertx, RequestType.ENTITY_QUERY);
     ValidationFailureHandler validationsFailureHandler = new ValidationFailureHandler();
 
-    router.get(NGSILD_ENTITIES_URL).handler(entityQueryValidationHandler)
-        .handler(this::handleEntitiesQuery).failureHandler(validationsFailureHandler);
+    router
+        .get(NGSILD_ENTITIES_URL)
+        .handler(entityQueryValidationHandler)
+        .handler(AuthHandler.create(vertx))
+        .handler(this::handleEntitiesQuery)
+        .failureHandler(validationsFailureHandler);
 
     ValidationHandler entityPathValidationHandler =
         new ValidationHandler(vertx, RequestType.ENTITY_PATH);
     router
         .get(NGSILD_ENTITIES_URL + "/:domain/:userSha/:resourceServer/:resourceGroup/:resourceName")
-        .handler(entityPathValidationHandler).handler(this::handleEntitiesPath)
+        .handler(entityPathValidationHandler)
+        .handler(this::handleEntitiesPath)
         .failureHandler(validationsFailureHandler);
 
     ValidationHandler adminCrudPathValidationHandler =
@@ -163,9 +212,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationHandler adminCrudPathIdValidationHandler =
         new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH_DELETE);
 
-    router
-        .get(ADMIN_BASE_PATH)
-        .handler(this::handleGetAdminPath);
+    router.get(ADMIN_BASE_PATH).handler(this::handleGetAdminPath);
 
     router
         .post(ADMIN_BASE_PATH)
@@ -185,12 +232,17 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(this::handleDeleteAdminPath)
         .failureHandler(validationsFailureHandler);
 
-    router.route().last().handler(requestHandler -> {
-      HttpServerResponse response = requestHandler.response();
-      response.putHeader(HEADER_CONTENT_TYPE, MIME_APPLICATION_JSON)
-          .setStatusCode(404)
-          .end(generateResponse(HttpStatusCode.NOT_FOUND, YET_NOT_IMPLEMENTED).toString());
-    });
+    router
+        .route()
+        .last()
+        .handler(
+            requestHandler -> {
+              HttpServerResponse response = requestHandler.response();
+              response
+                  .putHeader(HEADER_CONTENT_TYPE, MIME_APPLICATION_JSON)
+                  .setStatusCode(404)
+                  .end(generateResponse(HttpStatusCode.NOT_FOUND, YET_NOT_IMPLEMENTED));
+            });
 
     catalogueService = new CatalogueService(vertx, config());
   }
@@ -204,15 +256,17 @@ public class ApiServerVerticle extends AbstractVerticle {
     HttpServerResponse response = routingContext.response();
     String resourceId = routingContext.queryParams().get(ID);
 
-    database.deleteAdminDetails(resourceId, ar -> {
-      if (ar.succeeded()) {
-        LOGGER.debug("Success: Delete operation successful");
-        handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
-      } else {
-        LOGGER.error("Fail: Delete operation Failed");
-        processBackendResponse(response, ar.cause().getMessage());
-      }
-    });
+    database.deleteAdminDetails(
+        resourceId,
+        ar -> {
+          if (ar.succeeded()) {
+            LOGGER.debug("Success: Delete operation successful");
+            handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
+          } else {
+            LOGGER.error("Fail: Delete operation Failed");
+            processBackendResponse(response, ar.cause().getMessage());
+          }
+        });
   }
 
   private void handlePutAdminPath(RoutingContext routingContext) {
@@ -221,15 +275,17 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     JsonObject requestBody = routingContext.getBodyAsJson();
 
-    database.updateAdminDetails(requestBody, ar -> {
-      if (ar.succeeded()) {
-        LOGGER.debug("Success: Update operation successful");
-        handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
-      } else {
-        LOGGER.error("Fail: Update operation Failed");
-        processBackendResponse(response, ar.cause().getMessage());
-      }
-    });
+    database.updateAdminDetails(
+        requestBody,
+        ar -> {
+          if (ar.succeeded()) {
+            LOGGER.debug("Success: Update operation successful");
+            handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
+          } else {
+            LOGGER.error("Fail: Update operation Failed");
+            processBackendResponse(response, ar.cause().getMessage());
+          }
+        });
   }
 
   private void handlePostAdminPath(RoutingContext routingContext) {
@@ -238,15 +294,17 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     JsonObject requestBody = routingContext.getBodyAsJson();
 
-    database.insertAdminDetails(requestBody, ar -> {
-      if (ar.succeeded()) {
-        LOGGER.debug("Success: Insert operation successful");
-        handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
-      } else {
-        LOGGER.error("Fail: Insert operation Failed");
-        processBackendResponse(response, ar.cause().getMessage());
-      }
-    });
+    database.insertAdminDetails(
+        requestBody,
+        ar -> {
+          if (ar.succeeded()) {
+            LOGGER.debug("Success: Insert operation successful");
+            handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
+          } else {
+            LOGGER.error("Fail: Insert operation Failed");
+            processBackendResponse(response, ar.cause().getMessage());
+          }
+        });
   }
 
   private void handleEntitiesPath(RoutingContext routingContext) {
@@ -274,7 +332,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     // check Catalogue Cache before search
     Future<Boolean> isIdPresent = catalogueService.isItemExist(id);
     isIdPresent
-        .onSuccess(handler -> executeSearchQuery(json, response))
+        .onSuccess(handler -> executeSearchQuery(routingContext, json, response))
         .onFailure(handler -> processBackendResponse(response, handler.getCause().getMessage()));
   }
 
@@ -287,20 +345,13 @@ public class ApiServerVerticle extends AbstractVerticle {
     /* Handles HTTP response from server to client */
     HttpServerResponse response = routingContext.response();
     // get query paramaters
-    MultiMap params = getQueryParams(routingContext, response).get();
-    MultiMap headerParams = request.headers();
-    // validate request parameters
-    if (validateParams(params)) {
-      JsonObject json = new JsonObject();
-      json.put(ID, params.entries().get(0).toString());
-      // check Catalogue Cache before calling search
-      Future<Boolean> isIdPresent =
-          catalogueService.isIdPresent(params.entries().get(0).toString());
-      isIdPresent.onComplete(handler -> executeSearchQuery(json, response));
-    } else {
-      LOGGER.error("Fail: Validation failed");
-      handleResponse(response, HttpStatusCode.BAD_REQUEST, RESOURCE_NOT_FOUND);
-    }
+    String id = request.getParam(ID);
+    JsonObject json = new JsonObject();
+    json.put(ID, id);
+    Future<Boolean> isIdPresent = catalogueService.isItemExist(id);
+    isIdPresent
+        .onSuccess(handler -> executeSearchQuery(routingContext, json, response))
+        .onFailure(handler -> processBackendResponse(response, handler.getCause().getMessage()));
   }
 
   /**
@@ -309,23 +360,28 @@ public class ApiServerVerticle extends AbstractVerticle {
    * @param json valid json query
    * @param response
    */
-  private void executeSearchQuery(JsonObject json, HttpServerResponse response) {
-    database.searchQuery(json, handler -> {
-      if (handler.succeeded()) {
-        LOGGER.info("Success: Search Success");
-        handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result().toString());
-        LOGGER.info("CONTEXT "+context);
-      } else if (handler.failed()) {
-        LOGGER.error("Fail: Search Fail");
-        processBackendResponse(response, handler.cause().getMessage());
-      }
-    });
+  private void executeSearchQuery(
+      RoutingContext context, JsonObject json, HttpServerResponse response) {
+    database.searchQuery(
+        json,
+        handler -> {
+          if (handler.succeeded()) {
+            LOGGER.info("Success: Search Success");
+            Future.future(fu -> updateAuditTable(context));
+            handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result().toString());
+            LOGGER.info("CONTEXT " + context);
+          } else if (handler.failed()) {
+            LOGGER.error("Fail: Search Fail");
+            processBackendResponse(response, handler.cause().getMessage());
+          }
+        });
   }
 
   private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
-    response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(
-        generateResponse(HttpStatusCode.SUCCESS, SUCCESS, result).toString()
-    );
+    response
+        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+        .setStatusCode(statusCode)
+        .end(generateResponse(HttpStatusCode.SUCCESS, SUCCESS, result));
   }
 
   private void processBackendResponse(HttpServerResponse response, String failureMessage) {
@@ -342,49 +398,44 @@ public class ApiServerVerticle extends AbstractVerticle {
         urn = ResponseUrn.fromCode(type + "");
       }
       String errorMessage = json.getString(ERROR_MESSAGE);
-      response.putHeader(CONTENT_TYPE, APPLICATION_JSON)
-          .setStatusCode(type);
-      if (errorMessage==null || errorMessage.isEmpty()) {
-        response.end(generateResponse(status, urn).toString());
-      }
-      else {
-        response.end(generateResponse(status, urn, errorMessage).toString());
+      response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(type);
+      if (errorMessage == null || errorMessage.isEmpty()) {
+        response.end(generateResponse(status, urn));
+      } else {
+        response.end(generateResponse(status, urn, errorMessage));
       }
     } catch (DecodeException ex) {
       LOGGER.error("ERROR : Expecting Json from backend service [ jsonFormattingException ]");
       handleResponse(response, HttpStatusCode.BAD_REQUEST, BACKING_SERVICE_FORMAT);
     }
-
   }
 
   private void handleResponse(HttpServerResponse response, HttpStatusCode code, ResponseUrn urn) {
     handleResponse(response, code, urn, code.getDescription());
   }
 
-  private void handleResponse(HttpServerResponse response, HttpStatusCode statusCode,
-                              ResponseUrn urn, String message) {
-    response.putHeader(CONTENT_TYPE, APPLICATION_JSON)
+  private void handleResponse(
+      HttpServerResponse response, HttpStatusCode statusCode, ResponseUrn urn, String message) {
+    response
+        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
         .setStatusCode(statusCode.getValue())
-        .end(generateResponse(statusCode, urn, message).toString());
+        .end(generateResponse(statusCode, urn, message));
   }
 
-
-  private JsonObject generateResponse(HttpStatusCode statusCode, ResponseUrn urn) {
+  private String generateResponse(HttpStatusCode statusCode, ResponseUrn urn) {
     return generateResponse(statusCode, urn, statusCode.getDescription());
   }
 
-  private JsonObject generateResponse(HttpStatusCode statusCode, ResponseUrn urn, String message) {
-    String type = urn.getUrn();
-    return new RestResponse.Builder()
-        .withType(type)
-        .withTitle(statusCode.getDescription())
-        .withMessage(message)
-        .build().toJson();
-
+  private String generateResponse(HttpStatusCode statusCode, ResponseUrn urn, String message) {
+    return new JsonObject()
+        .put(JSON_TYPE, urn.getUrn())
+        .put(JSON_TITLE, statusCode.getDescription())
+        .put(JSON_DETAIL, message)
+        .toString();
   }
 
-  private Optional<MultiMap> getQueryParams(RoutingContext routingContext,
-      HttpServerResponse response) {
+  private Optional<MultiMap> getQueryParams(
+      RoutingContext routingContext, HttpServerResponse response) {
     MultiMap queryParams = null;
     try {
       queryParams = MultiMap.caseInsensitiveMultiMap();
@@ -396,11 +447,10 @@ public class ApiServerVerticle extends AbstractVerticle {
         queryParams.add(entry.getKey(), entry.getValue());
       }
     } catch (IllegalArgumentException ex) {
-      response.putHeader(CONTENT_TYPE, APPLICATION_JSON)
+      response
+          .putHeader(CONTENT_TYPE, APPLICATION_JSON)
           .setStatusCode(ResponseType.BadRequestData.getCode())
-          .end(generateResponse(HttpStatusCode.BAD_REQUEST, INVALID_ATTR_PARAM).toString());
-
-
+          .end(generateResponse(HttpStatusCode.BAD_REQUEST, INVALID_ATTR_PARAM));
     }
     return Optional.of(queryParams);
   }
@@ -438,5 +488,4 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     return promise.future();
   }
-
 }

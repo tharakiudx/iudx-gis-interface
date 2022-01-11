@@ -31,6 +31,7 @@ public class Constants {
           "/ngsi-ld/v1/temporal/entities",
           "/ngsi-ld/v1/entities",
           "/ngsi-ld/v1/entityOperations/query");
+  public static String PG_SERVICE_ADD="iudx.rs.pgsql.service";
   /** Accept Headers and CORS */
   public static final String MIME_APPLICATION_JSON = "application/json";
 
@@ -75,37 +76,22 @@ public class Constants {
   public static final String JSON_RESOURCE_SERVER = "resourceServer";
   public static final String JSON_RESOURCE_GROUP = "resourceGroup";
   public static final String JSON_RESOURCE_NAME = "resourceName";
+  public static final String EXPIRY = "expiry";
+  public static final String IID = "iid";
+
 
   // messages (Error, Exception, messages..)
-  public static final String MSG_INVALID_PARAM = "Invalid parameter in request.";
-  public static final String MSG_PARAM_DECODE_ERROR = "Error while decoding query params.";
-  public static final String MSG_INVALID_EXCHANGE_NAME = "Invalid exchange name";
-  public static final String MSG_INVALID_QUEUE_NAME = "Invalid queue name";
-  public static final String MSG_INVALID_VHOST_NAME = "Invalid vhost name";
-  public static final String MSG_INVALID_NAME = "Invalid name.";
-  public static final String MSG_FAILURE = "failure";
-  public static final String MSG_FAILURE_NO_VHOST = "No vhosts found";
-  public static final String MSG_FAILURE_VHOST_EXIST = "vHost already exists";
-  public static final String MSG_FAILURE_EXCHANGE_NOT_FOUND = "Exchange not found";
-  public static final String MSG_FAILURE_QUEUE_NOT_EXIST = "Queue does not exist";
-  public static final String MSG_FAILURE_QUEUE_EXIST = "Queue already exists";
-  public static final String MSG_EXCHANGE_EXIST = "Exchange already exists";
-  public static final String MSG_SUB_TYPE_NOT_FOUND = "Subscription type not present in body";
-  public static final String MSG_SUB_INVALID_TOKEN = "Invalid/no token found in header";
   public static final String MSG_BAD_QUERY = "Bad query";
 
-  // results
-  public static final String SUCCCESS = "success";
-
   // Validations
-  public static final int VALIDATION_ID_MIN_LEN = 0;
   public static final int VALIDATION_ID_MAX_LEN = 512;
-  public static final String VALIDATION_ID_PATTERN = ".*"; // TODO : create a regex for IUDX ID
-  // pattern
-  public static final int VALIDATION_MAX_ATTRS = 5;
-  public static final int VALIDATION_MAX_DAYS_INTERVAL_ALLOWED = 10;
-  public static final int VALIDATION_COORDINATE_PRECISION_ALLOWED = 6;
-  public static final int VALIDATIONS_MAX_ATTR_LENGTH = 100;
-  public static final int VALIDATION_ALLOWED_COORDINATES = 10;
-  public static final List<String> VALIDATION_ALLOWED_HEADERS = List.of("token", "options");
+  /** Accept Headers and CORS */
+  public static final String DOMAIN = "domain";
+  public static final String USERSHA = "userSha";
+  public static final String JSON_ALIAS = "alias";
+  public static final String RESOURCE_SERVER = "resourceServer";
+  public static final String RESOURCE_GROUP = "resourceGroup";
+  public static final String RESOURCE_NAME = "resourceName";
+  public static final String AUTH_INFO = "authInfo";
+
 }

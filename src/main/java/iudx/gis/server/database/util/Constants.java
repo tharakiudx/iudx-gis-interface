@@ -16,7 +16,7 @@ public class Constants {
   public static final String USERNAME = "username";
   public static final String PASSWORD = "password";
 
-  public static final String TABLE_NAME = "gif";
+  public static final String TABLE_NAME = "gis";
 
   public static final String SELECT_ADMIN_DETAILS_QUERY =
       "SELECT * FROM " + TABLE_NAME + " WHERE id = '$1'";
