@@ -95,10 +95,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
             })
         .compose(audienceHandler -> isValidIssuerValue(result.jwtData))
         .compose(
-            //this method can be disabled while testing with the expired token.
-            issuerHandler -> isValidExpiryTime(result.jwtData))
-        .compose(
-            expiryTimeHandler -> {
+            issuerHandler -> {
               if (!result.jwtData.getIss().equals(result.jwtData.getSub())) {
                 return isOpenResource(id);
               } else {

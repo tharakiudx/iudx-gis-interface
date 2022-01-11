@@ -73,6 +73,7 @@ public class Constants {
   public static final String JSON_VALUE = "value";
   public static final String JSON_TITLE = "title";
   public static final String JSON_DETAIL = "detail";
+  public static final String JSON_RESULT = "results";
   public static final String JSON_RESOURCE_SERVER = "resourceServer";
   public static final String JSON_RESOURCE_GROUP = "resourceGroup";
   public static final String JSON_RESOURCE_NAME = "resourceName";

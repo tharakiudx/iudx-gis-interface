@@ -27,6 +27,7 @@ import static iudx.gis.server.apiserver.util.Constants.JSON_INSTANCEID;
 import static iudx.gis.server.apiserver.util.Constants.JSON_RESOURCE_GROUP;
 import static iudx.gis.server.apiserver.util.Constants.JSON_RESOURCE_NAME;
 import static iudx.gis.server.apiserver.util.Constants.JSON_RESOURCE_SERVER;
+import static iudx.gis.server.apiserver.util.Constants.JSON_RESULT;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TITLE;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TYPE;
 import static iudx.gis.server.apiserver.util.Constants.JSON_USERSHA;
@@ -348,10 +349,9 @@ public class ApiServerVerticle extends AbstractVerticle {
     String id = request.getParam(ID);
     JsonObject json = new JsonObject();
     json.put(ID, id);
-    Future<Boolean> isIdPresent = catalogueService.isItemExist(id);
-    isIdPresent
-        .onSuccess(handler -> executeSearchQuery(routingContext, json, response))
-        .onFailure(handler -> processBackendResponse(response, handler.getCause().getMessage()));
+
+    executeSearchQuery(routingContext,json,response);
+
   }
 
   /**
@@ -368,7 +368,7 @@ public class ApiServerVerticle extends AbstractVerticle {
           if (handler.succeeded()) {
             LOGGER.info("Success: Search Success");
             Future.future(fu -> updateAuditTable(context));
-            handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result().toString());
+            handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result());
             LOGGER.info("CONTEXT " + context);
           } else if (handler.failed()) {
             LOGGER.error("Fail: Search Fail");
@@ -378,6 +378,13 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
+    response
+        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+        .setStatusCode(statusCode)
+        .end(generateResponse(HttpStatusCode.SUCCESS, SUCCESS, result));
+  }
+
+  private void handleSuccessResponse(HttpServerResponse response, int statusCode, JsonObject result) {
     response
         .putHeader(CONTENT_TYPE, APPLICATION_JSON)
         .setStatusCode(statusCode)
@@ -430,7 +437,15 @@ public class ApiServerVerticle extends AbstractVerticle {
     return new JsonObject()
         .put(JSON_TYPE, urn.getUrn())
         .put(JSON_TITLE, statusCode.getDescription())
-        .put(JSON_DETAIL, message)
+        .put(JSON_RESULT, message)
+        .toString();
+  }
+
+  private String generateResponse(HttpStatusCode statusCode, ResponseUrn urn, JsonObject message) {
+    return new JsonObject()
+        .put(JSON_TYPE, urn.getUrn())
+        .put(JSON_TITLE, statusCode.getDescription())
+        .put(JSON_RESULT, message)
         .toString();
   }
 

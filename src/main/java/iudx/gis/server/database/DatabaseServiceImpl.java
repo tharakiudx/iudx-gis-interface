@@ -210,7 +210,8 @@ public class DatabaseServiceImpl implements DatabaseService {
             url = row.getString(1);
           }
         }
-        response.put("results",new JsonObject().put("URL", url));
+        response.put("URL", url);
+        LOGGER.info("Response "+response);
         promise.complete(response);
       } else {
         LOGGER.fatal("Fail : PSQLClient#getUserInDb()executeAsync failed");
