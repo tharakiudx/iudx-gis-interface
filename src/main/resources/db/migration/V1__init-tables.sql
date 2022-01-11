@@ -1,14 +1,14 @@
 --gis table
 CREATE TABLE IF NOT EXISTS gis
 (
-   _id uuid NOT NULL,
+   iudx_resource_id character varying NOT NULL,
    url varchar NOT NULL,
    isOpen BOOLEAN NOT NULL,
    api varchar NOT NULL,
    port integer NOT NULL,
    created_at timestamp without time zone NOT NULL,
    modified_at timestamp without time zone NOT NULL,
-   CONSTRAINT gis_pk PRIMARY KEY (_id)
+   CONSTRAINT gis_pk PRIMARY KEY (iudx_resource_id)
 )
 -- Functions for audit[new,update] on table/column
 -- modified_at column function
