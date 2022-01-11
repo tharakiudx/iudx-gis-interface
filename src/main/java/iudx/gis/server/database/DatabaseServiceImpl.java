@@ -206,12 +206,12 @@ public class DatabaseServiceImpl implements DatabaseService {
         RowSet<Row> result = db.result();
         if (db.result().size() > 0) {
           for (Row row : result) {
-            url = row.getString(2);
+            LOGGER.info("URL: "+row.getString(1));
+            url = row.getString(1);
           }
         }
-        response.put("type", "success");
-        response.put("title", "Successfully fetched the GIS server URL");
-        response.put("results", new JsonArray().add(new JsonObject().put("URL", url)));
+        response.put("URL", url);
+        LOGGER.info("Response "+response);
         promise.complete(response);
       } else {
         LOGGER.fatal("Fail : PSQLClient#getUserInDb()executeAsync failed");

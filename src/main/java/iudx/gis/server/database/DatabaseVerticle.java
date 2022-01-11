@@ -31,9 +31,9 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     databaseIP = config().getString("databaseIP");
     databasePort = config().getInteger("databasePort");
-    databaseName = config().getString("dbDatabaseName");
-    databaseUserName = config().getString("dbUser");
-    databasePassword = config().getString("dbPassword");
+    databaseName = config().getString("databaseName");
+    databaseUserName = config().getString("databaseUserName");
+    databasePassword = config().getString("databasePassword");
     poolSize = config().getInteger("dbClientPoolSize");
 
     /* Set Connection Object */

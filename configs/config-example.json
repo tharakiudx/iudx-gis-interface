@@ -1,43 +1,50 @@
 {
-	"version": "1.0",
-	"zookeepers": [
-		"zookeeper"
-	],
-	"clusterId": "iudx-gis-server-cluster",
-	"host": "rs.iudx.io",
-	"modules": [
-		{
-			"id": "iudx.gis.server.apiserver.ApiServerVerticle",
-			"ssl": true,
-			"production": false,
-			"keystore": "configs/keystore.jks",
-			"keystorePassword": "password",
-			"verticleInstances": 2,
-			"serverMode": "testing",
-			"authServerHost": "<<authserver-ip>>",
-			"catServerHost": "<<catalogue-ip>>",
-			"catServerPort": 443,
-			"resourceServerId": "datakaveri.org/f7e044eee8122b5c87dce6e7ad64f3266afa41dc/rs.iudx.io"
-		},
-		{
-			"id": "iudx.gis.server.database.DatabaseVerticle",
-			"verticleInstances": 2,
-			"databaseIP": "<<database-ip>>",
-			"databasePort": 123,
-			"dbUser": "<<postgres_user_name>>",
-			"dbPassword": "<<postgres_user_password>>",
-			"dbDatabaseName": "<<postgres_db_name>>",
-			"dbClientPoolSize": 25
-		},
-		{
-			"id": "iudx.gis.server.metering.MeteringVerticle",
-			"verticleInstances": 1,
-			"meteringDatabaseIP": "",
-			"meteringDatabasePort": 0,
-			"meteringDatabaseName": "",
-			"meteringDatabaseUserName": "",
-			"meteringDatabasePassword": "",
-			"meteringPoolSize": 2
-		}
-	]
+  "version": "1.0",
+  "zookeepers": [
+    "zookeeper"
+  ],
+  "clusterId": "",
+  "host": "",
+  "modules": [
+    {
+      "id": "iudx.gis.server.apiserver.ApiServerVerticle",
+      "ssl": true,
+      "production": false,
+      "keystore": "",
+      "keystorePassword": "",
+      "verticleInstances": 2,
+      "catServerHost": "",
+      "catServerPort": 0
+    },
+    {
+      "id": "iudx.gis.server.authenticator.AuthenticationVerticle",
+      "verticleInstances": 1,
+      "authServerHost": "",
+      "host": "",
+      "catServerHost": "",
+      "catServerPort": 0,
+      "serverMode": "",
+      "jwtIgnoreExpiry": true
+    },
+    {
+      "id": "iudx.gis.server.database.DatabaseVerticle",
+      "verticleInstances": 2,
+      "databaseIP": "",
+      "databasePort": 0,
+      "databaseName": "",
+      "databaseUserName": "",
+      "databasePassword": "",
+      "dbClientPoolSize": 25
+    },
+    {
+      "id": "iudx.gis.server.metering.MeteringVerticle",
+      "verticleInstances": 1,
+      "meteringDatabaseIP": "0",
+      "meteringDatabasePort": 0,
+      "meteringDatabaseName": "",
+      "meteringDatabaseUserName": "",
+      "meteringDatabasePassword": "",
+      "meteringPoolSize": 25
+    }
+  ]
 }
