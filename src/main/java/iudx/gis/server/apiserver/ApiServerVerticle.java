@@ -1,7 +1,6 @@
 package iudx.gis.server.apiserver;
 
 import static iudx.gis.server.apiserver.response.ResponseUrn.BACKING_SERVICE_FORMAT;
-import static iudx.gis.server.apiserver.response.ResponseUrn.INVALID_ATTR_PARAM;
 import static iudx.gis.server.apiserver.response.ResponseUrn.METHOD_NOT_FOUND;
 import static iudx.gis.server.apiserver.response.ResponseUrn.SUCCESS;
 import static iudx.gis.server.apiserver.response.ResponseUrn.YET_NOT_IMPLEMENTED;
@@ -20,28 +19,19 @@ import static iudx.gis.server.apiserver.util.Constants.HEADER_ORIGIN;
 import static iudx.gis.server.apiserver.util.Constants.HEADER_REFERER;
 import static iudx.gis.server.apiserver.util.Constants.HEADER_TOKEN;
 import static iudx.gis.server.apiserver.util.Constants.ID;
+import static iudx.gis.server.apiserver.util.Constants.IID;
 import static iudx.gis.server.apiserver.util.Constants.JSON_DETAIL;
-import static iudx.gis.server.apiserver.util.Constants.JSON_DOMAIN;
-import static iudx.gis.server.apiserver.util.Constants.JSON_ID;
-import static iudx.gis.server.apiserver.util.Constants.JSON_INSTANCEID;
-import static iudx.gis.server.apiserver.util.Constants.JSON_RESOURCE_GROUP;
-import static iudx.gis.server.apiserver.util.Constants.JSON_RESOURCE_NAME;
-import static iudx.gis.server.apiserver.util.Constants.JSON_RESOURCE_SERVER;
 import static iudx.gis.server.apiserver.util.Constants.JSON_RESULT;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TITLE;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TYPE;
-import static iudx.gis.server.apiserver.util.Constants.JSON_USERSHA;
 import static iudx.gis.server.apiserver.util.Constants.MIME_APPLICATION_JSON;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_ID;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_IDPATTERN;
 import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
 import static iudx.gis.server.apiserver.util.Constants.USER_ID;
 
-import io.netty.handler.codec.http.HttpConstants;
-import io.netty.handler.codec.http.QueryStringDecoder;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
@@ -68,9 +58,6 @@ import iudx.gis.server.authenticator.AuthenticationService;
 import iudx.gis.server.database.DatabaseService;
 import iudx.gis.server.metering.MeteringService;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -200,14 +187,6 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(this::handleEntitiesQuery)
         .failureHandler(validationsFailureHandler);
 
-    ValidationHandler entityPathValidationHandler =
-        new ValidationHandler(vertx, RequestType.ENTITY_PATH);
-    router
-        .get(NGSILD_ENTITIES_URL + "/:domain/:userSha/:resourceServer/:resourceGroup/:resourceName")
-        .handler(entityPathValidationHandler)
-        .handler(this::handleEntitiesPath)
-        .failureHandler(validationsFailureHandler);
-
     ValidationHandler adminCrudPathValidationHandler =
         new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH);
 
@@ -216,21 +195,28 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     router.get(ADMIN_BASE_PATH).handler(this::handleGetAdminPath);
 
+    // don't forget to comment .handler(adminCrudPathValidationHandler) &
+    //        .handler(adminCrudPathIdValidationHandler) (for delete) in all the three routers below
+    // for testing purpose
+
     router
         .post(ADMIN_BASE_PATH)
         .handler(adminCrudPathValidationHandler)
+        .handler(AuthHandler.create(vertx))
         .handler(this::handlePostAdminPath)
         .failureHandler(validationsFailureHandler);
 
     router
         .put(ADMIN_BASE_PATH)
         .handler(adminCrudPathValidationHandler)
+        .handler(AuthHandler.create(vertx))
         .handler(this::handlePutAdminPath)
         .failureHandler(validationsFailureHandler);
 
     router
         .delete(ADMIN_BASE_PATH)
         .handler(adminCrudPathIdValidationHandler)
+        .handler(AuthHandler.create(vertx))
         .handler(this::handleDeleteAdminPath)
         .failureHandler(validationsFailureHandler);
 
@@ -263,7 +249,9 @@ public class ApiServerVerticle extends AbstractVerticle {
         ar -> {
           if (ar.succeeded()) {
             LOGGER.debug("Success: Delete operation successful");
-            handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
+            Future.future(fu -> updateAuditTable(routingContext));
+            handleSuccessResponse(
+                response, ResponseType.Ok.getCode(), ar.result().getString(JSON_DETAIL));
           } else {
             LOGGER.error("Fail: Delete operation Failed");
             processBackendResponse(response, ar.cause().getMessage());
@@ -282,7 +270,9 @@ public class ApiServerVerticle extends AbstractVerticle {
         ar -> {
           if (ar.succeeded()) {
             LOGGER.debug("Success: Update operation successful");
-            handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
+            Future.future(fu -> updateAuditTable(routingContext));
+            handleSuccessResponse(
+                response, ResponseType.Ok.getCode(), ar.result().getString(JSON_DETAIL));
           } else {
             LOGGER.error("Fail: Update operation Failed");
             processBackendResponse(response, ar.cause().getMessage());
@@ -293,49 +283,22 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void handlePostAdminPath(RoutingContext routingContext) {
     LOGGER.debug("Info:handlePostAdminPath method started.;");
     HttpServerResponse response = routingContext.response();
-
     JsonObject requestBody = routingContext.getBodyAsJson();
 
     database.insertAdminDetails(
         requestBody,
         ar -> {
           if (ar.succeeded()) {
+            Future.future(fu -> updateAuditTable(routingContext));
             LOGGER.debug("Success: Insert operation successful");
-            handleSuccessResponse(response, ResponseType.Ok.getCode(), ar.result().toString());
+
+            handleSuccessResponse(
+                response, ResponseType.Ok.getCode(), ar.result().getString(JSON_DETAIL));
           } else {
             LOGGER.error("Fail: Insert operation Failed");
             processBackendResponse(response, ar.cause().getMessage());
           }
         });
-  }
-
-  private void handleEntitiesPath(RoutingContext routingContext) {
-    LOGGER.debug("Info:handleLatestEntitiesQuery method started.;");
-    /* Handles HTTP request from client */
-    JsonObject authInfo = (JsonObject) routingContext.data().get("authInfo");
-    LOGGER.debug("authInfo : " + authInfo);
-    HttpServerRequest request = routingContext.request();
-    /* Handles HTTP response from server to client */
-    HttpServerResponse response = routingContext.response();
-
-    String domain = request.getParam(JSON_DOMAIN);
-    String userSha = request.getParam(JSON_USERSHA);
-    String resourceServer = request.getParam(JSON_RESOURCE_SERVER);
-    String resourceGroup = request.getParam(JSON_RESOURCE_GROUP);
-    String resourceName = request.getParam(JSON_RESOURCE_NAME);
-    String id =
-        domain + "/" + userSha + "/" + resourceServer + "/" + resourceGroup + "/" + resourceName;
-    JsonObject json = new JsonObject();
-    /* HTTP request instance/host details */
-    String instanceID = request.getHeader(HEADER_HOST);
-    json.put(JSON_INSTANCEID, instanceID);
-    json.put(JSON_ID, id);
-    LOGGER.debug("Info: IUDX query json;" + json);
-    // check Catalogue Cache before search
-    Future<Boolean> isIdPresent = catalogueService.isItemExist(id);
-    isIdPresent
-        .onSuccess(handler -> executeSearchQuery(routingContext, json, response))
-        .onFailure(handler -> processBackendResponse(response, handler.getCause().getMessage()));
   }
 
   private void handleEntitiesQuery(RoutingContext routingContext) {
@@ -351,8 +314,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     JsonObject json = new JsonObject();
     json.put(ID, id);
 
-    executeSearchQuery(routingContext,json,response);
-
+    executeSearchQuery(routingContext, json, response);
   }
 
   /**
@@ -378,14 +340,15 @@ public class ApiServerVerticle extends AbstractVerticle {
         });
   }
 
-  private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
+  private void handleSuccessResponse(
+      HttpServerResponse response, int statusCode, JsonObject result) {
     response
         .putHeader(CONTENT_TYPE, APPLICATION_JSON)
         .setStatusCode(statusCode)
         .end(generateResponse(HttpStatusCode.SUCCESS, SUCCESS, result));
   }
 
-  private void handleSuccessResponse(HttpServerResponse response, int statusCode, JsonObject result) {
+  private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
     response
         .putHeader(CONTENT_TYPE, APPLICATION_JSON)
         .setStatusCode(statusCode)
@@ -438,7 +401,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     return new JsonObject()
         .put(JSON_TYPE, urn.getUrn())
         .put(JSON_TITLE, statusCode.getDescription())
-        .put(JSON_RESULT, message)
+        .put(JSON_DETAIL, message)
         .toString();
   }
 
@@ -450,44 +413,13 @@ public class ApiServerVerticle extends AbstractVerticle {
         .toString();
   }
 
-  private Optional<MultiMap> getQueryParams(
-      RoutingContext routingContext, HttpServerResponse response) {
-    MultiMap queryParams = null;
-    try {
-      queryParams = MultiMap.caseInsensitiveMultiMap();
-      String uri = routingContext.request().uri();
-      Map<String, List<String>> decodedParams =
-          new QueryStringDecoder(uri, HttpConstants.DEFAULT_CHARSET, true, 1024, true).parameters();
-      for (Map.Entry<String, List<String>> entry : decodedParams.entrySet()) {
-        LOGGER.debug("Info: param :" + entry.getKey() + " value : " + entry.getValue());
-        queryParams.add(entry.getKey(), entry.getValue());
-      }
-    } catch (IllegalArgumentException ex) {
-      response
-          .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-          .setStatusCode(ResponseType.BadRequestData.getCode())
-          .end(generateResponse(HttpStatusCode.BAD_REQUEST, INVALID_ATTR_PARAM));
-    }
-    return Optional.of(queryParams);
-  }
-
-  private boolean validateParams(MultiMap parameterMap) {
-    final List<Map.Entry<String, String>> entries = parameterMap.entries();
-    for (final Map.Entry<String, String> entry : entries) {
-      // System.out.println(entry.getKey());
-      if (!validParams.contains(entry.getKey())) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   private Future<Void> updateAuditTable(RoutingContext context) {
     Promise<Void> promise = Promise.promise();
     JsonObject authInfo = (JsonObject) context.data().get("authInfo");
 
     JsonObject request = new JsonObject();
     request.put(USER_ID, authInfo.getValue(USER_ID));
+    request.put(IID, authInfo.getValue(IID));
     request.put(ID, authInfo.getValue(ID));
     request.put(API, authInfo.getValue(API_ENDPOINT));
     meteringService.executeWriteQuery(

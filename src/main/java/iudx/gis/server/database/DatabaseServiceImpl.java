@@ -2,19 +2,15 @@ package iudx.gis.server.database;
 
 import static iudx.gis.server.database.util.Constants.*;
 
-import iudx.gis.server.apiserver.ApiServerVerticle;
-import iudx.gis.server.apiserver.exceptions.DxRuntimeException;
 import iudx.gis.server.apiserver.response.ResponseUrn;
 import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.database.util.Util;
-import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
@@ -27,7 +23,6 @@ public class DatabaseServiceImpl implements DatabaseService {
   private PostgresClient pgSQLClient;
   public static final String SELECT_GIS_SERVER_URL =
       "SELECT * FROM gis WHERE iudx_resource_id='$1'";
- 
   public DatabaseServiceImpl(PostgresClient pgClient) {
     // TODO Auto-generated constructor stub
     this.pgSQLClient = pgClient;
@@ -77,9 +72,10 @@ public class DatabaseServiceImpl implements DatabaseService {
       JsonObject accessObject = accessInfo.get();
       String username = accessObject.getString(USERNAME);
       String password = accessObject.getString(PASSWORD);
-      insertQuery = insertQuery.replace("$5", username).replace("$6", password);
+      String tokenUrl=accessObject.getString(TOKEN_URL);
+      insertQuery = insertQuery.replace("$5", username).replace("$6", password).replace("$7",tokenUrl);
     } else {
-      insertQuery = insertQuery.replace("$5", "").replace("$6", "");
+      insertQuery = insertQuery.replace("$5", "").replace("$6", "").replace("$7","");
     }
 
     String finalInsertQuery = insertQuery;
@@ -97,7 +93,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         })
         .onSuccess(ar -> {
           LOGGER.debug("Insert admin details operation successful");
-          handler.handle(Future.succeededFuture(new JsonObject().put(TYPE, SUCCESS)));
+          handler.handle(Future.succeededFuture(new JsonObject().put(DETAIL, SUCCESS)));
         })
         .onFailure(ar -> {
           LOGGER.error("Insert admin operation failed due to: {}", ar.getLocalizedMessage());
@@ -119,7 +115,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     if (isRequestInvalid(isSecure, accessInfo, handler)) {
       return this;
     }
-
     String searchQuery = SELECT_ADMIN_DETAILS_QUERY.replace("$1", resourceId);
     String updateQuery = UPDATE_ADMIN_DETAILS_QUERY.replace("$1", serverUrl)
         .replace("$2", serverPort.toString())
@@ -130,9 +125,10 @@ public class DatabaseServiceImpl implements DatabaseService {
       JsonObject accessObject = accessInfo.get();
       String username = accessObject.getString(USERNAME);
       String password = accessObject.getString(PASSWORD);
-      updateQuery = updateQuery.replace("$4", username).replace("$5", password);
+      String tokenUrl=accessObject.getString(TOKEN_URL);
+      updateQuery = updateQuery.replace("$4", username).replace("$5", password).replace("$7",tokenUrl);;
     } else {
-      updateQuery = updateQuery.replace("$4", "").replace("$5", "");
+      updateQuery = updateQuery.replace("$4", "").replace("$5", "").replace("$7","");;
     }
 
     String finalUpdateQuery = updateQuery;
@@ -150,7 +146,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         })
         .onSuccess(ar -> {
           LOGGER.debug("Update admin details operation successful!");
-          handler.handle(Future.succeededFuture(new JsonObject().put(TYPE, SUCCESS)));
+          handler.handle(Future.succeededFuture(new JsonObject().put(DETAIL, SUCCESS)));
         })
         .onFailure(ar -> {
           LOGGER.error("Update admin operation failed due to: {}", ar.getLocalizedMessage());
@@ -179,7 +175,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         })
         .onSuccess(ar -> {
           LOGGER.debug("Delete admin details operation successful!");
-          handler.handle(Future.succeededFuture(new JsonObject().put(TYPE, SUCCESS)));
+          handler.handle(Future.succeededFuture(new JsonObject().put(DETAIL, SUCCESS)));
         })
         .onFailure(ar -> {
           LOGGER.error("Delete admin operation failed due to: {}", ar.getLocalizedMessage());
@@ -232,8 +228,9 @@ public class DatabaseServiceImpl implements DatabaseService {
       JsonObject accessObject = accessInfo.get();
       String username = accessObject.getString(USERNAME);
       String password = accessObject.getString(PASSWORD);
-      if (username==null || username.isEmpty() || password==null || password.isEmpty()) {
-        errorMessage = "Username and Password cannot be empty fields";
+      String tokenUrl=accessObject.getString(TOKEN_URL);
+      if (username==null || username.isEmpty() || password==null || password.isEmpty() || tokenUrl==null || tokenUrl.isEmpty()) {
+        errorMessage = "Access Info cannot contain empty fields.";
       } else {
         return false;
       }
