@@ -2,6 +2,7 @@ package iudx.gis.server.apiserver.handlers;
 
 import static iudx.gis.server.apiserver.response.ResponseUrn.INVALID_TOKEN;
 import static iudx.gis.server.apiserver.response.ResponseUrn.RESOURCE_NOT_FOUND;
+import static iudx.gis.server.apiserver.util.Constants.ADMIN_BASE_PATH;
 import static iudx.gis.server.apiserver.util.Constants.API_ENDPOINT;
 import static iudx.gis.server.apiserver.util.Constants.API_METHOD;
 import static iudx.gis.server.apiserver.util.Constants.APPLICATION_JSON;
@@ -119,6 +120,7 @@ public class AuthHandler implements Handler<RoutingContext> {
     LOGGER.debug("URL : {}", url);
     String path = null;
     if (url.matches(NGSILD_ENTITIES_URL)) path = NGSILD_ENTITIES_URL;
+    else if (url.matches(ADMIN_BASE_PATH)) path = ADMIN_BASE_PATH;
     return path;
   }
 

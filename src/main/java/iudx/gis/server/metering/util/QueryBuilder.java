@@ -1,7 +1,10 @@
 package iudx.gis.server.metering.util;
 
+import static iudx.gis.server.metering.util.Constants.ADMIN;
+import static iudx.gis.server.metering.util.Constants.ADMIN_BASE_PATH;
 import static iudx.gis.server.metering.util.Constants.API;
 import static iudx.gis.server.metering.util.Constants.ID;
+import static iudx.gis.server.metering.util.Constants.IID;
 import static iudx.gis.server.metering.util.Constants.QUERY_KEY;
 import static iudx.gis.server.metering.util.Constants.USER_ID;
 import static iudx.gis.server.metering.util.Constants.WRITE_QUERY;
@@ -20,13 +23,16 @@ public class QueryBuilder {
   private static final Logger LOGGER = LogManager.getLogger(QueryBuilder.class);
 
   public JsonObject buildWritingQuery(JsonObject request) {
-
     String primaryKey = UUID.randomUUID().toString().replace("-", "");
     String userId = request.getString(USER_ID);
-    String resourceId = request.getString(ID);
-    String providerID =
-        resourceId.substring(0, resourceId.indexOf('/', resourceId.indexOf('/') + 1));
     String api = request.getString(API);
+    String resourceId =
+        api.equals(ADMIN_BASE_PATH) ? request.getString(IID) : request.getString(ID);
+    String providerID =
+        api.equals(ADMIN_BASE_PATH)
+            ? ADMIN
+            : resourceId.substring(0, resourceId.indexOf('/', resourceId.indexOf('/') + 1));
+
     ZonedDateTime zst = ZonedDateTime.now();
     long time = getEpochTime(zst);
     String isoTime =

@@ -1,5 +1,6 @@
 package iudx.gis.server.authenticator;
 
+import static iudx.gis.server.apiserver.util.Constants.ADMIN_BASE_PATH;
 import static iudx.gis.server.authenticator.Constants.JSON_EXPIRY;
 import static iudx.gis.server.authenticator.Constants.JSON_IID;
 import static iudx.gis.server.authenticator.Constants.JSON_USERID;
@@ -81,43 +82,59 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
     String id = authenticationInfo.getString("id");
     String token = authenticationInfo.getString("token");
-
+    String endPoint = authenticationInfo.getString("apiEndpoint");
     Future<JwtData> jwtDecodeFuture = decodeJwt(token);
 
     ResultContainer result = new ResultContainer();
-
-    jwtDecodeFuture
-        .compose(
-            decodeHandler -> {
-              result.jwtData = decodeHandler;
-              LOGGER.info(result.jwtData);
-              return isValidAudienceValue(result.jwtData);
-            })
-        .compose(audienceHandler -> isValidIssuerValue(result.jwtData))
-        .compose(
-            issuerHandler -> {
-              if (!result.jwtData.getIss().equals(result.jwtData.getSub())) {
-                return isOpenResource(id);
-              } else {
-                return Future.succeededFuture("OPEN");
-              }
-            })
-        .compose(
-            openResourceHandler -> {
-              result.isOpen = openResourceHandler.equalsIgnoreCase("OPEN");
-              if (result.isOpen) {
-                JsonObject json = new JsonObject();
-                json.put(JSON_USERID, result.jwtData.getSub());
-                return Future.succeededFuture(true);
-              } else {
-                return isValidId(result.jwtData, id);
-              }
-            })
-        .compose(
-            validIdHandler -> validateAccess(result.jwtData, result.isOpen, authenticationInfo))
-        .onSuccess(successHandler -> handler.handle(Future.succeededFuture(successHandler)))
-        .onFailure(
-            failureHandler -> handler.handle(Future.failedFuture(failureHandler.getMessage())));
+    LOGGER.info("endPoint " + endPoint);
+    if (endPoint != null && endPoint.equals(ADMIN_BASE_PATH)) {
+      jwtDecodeFuture
+          .compose(
+              decodeHandler -> {
+                result.jwtData = decodeHandler;
+                LOGGER.info(result.jwtData);
+                return isValidAudienceValue(result.jwtData);
+              })
+          .compose(audienceHandler -> isValidIid(result.jwtData))
+          .compose(IdHandler -> isValidRole(result.jwtData))
+          .onSuccess(successHandler -> handler.handle(Future.succeededFuture(successHandler)))
+          .onFailure(
+              failureHandler -> handler.handle(Future.failedFuture(failureHandler.getMessage())));
+      return this;
+    } else {
+      jwtDecodeFuture
+          .compose(
+              decodeHandler -> {
+                result.jwtData = decodeHandler;
+                LOGGER.info(result.jwtData);
+                return isValidAudienceValue(result.jwtData);
+              })
+          .compose(audienceHandler -> isValidIssuerValue(result.jwtData))
+          .compose(
+              issuerHandler -> {
+                if (!result.jwtData.getIss().equals(result.jwtData.getSub())) {
+                  return isOpenResource(id);
+                } else {
+                  return Future.succeededFuture("OPEN");
+                }
+              })
+          .compose(
+              openResourceHandler -> {
+                result.isOpen = openResourceHandler.equalsIgnoreCase("OPEN");
+                if (result.isOpen) {
+                  JsonObject json = new JsonObject();
+                  json.put(JSON_USERID, result.jwtData.getSub());
+                  return Future.succeededFuture(true);
+                } else {
+                  return isValidId(result.jwtData, id);
+                }
+              })
+          .compose(
+              validIdHandler -> validateAccess(result.jwtData, result.isOpen, authenticationInfo))
+          .onSuccess(successHandler -> handler.handle(Future.succeededFuture(successHandler)))
+          .onFailure(
+              failureHandler -> handler.handle(Future.failedFuture(failureHandler.getMessage())));
+    }
     return this;
   }
 
@@ -247,17 +264,34 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     return promise.future();
   }
 
-  Future<Boolean> isValidExpiryTime(JwtData jwtData) {
+  Future<Boolean> isValidIid(JwtData jwtData) {
     Promise<Boolean> promise = Promise.promise();
+    String jwtId = jwtData.getIid().split(":")[1];
+    LOGGER.info("JWTId " + jwtId);
 
-    if (LocalDateTime.ofInstant(
-            Instant.ofEpochSecond(Long.parseLong(jwtData.getExp().toString())),
-            ZoneId.systemDefault())
-        .isAfter(LocalDateTime.now())) {
+    if (audience != null && audience.equalsIgnoreCase(jwtId)) {
       promise.complete(true);
     } else {
-      LOGGER.error("Token Expired.");
-      promise.fail("Token Expired.");
+      LOGGER.error("Incorrect iid value in jwt");
+      promise.fail("Incorrect iid value in jwt");
+    }
+    return promise.future();
+  }
+
+  Future<JsonObject> isValidRole(JwtData jwtData) {
+    Promise<JsonObject> promise = Promise.promise();
+    String jwtId = jwtData.getIid().split(":")[1];
+    String role = jwtData.getRole();
+    LOGGER.info("ROLE " + role);
+    JsonObject jsonResponse = new JsonObject();
+    if (role.equalsIgnoreCase("admin")) {
+      jsonResponse.put(JSON_USERID, jwtData.getSub());
+      jsonResponse.put(JSON_IID, jwtId);
+      promise.complete(jsonResponse);
+    } else {
+      LOGGER.info("failed");
+      JsonObject result = new JsonObject().put("401", "Only admin access allowed.");
+      promise.fail(result.toString());
     }
     return promise.future();
   }

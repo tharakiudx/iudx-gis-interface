@@ -4,10 +4,12 @@ CREATE TABLE IF NOT EXISTS gis
    iudx_resource_id character varying NOT NULL,
    url varchar NOT NULL,
    isOpen BOOLEAN NOT NULL,
-   api varchar NOT NULL,
    port integer NOT NULL,
    created_at timestamp without time zone NOT NULL,
    modified_at timestamp without time zone NOT NULL,
+   username varchar,
+   password varchar,
+   tokenurl character varying,
    CONSTRAINT gis_pk PRIMARY KEY (iudx_resource_id)
 )
 -- Functions for audit[new,update] on table/column
