@@ -13,7 +13,7 @@ services:
       - LOG_LEVEL=DEBUG
       - RS_JAVA_OPTS=-Xmx1024m
     volumes:
-      - /home/ubuntu/configs/gis-config-test.json:/usr/share/app/configs/config.json
+      - /home/ubuntu/configs/gis-config-test.json:/usr/share/app/configs/config-test.json
       - /home/ubuntu/configs/keystore-gis.jks:/usr/share/app/configs/keystore.jks
       - ./docker/runTests.sh:/usr/share/app/docker/runTests.sh
       - ./src/:/usr/share/app/src
