@@ -18,8 +18,8 @@ pipeline {
       steps{
         script {
           echo 'Pulled - ' + env.GIT_BRANCH
-          devImage = docker.build( devRegistry, "-f ./docker/dev.dockerfile .")
-          deplImage = docker.build( deplRegistry, "-f ./docker/depl.dockerfile .")
+          // devImage = docker.build( devRegistry, "-f ./docker/dev.dockerfile .")
+          // deplImage = docker.build( deplRegistry, "-f ./docker/depl.dockerfile .")
           testImage = docker.build( testRegistry, "-f ./docker/test.dockerfile .")
         }
       }
