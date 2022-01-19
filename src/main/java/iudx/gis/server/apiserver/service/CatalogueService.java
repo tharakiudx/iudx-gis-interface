@@ -159,12 +159,10 @@ public class CatalogueService {
   public Future<Boolean> isItemExist(String id) {
     LOGGER.debug("isItemExist() started");
     Promise<Boolean> promise = Promise.promise();
-    LOGGER.info("id : " + id);
     catWebClient.get(catPort, catHost, catItemPath).addQueryParam("id", id)
         .expect(ResponsePredicate.JSON).send(responseHandler -> {
           if (responseHandler.succeeded()) {
             HttpResponse<Buffer> response = responseHandler.result();
-            LOGGER.info("RES "+ response.bodyAsString());
             JsonObject responseBody = response.bodyAsJsonObject();
             if (responseBody.getString("type").equalsIgnoreCase("urn:dx:cat:Success")
                 && responseBody.getInteger("totalHits") > 0) {

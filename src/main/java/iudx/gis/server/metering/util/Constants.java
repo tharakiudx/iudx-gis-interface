@@ -20,7 +20,6 @@ public class Constants {
   public static final String TOTAL = "total";
   public static final String TYPE_KEY = "type";
   public static final String API = "api";
-  public static final String API_ENDPOINT = "apiEndpoint";
   public static final String USER_ID = "userid";
   public static final String WRITE_QUERY =
       "INSERT INTO gisauditingtable (id,api,userid,epochtime,resourceid,isotime,providerid) VALUES ('$1','$2','$3',$4,'$5','$6','$7')";

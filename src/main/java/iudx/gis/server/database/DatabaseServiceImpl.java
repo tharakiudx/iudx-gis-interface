@@ -1,12 +1,20 @@
 package iudx.gis.server.database;
 
-import static iudx.gis.server.database.util.Constants.*;
+import static iudx.gis.server.database.util.Constants.ACCESS_INFO;
+import static iudx.gis.server.database.util.Constants.DELETE_ADMIN_DETAILS_QUERY;
+import static iudx.gis.server.database.util.Constants.DETAIL;
+import static iudx.gis.server.database.util.Constants.ID;
+import static iudx.gis.server.database.util.Constants.INSERT_ADMIN_DETAILS_QUERY;
+import static iudx.gis.server.database.util.Constants.PASSWORD;
+import static iudx.gis.server.database.util.Constants.SECURE;
+import static iudx.gis.server.database.util.Constants.SELECT_ADMIN_DETAILS_QUERY;
+import static iudx.gis.server.database.util.Constants.SERVER_PORT;
+import static iudx.gis.server.database.util.Constants.SERVER_URL;
+import static iudx.gis.server.database.util.Constants.SUCCESS;
+import static iudx.gis.server.database.util.Constants.TOKEN_URL;
+import static iudx.gis.server.database.util.Constants.UPDATE_ADMIN_DETAILS_QUERY;
+import static iudx.gis.server.database.util.Constants.USERNAME;
 
-import iudx.gis.server.apiserver.response.ResponseUrn;
-import iudx.gis.server.apiserver.util.HttpStatusCode;
-import iudx.gis.server.database.util.Util;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -14,15 +22,20 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
-
+import iudx.gis.server.apiserver.response.ResponseUrn;
+import iudx.gis.server.apiserver.util.HttpStatusCode;
+import iudx.gis.server.database.util.Util;
 import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class DatabaseServiceImpl implements DatabaseService {
 
-  private static final Logger LOGGER = LogManager.getLogger(DatabaseServiceImpl.class);
-  private PostgresClient pgSQLClient;
   public static final String SELECT_GIS_SERVER_URL =
       "SELECT * FROM gis WHERE iudx_resource_id='$1'";
+  private static final Logger LOGGER = LogManager.getLogger(DatabaseServiceImpl.class);
+  private final PostgresClient pgSQLClient;
+
   public DatabaseServiceImpl(PostgresClient pgClient) {
     // TODO Auto-generated constructor stub
     this.pgSQLClient = pgClient;
@@ -43,14 +56,15 @@ public class DatabaseServiceImpl implements DatabaseService {
   }
 
   @Override
-  public DatabaseService insertIntoDb(JsonObject request,
-      Handler<AsyncResult<JsonObject>> handler) {
+  public DatabaseService insertIntoDb(
+      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     handler.handle(Future.succeededFuture(new JsonObject().put("a", "b")));
     return this;
   }
 
   @Override
-  public DatabaseService insertAdminDetails(JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public DatabaseService insertAdminDetails(
+      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String resourceId = request.getString(ID);
     String serverUrl = request.getString(SERVER_URL);
     Long serverPort = request.getLong(SERVER_PORT);
@@ -104,7 +118,8 @@ public class DatabaseServiceImpl implements DatabaseService {
   }
 
   @Override
-  public DatabaseService updateAdminDetails(JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public DatabaseService updateAdminDetails(
+      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String resourceId = request.getString(ID);
     String serverUrl = request.getString(SERVER_URL);
     Long serverPort = request.getLong(SERVER_PORT);
@@ -128,7 +143,7 @@ public class DatabaseServiceImpl implements DatabaseService {
       String tokenUrl=accessObject.getString(TOKEN_URL);
       updateQuery = updateQuery.replace("$4", username).replace("$5", password).replace("$7",tokenUrl);;
     } else {
-      updateQuery = updateQuery.replace("$4", "").replace("$5", "").replace("$7","");;
+      updateQuery = updateQuery.replace("$4", "").replace("$5", "").replace("$7", "");
     }
 
     String finalUpdateQuery = updateQuery;
@@ -157,7 +172,8 @@ public class DatabaseServiceImpl implements DatabaseService {
   }
 
   @Override
-  public DatabaseService deleteAdminDetails(String resourceId, Handler<AsyncResult<JsonObject>> handler) {
+  public DatabaseService deleteAdminDetails(
+      String resourceId, Handler<AsyncResult<JsonObject>> handler) {
     String searchQuery = SELECT_ADMIN_DETAILS_QUERY.replace("$1", resourceId);
     String deleteQuery = DELETE_ADMIN_DETAILS_QUERY.replace("$1", resourceId);
 
@@ -191,7 +207,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     Promise<JsonObject> promise = Promise.promise();
     JsonObject response = new JsonObject();
     String query = SELECT_GIS_SERVER_URL.replace("$1", id);
-    LOGGER.debug("Info : " + query);
     // Check in DB, get username and password
     pgSQLClient.executeAsync(query).onComplete(db -> {
       LOGGER.debug("Info : PSQLClient#getUserInDb()executeAsync completed");
@@ -217,9 +232,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     return promise.future();
   }
 
-  private boolean isRequestInvalid(Boolean isSecure,
-                                   Optional<JsonObject> accessInfo,
-                                   Handler<AsyncResult<JsonObject>> handler) {
+  private boolean isRequestInvalid(
+      Boolean isSecure, Optional<JsonObject> accessInfo, Handler<AsyncResult<JsonObject>> handler) {
     if (!isSecure) {
       return false;
     }
