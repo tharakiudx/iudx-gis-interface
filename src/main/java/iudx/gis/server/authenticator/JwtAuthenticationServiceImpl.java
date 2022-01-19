@@ -49,21 +49,20 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   final String path;
   final String audience;
   final String iss;
-
-  // resourceGroupCache will contains ACL info about all resource group in a resource server
+  // resourceIdCache will contain info about resources available(& their ACL) in resource server.
+  public Cache<String, String> resourceIdCache =
+      CacheBuilder.newBuilder()
+          .maximumSize(1000)
+          .expireAfterAccess(Constants.CACHE_TIMEOUT_AMOUNT, TimeUnit.MINUTES)
+          .build();
+  // resourceGroupCache will contain ACL info about all resource group in a resource server
   Cache<String, String> resourceGroupCache =
       CacheBuilder.newBuilder()
           .maximumSize(1000)
           .expireAfterAccess(Constants.CACHE_TIMEOUT_AMOUNT, TimeUnit.MINUTES)
           .build();
-  // resourceIdCache will contains info about resources available(& their ACL) in resource server.
-  Cache<String, String> resourceIdCache =
-      CacheBuilder.newBuilder()
-          .maximumSize(1000)
-          .expireAfterAccess(Constants.CACHE_TIMEOUT_AMOUNT, TimeUnit.MINUTES)
-          .build();
 
-  JwtAuthenticationServiceImpl(Vertx vertx, final JWTAuth jwtAuth, final JsonObject config) {
+  public JwtAuthenticationServiceImpl(Vertx vertx, final JWTAuth jwtAuth, final JsonObject config) {
     this.jwtAuth = jwtAuth;
     this.audience = config.getString("host");
     this.iss = config.getString("authServerHost");
@@ -92,7 +91,6 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
           .compose(
               decodeHandler -> {
                 result.jwtData = decodeHandler;
-                LOGGER.info(result.jwtData);
                 return isValidAudienceValue(result.jwtData);
               })
           .compose(audienceHandler -> isValidIid(result.jwtData))
@@ -106,7 +104,6 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
           .compose(
               decodeHandler -> {
                 result.jwtData = decodeHandler;
-                LOGGER.info(result.jwtData);
                 return isValidAudienceValue(result.jwtData);
               })
           .compose(audienceHandler -> isValidIssuerValue(result.jwtData))
@@ -138,7 +135,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     return this;
   }
 
-  Future<JwtData> decodeJwt(String jwtToken) {
+  public Future<JwtData> decodeJwt(String jwtToken) {
     Promise<JwtData> promise = Promise.promise();
     TokenCredentials creds = new TokenCredentials(jwtToken);
 
@@ -231,7 +228,6 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
         JsonObject jsonResponse = new JsonObject();
         jsonResponse.put(JSON_USERID, jwtData.getSub());
         jsonResponse.put(JSON_IID, jwtId);
-        LOGGER.info("jwt : " + jwtData);
         jsonResponse.put(
             JSON_EXPIRY,
             (LocalDateTime.ofInstant(
@@ -252,7 +248,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     return promise.future();
   }
 
-  Future<Boolean> isValidAudienceValue(JwtData jwtData) {
+  public Future<Boolean> isValidAudienceValue(JwtData jwtData) {
     Promise<Boolean> promise = Promise.promise();
 
     if (audience != null && audience.equalsIgnoreCase(jwtData.getAud())) {
@@ -267,7 +263,6 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   Future<Boolean> isValidIid(JwtData jwtData) {
     Promise<Boolean> promise = Promise.promise();
     String jwtId = jwtData.getIid().split(":")[1];
-    LOGGER.info("JWTId " + jwtId);
 
     if (audience != null && audience.equalsIgnoreCase(jwtId)) {
       promise.complete(true);
@@ -307,7 +302,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     return promise.future();
   }
 
-  Future<Boolean> isValidId(JwtData jwtData, String id) {
+  public Future<Boolean> isValidId(JwtData jwtData, String id) {
     LOGGER.debug("Is Valid Started. ");
     Promise<Boolean> promise = Promise.promise();
     String jwtId = jwtData.getIid().split(":")[1];

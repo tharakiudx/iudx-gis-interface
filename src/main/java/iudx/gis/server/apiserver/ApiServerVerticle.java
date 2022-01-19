@@ -201,7 +201,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     router
         .post(ADMIN_BASE_PATH)
-        .handler(adminCrudPathValidationHandler)
+//        .handler(adminCrudPathValidationHandler)
         .handler(AuthHandler.create(vertx))
         .handler(this::handlePostAdminPath)
         .failureHandler(validationsFailureHandler);
@@ -305,7 +305,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     LOGGER.debug("Info:handleEntitiesQuery method started.;");
     /* Handles HTTP request from client */
     JsonObject authInfo = (JsonObject) routingContext.data().get("authInfo");
-    LOGGER.debug("authInfo : " + authInfo);
     HttpServerRequest request = routingContext.request();
     /* Handles HTTP response from server to client */
     HttpServerResponse response = routingContext.response();

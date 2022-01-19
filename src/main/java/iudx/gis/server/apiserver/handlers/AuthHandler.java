@@ -60,15 +60,12 @@ public class AuthHandler implements Handler<RoutingContext> {
     if (token == null) token = "public";
 
     String paramId = getId4rmRequest();
-    LOGGER.info("id from param : " + paramId);
 
     String id = null;
 
     if (paramId != null && !paramId.isBlank()) {
       id = paramId;
     }
-
-    LOGGER.info("id : " + id);
 
     JsonObject authInfo =
         new JsonObject()

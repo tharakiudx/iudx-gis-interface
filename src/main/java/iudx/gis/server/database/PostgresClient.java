@@ -24,7 +24,6 @@ public class PostgresClient {
 
   public Future<RowSet<Row>> executeAsync(String preparedQuerySQL) {
     LOGGER.debug("Info : PostgresQLClient#executeAsync() started");
-    LOGGER.debug("Info : Executing query: {}", preparedQuerySQL);
     Promise<RowSet<Row>> promise = Promise.promise();
     pgPool.withConnection(connection -> connection.query(preparedQuerySQL).execute())
         .onSuccess(ar -> {

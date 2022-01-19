@@ -2,6 +2,7 @@ package iudx.gis.server.metering;
 
 import static iudx.gis.server.metering.util.Constants.API;
 import static iudx.gis.server.metering.util.Constants.ID;
+import static iudx.gis.server.metering.util.Constants.IID;
 import static iudx.gis.server.metering.util.Constants.USER_ID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,7 +40,7 @@ public class MeteringServiceTest {
   static void startVertex(Vertx vertx, VertxTestContext vertxTestContext) {
     vertxObj = vertx;
     config = new Configuration();
-    JsonObject dbConfig = config.configLoader(2, vertx);
+    JsonObject dbConfig = config.configLoader(3, vertx);
     LOGGER.info(dbConfig);
     databaseIP = dbConfig.getString("meteringDatabaseIP");
     databasePort = dbConfig.getInteger("meteringDatabasePort");
@@ -77,4 +78,24 @@ public class MeteringServiceTest {
                       vertxTestContext.completeNow();
                     })));
   }
+
+  @Test
+  @DisplayName("Testing Write Query for admin api.")
+  void writeAdminData(VertxTestContext vertxTestContext) {
+    JsonObject request = new JsonObject();
+    request.put(USER_ID, "15c7506f-c800-48d6-adeb-0542b03947c6");
+    request.put(IID, "rs.iudx.io");
+    request.put(API, "/admin/gis/serverInfo");
+    meteringService.executeWriteQuery(
+        request,
+        vertxTestContext.succeeding(
+            response ->
+                vertxTestContext.verify(
+                    () -> {
+                      LOGGER.info("RESPONSE" + response.getString("title"));
+                      assertTrue(response.getString("title").equals("Success"));
+                      vertxTestContext.completeNow();
+                    })));
+  }
+
 }

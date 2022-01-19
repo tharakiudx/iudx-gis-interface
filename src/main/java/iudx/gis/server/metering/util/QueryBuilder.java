@@ -52,7 +52,6 @@ public class QueryBuilder {
                 .replace("$6", isoTime)
                 .replace("$7", providerID));
 
-    LOGGER.info("Info: Query " + query);
     return new JsonObject().put(QUERY_KEY, query);
   }
 
