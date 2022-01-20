@@ -34,8 +34,8 @@ public class ConsumerAuthStrategy implements AuthorizationStrategy {
     }
     String endpoint = authRequest.getApi().getApiEndpoint();
     Method method = authRequest.getMethod();
-    LOGGER.info("authorization request for : " + endpoint + " with method : " + method.name());
-    LOGGER.info("allowed access : " + access);
+    LOGGER.debug("authorization request for : " + endpoint + " with method : " + method.name());
+    LOGGER.debug("allowed access : " + access);
 
     if (!result && access.contains(IudxAccess.API.getAccess())) {
       result = consumerAuthorizationRules.get(IudxAccess.API.getAccess()).contains(authRequest);

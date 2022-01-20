@@ -83,7 +83,7 @@ public class JwtAuthServiceImplTest {
   @Test
   @DisplayName("Testing setup")
   public void shouldSucceed(VertxTestContext testContext) {
-    LOGGER.info("Default test is passing");
+    LOGGER.debug("Default test is passing");
     testContext.completeNow();
   }
 

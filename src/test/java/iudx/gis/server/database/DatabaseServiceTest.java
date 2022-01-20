@@ -117,7 +117,7 @@ public class DatabaseServiceTest {
     database.insertAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Insert admin details without access info response is: {}", response.toString());
+        LOGGER.debug("Insert admin details without access info response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
@@ -143,7 +143,7 @@ public class DatabaseServiceTest {
     database.insertAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Insert admin details with access info response is: {}", response.toString());
+        LOGGER.debug("Insert admin details with access info response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
@@ -168,7 +168,7 @@ public class DatabaseServiceTest {
     database.updateAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Update admin details without access info response is: {}", response.toString());
+        LOGGER.debug("Update admin details without access info response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
@@ -194,7 +194,7 @@ public class DatabaseServiceTest {
     database.updateAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Update admin details with access info response is: {}", response.toString());
+        LOGGER.debug("Update admin details with access info response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
@@ -215,7 +215,7 @@ public class DatabaseServiceTest {
     database.deleteAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Delete admin details response is: {}", response.toString());
+        LOGGER.debug("Delete admin details response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
@@ -236,7 +236,7 @@ public class DatabaseServiceTest {
     database.deleteAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Delete admin details response is: {}", response.toString());
+        LOGGER.debug("Delete admin details response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {

@@ -140,7 +140,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     HttpServerOptions serverOptions = new HttpServerOptions();
 
     if (isSSL) {
-      LOGGER.debug("Info: Starting HTTPs server");
+      LOGGER.info("Info: Starting HTTPs server");
 
       /* Read the configuration and set the HTTPs server properties. */
 
@@ -154,7 +154,7 @@ public class ApiServerVerticle extends AbstractVerticle {
           .setKeyStoreOptions(new JksOptions().setPath(keystore).setPassword(keystorePassword));
 
     } else {
-      LOGGER.debug("Info: Starting HTTP server");
+      LOGGER.info("Info: Starting HTTP server");
 
       /* Setup the HTTP server properties, APIs and port. */
 
@@ -240,7 +240,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void handleDeleteAdminPath(RoutingContext routingContext) {
-    LOGGER.debug("Info:handleDeleteAdminPath method started.;");
+    LOGGER.trace("Info:handleDeleteAdminPath method started.;");
     HttpServerResponse response = routingContext.response();
     String resourceId = routingContext.queryParams().get(ID);
 
@@ -260,7 +260,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void handlePutAdminPath(RoutingContext routingContext) {
-    LOGGER.debug("Info:handlePutAdminPath method started.;");
+    LOGGER.trace("Info:handlePutAdminPath method started.;");
     HttpServerResponse response = routingContext.response();
 
     JsonObject requestBody = routingContext.getBodyAsJson();
@@ -281,7 +281,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void handlePostAdminPath(RoutingContext routingContext) {
-    LOGGER.debug("Info:handlePostAdminPath method started.;");
+    LOGGER.trace("Info:handlePostAdminPath method started.;");
     HttpServerResponse response = routingContext.response();
     JsonObject requestBody = routingContext.getBodyAsJson();
 
@@ -302,7 +302,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void handleEntitiesQuery(RoutingContext routingContext) {
-    LOGGER.debug("Info:handleEntitiesQuery method started.;");
+    LOGGER.trace("Info:handleEntitiesQuery method started.;");
     /* Handles HTTP request from client */
     JsonObject authInfo = (JsonObject) routingContext.data().get("authInfo");
     HttpServerRequest request = routingContext.request();
@@ -328,10 +328,10 @@ public class ApiServerVerticle extends AbstractVerticle {
         json,
         handler -> {
           if (handler.succeeded()) {
-            LOGGER.info("Success: Search Success");
+            LOGGER.debug("Success: Search Success");
             Future.future(fu -> updateAuditTable(context));
             handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result());
-            LOGGER.info("CONTEXT " + context);
+            LOGGER.debug("CONTEXT " + context);
           } else if (handler.failed()) {
             LOGGER.error("Fail: Search Fail");
             processBackendResponse(response, handler.cause().getMessage());
@@ -355,7 +355,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void processBackendResponse(HttpServerResponse response, String failureMessage) {
-    LOGGER.debug("Info : " + failureMessage);
+    LOGGER.trace("Info : " + failureMessage);
     try {
       JsonObject json = new JsonObject(failureMessage);
       int type = json.getInteger(JSON_TYPE);
@@ -425,7 +425,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         request,
         handler -> {
           if (handler.succeeded()) {
-            LOGGER.info("audit table updated");
+            LOGGER.debug("audit table updated");
             promise.complete();
           } else {
             LOGGER.error("failed to update audit table");

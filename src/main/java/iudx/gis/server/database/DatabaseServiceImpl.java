@@ -46,10 +46,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     Future<JsonObject> getGISURL = getURLInDb(request.getString("id"));
     getGISURL.onComplete(getUserApiKeyHandler -> {
       if (getUserApiKeyHandler.succeeded()) {
-        LOGGER.info("DATABASE_READ_SUCCESS");
+        LOGGER.debug("DATABASE_READ_SUCCESS");
         handler.handle(Future.succeededFuture(getUserApiKeyHandler.result()));
       } else {
-        LOGGER.info("DATABASE_READ_FAILURE");
+        LOGGER.debug("DATABASE_READ_FAILURE");
       }
     });
     return this;
@@ -203,7 +203,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
   Future<JsonObject> getURLInDb(String id) {
 
-    LOGGER.debug("Info : PSQLClient#getUserInDb() started");
+    LOGGER.trace("Info : PSQLClient#getUserInDb() started");
     Promise<JsonObject> promise = Promise.promise();
     JsonObject response = new JsonObject();
     String query = SELECT_GIS_SERVER_URL.replace("$1", id);
@@ -217,12 +217,11 @@ public class DatabaseServiceImpl implements DatabaseService {
         RowSet<Row> result = db.result();
         if (db.result().size() > 0) {
           for (Row row : result) {
-            LOGGER.info("URL: "+row.getString(1));
+            LOGGER.debug("URL: "+row.getString(1));
             url = row.getString(1);
           }
         }
         response.put("URL", url);
-        LOGGER.info("Response "+response);
         promise.complete(response);
       } else {
         LOGGER.fatal("Fail : PSQLClient#getUserInDb()executeAsync failed");
