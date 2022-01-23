@@ -31,8 +31,8 @@
 					}
 				],
 				"url": {
-					"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
-					"protocol": "https",
+					"raw": "http://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
+					"protocol": "http",
 					"host": [
 						"{{host}}"
 					],
@@ -84,8 +84,8 @@
 					}
 				],
 				"url": {
-					"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
-					"protocol": "https",
+					"raw": "http://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
+					"protocol": "http",
 					"host": [
 						"{{host}}"
 					],
@@ -137,8 +137,8 @@
 					}
 				],
 				"url": {
-					"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
-					"protocol": "https",
+					"raw": "http://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
+					"protocol": "http",
 					"host": [
 						"{{host}}"
 					],

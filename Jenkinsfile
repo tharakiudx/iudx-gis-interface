@@ -18,8 +18,8 @@ pipeline {
       steps{
         script {
           echo 'Pulled - ' + env.GIT_BRANCH
-          // devImage = docker.build( devRegistry, "-f ./docker/dev.dockerfile .")
-          // deplImage = docker.build( deplRegistry, "-f ./docker/depl.dockerfile .")
+          devImage = docker.build( devRegistry, "-f ./docker/dev.dockerfile .")
+          deplImage = docker.build( deplRegistry, "-f ./docker/depl.dockerfile .")
           testImage = docker.build( testRegistry, "-f ./docker/test.dockerfile .")
         }
       }
@@ -57,7 +57,7 @@ pipeline {
       steps{
         script{
             sh 'scp src/test/resources/IUDX-GIS-SERVER.postman_collection.json jenkins@jenkins-master:/var/lib/jenkins/iudx/gis/Newman/'
-            sh 'docker-compose -f docker-compose.test.yml up -d perfTest'
+            sh 'docker-compose -f docker-compose.test.yml up -d integTest'
             sh 'sleep 45'
         }
       }
@@ -69,7 +69,7 @@ pipeline {
           script{
             startZap ([host: 'localhost', port: 8090, zapHome: '/var/lib/jenkins/tools/com.cloudbees.jenkins.plugins.customtools.CustomTool/OWASP_ZAP/ZAP_2.11.0'])
               sh 'curl http://127.0.0.1:8090/JSON/pscan/action/disableScanners/?ids=10096'
-              sh 'HTTP_PROXY=\'127.0.0.1:8090\' newman run /var/lib/jenkins/iudx/di/Newman/IUDX-GIS-SERVER.postman_collection.json -e /home/ubuntu/configs/gis-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/gis/Newman/report/report.html'
+              sh 'HTTP_PROXY=\'127.0.0.1:8090\' newman run /var/lib/jenkins/iudx/gis/Newman/IUDX-GIS-SERVER.postman_collection.json -e /home/ubuntu/configs/gis-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/gis/Newman/report/report.html'
             runZapAttack()
           }
         }
