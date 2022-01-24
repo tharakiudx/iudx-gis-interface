@@ -41,7 +41,6 @@ public class MeteringServiceTest {
     vertxObj = vertx;
     config = new Configuration();
     JsonObject dbConfig = config.configLoader(3, vertx);
-    LOGGER.info(dbConfig);
     databaseIP = dbConfig.getString("meteringDatabaseIP");
     databasePort = dbConfig.getInteger("meteringDatabasePort");
     databaseName = dbConfig.getString("meteringDatabaseName");
@@ -73,7 +72,6 @@ public class MeteringServiceTest {
             response ->
                 vertxTestContext.verify(
                     () -> {
-                      LOGGER.info("RESPONSE" + response.getString("title"));
                       assertTrue(response.getString("title").equals("Success"));
                       vertxTestContext.completeNow();
                     })));
@@ -92,10 +90,8 @@ public class MeteringServiceTest {
             response ->
                 vertxTestContext.verify(
                     () -> {
-                      LOGGER.info("RESPONSE" + response.getString("title"));
                       assertTrue(response.getString("title").equals("Success"));
                       vertxTestContext.completeNow();
                     })));
   }
-
 }
