@@ -143,7 +143,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": \"open-resource-id\",\n    \"server-url\": \"URL\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
+							"raw": "{\n    \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059\",\n    \"server-url\": \"URL\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -216,7 +216,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": \"open-resource-id\",\n    \"server-url\": \"URL\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
+							"raw": "{\n    \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059\",\n    \"server-url\": \"URL\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -461,7 +461,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=close-resource-id",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta",
 							"protocol": "https",
 							"host": [
 								"{{host}}"
@@ -475,7 +475,7 @@
 							"query": [
 								{
 									"key": "id",
-									"value": "close-resource-id"
+									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta"
 								}
 							]
 						}

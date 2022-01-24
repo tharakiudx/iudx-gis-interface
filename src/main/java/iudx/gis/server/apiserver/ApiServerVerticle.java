@@ -195,13 +195,9 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     router.get(ADMIN_BASE_PATH).handler(this::handleGetAdminPath);
 
-    // don't forget to comment .handler(adminCrudPathValidationHandler) &
-    //        .handler(adminCrudPathIdValidationHandler) (for delete) in all the three routers below
-    // for testing purpose
-
     router
         .post(ADMIN_BASE_PATH)
-//        .handler(adminCrudPathValidationHandler)
+        .handler(adminCrudPathValidationHandler)
         .handler(AuthHandler.create(vertx))
         .handler(this::handlePostAdminPath)
         .failureHandler(validationsFailureHandler);
