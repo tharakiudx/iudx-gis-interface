@@ -77,7 +77,6 @@ public class AuthHandler implements Handler<RoutingContext> {
     LOGGER.debug("Info :" + context.request().path());
     LOGGER.debug("Info :" + context.request().path().split("/").length);
 
-    LOGGER.debug("Request JSON: {}", requestJson);
     authenticator.tokenIntrospect(
         requestJson,
         authInfo,

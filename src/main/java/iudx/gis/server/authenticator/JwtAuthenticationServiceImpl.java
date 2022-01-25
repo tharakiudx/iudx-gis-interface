@@ -85,7 +85,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     Future<JwtData> jwtDecodeFuture = decodeJwt(token);
 
     ResultContainer result = new ResultContainer();
-    LOGGER.info("endPoint " + endPoint);
+    LOGGER.debug("endPoint " + endPoint);
     if (endPoint != null && endPoint.equals(ADMIN_BASE_PATH)) {
       jwtDecodeFuture
           .compose(
@@ -157,7 +157,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   }
 
   private Future<String> isOpenResource(String id) {
-    LOGGER.debug("isOpenResource() started");
+    LOGGER.trace("isOpenResource() started");
     Promise<String> promise = Promise.promise();
 
     String ACL = resourceIdCache.getIfPresent(id);
@@ -206,8 +206,8 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     if (jwtData.getRole().equals("consumer")) {
 
       if (openResource && OPEN_ENDPOINTS.contains(authInfo.getString("apiEndpoint"))) {
-        LOGGER.info("IS OPEN");
-        LOGGER.info("User access is allowed.");
+        LOGGER.debug("IS OPEN");
+        LOGGER.debug("User access is allowed.");
         JsonObject jsonResponse = new JsonObject();
         jsonResponse.put(JSON_IID, jwtId);
         jsonResponse.put(JSON_USERID, jwtData.getSub());
@@ -220,11 +220,11 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
       IudxRole role = IudxRole.fromRole(jwtData.getRole());
       AuthorizationStrategy authStrategy = AuthorizationContextFactory.create(role);
-      LOGGER.info("strategy : " + authStrategy.getClass().getSimpleName());
+      LOGGER.debug("strategy : " + authStrategy.getClass().getSimpleName());
       JwtAuthorization jwtAuthStrategy = new JwtAuthorization(authStrategy);
-      LOGGER.info("endPoint : " + authInfo.getString("apiEndpoint"));
+      LOGGER.debug("endPoint : " + authInfo.getString("apiEndpoint"));
       if (jwtAuthStrategy.isAuthorized(authRequest, jwtData)) {
-        LOGGER.info("User access is allowed.");
+        LOGGER.debug("User access is allowed.");
         JsonObject jsonResponse = new JsonObject();
         jsonResponse.put(JSON_USERID, jwtData.getSub());
         jsonResponse.put(JSON_IID, jwtId);
@@ -236,12 +236,12 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
                 .toString());
         promise.complete(jsonResponse);
       } else {
-        LOGGER.info("failed");
+        LOGGER.debug("failed");
         JsonObject result = new JsonObject().put("401", "no access provided to endpoint");
         promise.fail(result.toString());
       }
     } else {
-      LOGGER.info("failed");
+      LOGGER.debug("failed");
       JsonObject result = new JsonObject().put("401", "only consumer access allowed.");
       promise.fail(result.toString());
     }
@@ -277,14 +277,14 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     Promise<JsonObject> promise = Promise.promise();
     String jwtId = jwtData.getIid().split(":")[1];
     String role = jwtData.getRole();
-    LOGGER.info("ROLE " + role);
+    LOGGER.debug("ROLE " + role);
     JsonObject jsonResponse = new JsonObject();
     if (role.equalsIgnoreCase("admin")) {
       jsonResponse.put(JSON_USERID, jwtData.getSub());
       jsonResponse.put(JSON_IID, jwtId);
       promise.complete(jsonResponse);
     } else {
-      LOGGER.info("failed");
+      LOGGER.debug("failed");
       JsonObject result = new JsonObject().put("401", "Only admin access allowed.");
       promise.fail(result.toString());
     }
@@ -303,7 +303,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   }
 
   public Future<Boolean> isValidId(JwtData jwtData, String id) {
-    LOGGER.debug("Is Valid Started. ");
+    LOGGER.trace("Is Valid Started. ");
     Promise<Boolean> promise = Promise.promise();
     String jwtId = jwtData.getIid().split(":")[1];
     if (id.equalsIgnoreCase(jwtId)) {
@@ -317,7 +317,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   }
 
   private Future<Boolean> isResourceExist(String id, String groupACL) {
-    LOGGER.debug("isResourceExist() started");
+    LOGGER.trace("isResourceExist() started");
     Promise<Boolean> promise = Promise.promise();
     String resourceExist = resourceIdCache.getIfPresent(id);
     if (resourceExist != null) {
@@ -357,7 +357,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   }
 
   private Future<String> getGroupAccessPolicy(String groupId) {
-    LOGGER.debug("getGroupAccessPolicy() started");
+    LOGGER.trace("getGroupAccessPolicy() started");
     Promise<String> promise = Promise.promise();
     String groupACL = resourceGroupCache.getIfPresent(groupId);
     if (groupACL != null) {
@@ -400,7 +400,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
                   promise.complete(resourceACL);
                 } catch (Exception ignored) {
                   LOGGER.error(ignored.getMessage());
-                  LOGGER.debug("Info: Group ID invalid : Empty response in results from Catalogue");
+                  LOGGER.error("Info: Group ID invalid : Empty response in results from Catalogue");
                   promise.fail("Resource not found");
                 }
               });

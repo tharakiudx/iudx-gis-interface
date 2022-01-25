@@ -53,12 +53,6 @@ public class MeteringServiceTest {
     vertxTestContext.completeNow();
   }
 
-  // @AfterAll
-  // public void finish(VertxTestContext testContext) {
-  // logger.info("finishing");
-  // vertxObj.close(testContext.succeeding(response -> testContext.completeNow()));
-  // }
-
   @Test
   @DisplayName("Testing Write Query")
   void writeData(VertxTestContext vertxTestContext) {
@@ -94,4 +88,5 @@ public class MeteringServiceTest {
                       vertxTestContext.completeNow();
                     })));
   }
+
 }
