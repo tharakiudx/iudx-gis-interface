@@ -3,25 +3,22 @@ package iudx.gis.server.common;
 import io.vertx.core.json.JsonObject;
 
 /**
- * <p>
  * Response Object can be used to pass URN based messages/responses between different verticles,
  * mostly in case of failures. where following parameters can be used
- * 
+ *
  * <pre>
  *  type    : String representation of URN like urn:dx:rs:SomeErrorURN
  *  status  : HttpPstatus code (e.g 404,400 etc.)
  *  title   : brief error title
  *  detail  : detailed message
  * </pre>
- * </p>
- * 
  */
 public class Response {
 
-  private String type;
-  private int status;
-  private String title;
-  private String detail;
+  private final String type;
+  private final int status;
+  private final String title;
+  private final String detail;
 
   private Response(Builder builder) {
     this.type = builder.type;
@@ -41,6 +38,18 @@ public class Response {
     return json;
   }
 
+  public String getType() {
+    return type;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  @Override
+  public String toString() {
+    return toJson().toString();
+  }
 
   public static class Builder {
     private String type;
@@ -72,29 +81,4 @@ public class Response {
       return new Response(this);
     }
   }
-
-
-  public String getType() {
-    return type;
-  }
-
-  public int getStatus() {
-    return status;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public String getDetail() {
-    return detail;
-  }
-
-  @Override
-  public String toString() {
-    return toJson().toString();
-  }
-
-
-
 }

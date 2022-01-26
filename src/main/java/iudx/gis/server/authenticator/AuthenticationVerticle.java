@@ -1,7 +1,5 @@
 package iudx.gis.server.authenticator;
 
-import static iudx.gis.server.apiserver.util.Constants.PG_SERVICE_ADD;
-
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -22,9 +20,8 @@ import org.apache.logging.log4j.Logger;
  *
  * <h1>Authentication Verticle</h1>
  *
- * <p>
- * The Authentication Verticle implementation in the the IUDX Resource Server exposes the
- * {@link iudx.resource.server.authenticator.AuthenticationService} over the Vert.x Event Bus.
+ * <p>The Authentication Verticle implementation in the the IUDX Resource Server exposes the {@link
+ * iudx.resource.server.authenticator.AuthenticationService} over the Vert.x Event Bus.
  *
  * @version 1.0
  * @since 2020-05-31
@@ -42,7 +39,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
     return createWebClient(vertx, config, false);
   }
 
-  static WebClient createWebClient(Vertx vertxObj, JsonObject config, boolean testing) {
+  public static WebClient createWebClient(Vertx vertxObj, JsonObject config, boolean testing) {
     WebClientOptions webClientOptions = new WebClientOptions();
     if (testing) {
       webClientOptions.setTrustAll(true).setVerifyHost(false);
@@ -65,7 +62,6 @@ public class AuthenticationVerticle extends AbstractVerticle {
         .onSuccess(
             handler -> {
               String cert = handler;
-              LOGGER.info("cert : " + cert);
               binder = new ServiceBinder(vertx);
 
               JWTAuthOptions jwtAuthOptions = new JWTAuthOptions();
@@ -75,8 +71,8 @@ public class AuthenticationVerticle extends AbstractVerticle {
                * Default jwtIgnoreExpiry is false. If set through config, then that value is taken
                */
               boolean jwtIgnoreExpiry =
-                  config().getBoolean("jwtIgnoreExpiry") != null &&
-                      config().getBoolean("jwtIgnoreExpiry");
+                  config().getBoolean("jwtIgnoreExpiry") != null
+                      && config().getBoolean("jwtIgnoreExpiry");
               if (jwtIgnoreExpiry) {
                 jwtAuthOptions.getJWTOptions().setIgnoreExpiration(true);
                 LOGGER.warn(
@@ -84,10 +80,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
               }
               JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
 
-
-              jwtAuthenticationService =
-                  new JwtAuthenticationServiceImpl(
-                      vertx, jwtAuth,config());
+              jwtAuthenticationService = new JwtAuthenticationServiceImpl(vertx, jwtAuth, config());
 
               /* Publish the Authentication service with the Event Bus against an address. */
               consumer =
@@ -109,7 +102,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
     binder.unregister(consumer);
   }
 
-  private Future<String> getJwtPublicKey(Vertx vertx, JsonObject config) {
+  public Future<String> getJwtPublicKey(Vertx vertx, JsonObject config) {
     Promise<String> promise = Promise.promise();
     webClient = createWebClient(vertx, config);
     webClient

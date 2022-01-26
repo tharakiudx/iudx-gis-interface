@@ -74,7 +74,7 @@ public class CatalogueService {
               groupCache.put(id, res.getString("accessPolicy", "SECURE"));
             });
             LOGGER.debug("Cache has been populated!"); 
-            LOGGER.info(groupCache.size());
+            LOGGER.debug(groupCache.size());
             promise.complete(true);
           } else if (handler.failed()) {
             promise.fail(handler.cause());
@@ -122,7 +122,6 @@ public class CatalogueService {
     catWebClient.get(catPort, catHost, catItemPath).addQueryParam("id", id).send(catHandler -> {
       if (catHandler.succeeded()) {
         JsonArray response = catHandler.result().bodyAsJsonObject().getJsonArray("results");
-        System.out.println(response);
         response.forEach(json -> {
           JsonObject res = (JsonObject) json;
           if (res.containsKey("accessPolicy"))
@@ -157,14 +156,12 @@ public class CatalogueService {
   }
   
   public Future<Boolean> isItemExist(String id) {
-    LOGGER.debug("isItemExist() started");
+    LOGGER.trace("isItemExist() started");
     Promise<Boolean> promise = Promise.promise();
-    LOGGER.info("id : " + id);
     catWebClient.get(catPort, catHost, catItemPath).addQueryParam("id", id)
         .expect(ResponsePredicate.JSON).send(responseHandler -> {
           if (responseHandler.succeeded()) {
             HttpResponse<Buffer> response = responseHandler.result();
-            LOGGER.info("RES "+ response.bodyAsString());
             JsonObject responseBody = response.bodyAsJsonObject();
             if (responseBody.getString("type").equalsIgnoreCase("urn:dx:cat:Success")
                 && responseBody.getInteger("totalHits") > 0) {

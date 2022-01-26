@@ -43,6 +43,12 @@
           "$id": "#root/properties/accessInfo/properties/password",
           "type": "string",
           "title": "Password"
+        },
+        "tokenURL": {
+          "$id": "#root/properties/accessInfo/properties/tokenURL",
+          "type": "string",
+          "title": "tokenURL",
+          "pattern": "^.*$"
         }
       }
     }

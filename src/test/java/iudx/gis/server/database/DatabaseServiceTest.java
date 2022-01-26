@@ -29,6 +29,7 @@ public class DatabaseServiceTest {
   private static String username;
   private static String password;
   private static int serverPort;
+  public static String tokenUrl;
   private static String serverUrl;
   private static JsonObject accessInfo;
 
@@ -53,14 +54,14 @@ public class DatabaseServiceTest {
   static void startVertx(Vertx vertx, VertxTestContext vertxTestContext) {
 
     dbConfig = new Configuration();
-    JsonObject config = dbConfig.configLoader(1, vertx);
+    JsonObject config = dbConfig.configLoader(2, vertx);
 
     try {
       databaseIP = config.getString("databaseIP");
       databasePort = config.getInteger("databasePort");
-      databaseName = config.getString("dbDatabaseName");
-      databaseUserName = config.getString("dbUser");
-      databasePassword = config.getString("dbPassword");
+      databaseName = config.getString("databaseName");
+      databaseUserName = config.getString("databaseUserName");
+      databasePassword = config.getString("databasePassword");
       poolSize = config.getInteger("dbClientPoolSize");
     } catch (Exception e) {
       LOGGER.fatal("Could not set db properties due to: {}", e.getMessage());
@@ -73,10 +74,12 @@ public class DatabaseServiceTest {
     username = UUID.randomUUID().toString();
     password = UUID.randomUUID().toString();
     serverUrl = UUID.randomUUID().toString();
+    tokenUrl=UUID.randomUUID().toString();
     serverPort = ThreadLocalRandom.current().nextInt(1, 5000);
     accessInfo = new JsonObject()
         .put(USERNAME, username)
-        .put(PASSWORD, password);
+        .put(PASSWORD, password)
+        .put(TOKEN_URL,tokenUrl);
 
     /* Set Connection Object */
     if (connectOptions == null) {
@@ -109,12 +112,12 @@ public class DatabaseServiceTest {
         .put(SECURE, false);
 
     JsonObject expected = new JsonObject()
-        .put(TYPE, SUCCESS);
+        .put(DETAIL, SUCCESS);
 
     database.insertAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Insert admin details without access info response is: {}", response.toString());
+        LOGGER.debug("Insert admin details without access info response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
@@ -135,12 +138,12 @@ public class DatabaseServiceTest {
         .put(ACCESS_INFO, accessInfo);
 
     JsonObject expected = new JsonObject()
-        .put(TYPE, SUCCESS);
+        .put(DETAIL, SUCCESS);
 
     database.insertAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Insert admin details with access info response is: {}", response.toString());
+        LOGGER.debug("Insert admin details with access info response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
@@ -160,12 +163,12 @@ public class DatabaseServiceTest {
         .put(SECURE, false);
 
     JsonObject expected = new JsonObject()
-        .put(TYPE, SUCCESS);
+        .put(DETAIL, SUCCESS);
 
     database.updateAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Update admin details without access info response is: {}", response.toString());
+        LOGGER.debug("Update admin details without access info response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
@@ -186,12 +189,12 @@ public class DatabaseServiceTest {
         .put(ACCESS_INFO, accessInfo);
 
     JsonObject expected = new JsonObject()
-        .put(TYPE, SUCCESS);
+        .put(DETAIL, SUCCESS);
 
     database.updateAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Update admin details with access info response is: {}", response.toString());
+        LOGGER.debug("Update admin details with access info response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
@@ -207,12 +210,12 @@ public class DatabaseServiceTest {
     String request = resId1;
 
     JsonObject expected = new JsonObject()
-        .put(TYPE, SUCCESS);
+        .put(DETAIL, SUCCESS);
 
     database.deleteAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Delete admin details response is: {}", response.toString());
+        LOGGER.debug("Delete admin details response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
@@ -228,12 +231,12 @@ public class DatabaseServiceTest {
     String request = resId2;
 
     JsonObject expected = new JsonObject()
-        .put(TYPE, SUCCESS);
+        .put(DETAIL, SUCCESS);
 
     database.deleteAdminDetails(request, ar -> {
       if (ar.succeeded()) {
         JsonObject response = ar.result();
-        LOGGER.info("Delete admin details response is: {}", response.toString());
+        LOGGER.debug("Delete admin details response is: {}", response.toString());
         assertEquals(expected, response);
         testContext.completeNow();
       } else {
