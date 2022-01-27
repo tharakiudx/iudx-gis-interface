@@ -1,3 +1,4 @@
+# Run from project root directory
 ARG VERSION="0.0.1-SNAPSHOT"
 
 FROM maven:3-openjdk-11-slim as dependencies
@@ -20,4 +21,4 @@ ARG VERSION
 ENV JAR="iudx.gis.interface-cluster-0.0.1-SNAPSHOT-fat.jar"
 
 WORKDIR /usr/share/app
-COPY --from=builder /target/${JAR} ./fatjar.jar
+COPY --from=builder /usr/share/app/target/${JAR} ./fatjar.jar
