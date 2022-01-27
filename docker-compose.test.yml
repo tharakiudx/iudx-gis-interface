@@ -10,7 +10,7 @@ services:
     image: ghcr.io/karun-singh/gis-test:latest
     environment:
       - RS_URL=https://rs.iudx.org.in
-      - LOG_LEVEL=DEBUG
+      - LOG_LEVEL=INFO
       - RS_JAVA_OPTS=-Xmx1024m
     volumes:
       - /home/ubuntu/configs/gis-config-test.json:/usr/share/app/configs/config-test.json
@@ -31,7 +31,7 @@ services:
     image: ghcr.io/karun-singh/gis-test:latest
     environment:
       - RS_URL=https://rs.iudx.org.in
-      - LOG_LEVEL=DEBUG
+      - LOG_LEVEL=INFO
       - RS_JAVA_OPTS=-Xmx1024m
     volumes:
       - /home/ubuntu/configs/gis-config-test.json:/usr/share/app/configs/config-dev.json

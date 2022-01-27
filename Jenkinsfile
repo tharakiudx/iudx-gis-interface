@@ -25,31 +25,21 @@ pipeline {
       }
     }
 
-    stage('Run Unit Tests and CodeCoverage test'){
+    stage('Unit Tests and CodeCoverage Test'){
       steps{
         script{
           sh 'docker-compose -f docker-compose.test.yml up test'
         }
-      }
-    }
-
-    stage('Capture Unit Test results'){
-      steps{
         xunit (
-          thresholds: [ skipped(failureThreshold: '1'), failed(failureThreshold: '5') ],
+          thresholds: [ skipped(failureThreshold: '0'), failed(failureThreshold: '0') ],
           tools: [ JUnit(pattern: 'target/surefire-reports/*.xml') ]
         )
+        jacoco classPattern: 'target/classes', execPattern: 'target/jacoco.exec', sourcePattern: 'src/main/java'
       }
       post{
         failure{
           error "Test failure. Stopping pipeline execution!"
         }
-      }
-    }
-
-    stage('Capture Code Coverage'){
-      steps{
-        jacoco classPattern: 'target/classes', execPattern: 'target/jacoco.exec', sourcePattern: 'src/main/java'
       }
     }
 
@@ -68,8 +58,8 @@ pipeline {
         node('master') {
           script{
             startZap ([host: 'localhost', port: 8090, zapHome: '/var/lib/jenkins/tools/com.cloudbees.jenkins.plugins.customtools.CustomTool/OWASP_ZAP/ZAP_2.11.0'])
-              sh 'curl http://127.0.0.1:8090/JSON/pscan/action/disableScanners/?ids=10096'
-              sh 'HTTP_PROXY=\'127.0.0.1:8090\' newman run /var/lib/jenkins/iudx/gis/Newman/IUDX-GIS-SERVER.postman_collection.json -e /home/ubuntu/configs/gis-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/gis/Newman/report/report.html --reporter-htmlextra-skipSensitiveData'
+            sh 'curl http://127.0.0.1:8090/JSON/pscan/action/disableScanners/?ids=10096'
+            sh 'HTTP_PROXY=\'127.0.0.1:8090\' newman run /var/lib/jenkins/iudx/gis/Newman/IUDX-GIS-SERVER.postman_collection.json -e /home/ubuntu/configs/gis-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/gis/Newman/report/report.html --reporter-htmlextra-skipSensitiveData'
             runZapAttack()
           }
         }
@@ -78,7 +68,7 @@ pipeline {
         always{
           node('master') {
             script{
-              archiveZap failHighAlerts: 1, failMediumAlerts: 1, failLowAlerts: 15 
+              archiveZap failHighAlerts: 1, failMediumAlerts: 1, failLowAlerts: 1
             }  
             publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/gis/Newman/report/', reportFiles: 'report.html', reportName: 'HTML Report', reportTitles: '', reportName: 'Integration Test Report'])
           }
