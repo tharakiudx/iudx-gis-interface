@@ -1,33 +1,41 @@
 package iudx.gis.server.database;
 
-import static iudx.gis.server.database.util.Constants.*;
+import static iudx.gis.server.database.util.Constants.ACCESS_INFO;
+import static iudx.gis.server.database.util.Constants.DELETE_ADMIN_DETAILS_QUERY;
+import static iudx.gis.server.database.util.Constants.DETAIL;
+import static iudx.gis.server.database.util.Constants.ID;
+import static iudx.gis.server.database.util.Constants.INSERT_ADMIN_DETAILS_QUERY;
+import static iudx.gis.server.database.util.Constants.PASSWORD;
+import static iudx.gis.server.database.util.Constants.SECURE;
+import static iudx.gis.server.database.util.Constants.SELECT_ADMIN_DETAILS_QUERY;
+import static iudx.gis.server.database.util.Constants.SERVER_PORT;
+import static iudx.gis.server.database.util.Constants.SERVER_URL;
+import static iudx.gis.server.database.util.Constants.SUCCESS;
+import static iudx.gis.server.database.util.Constants.TOKEN_URL;
+import static iudx.gis.server.database.util.Constants.UPDATE_ADMIN_DETAILS_QUERY;
+import static iudx.gis.server.database.util.Constants.USERNAME;
 
-import iudx.gis.server.apiserver.ApiServerVerticle;
-import iudx.gis.server.apiserver.exceptions.DxRuntimeException;
-import iudx.gis.server.apiserver.response.ResponseUrn;
-import iudx.gis.server.apiserver.util.HttpStatusCode;
-import iudx.gis.server.database.util.Util;
-import org.apache.http.HttpStatus;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
-
+import iudx.gis.server.apiserver.response.ResponseUrn;
+import iudx.gis.server.apiserver.util.HttpStatusCode;
+import iudx.gis.server.database.util.Util;
 import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class DatabaseServiceImpl implements DatabaseService {
 
-  private static final Logger LOGGER = LogManager.getLogger(DatabaseServiceImpl.class);
-  private PostgresClient pgSQLClient;
   public static final String SELECT_GIS_SERVER_URL =
       "SELECT * FROM gis WHERE iudx_resource_id='$1'";
- 
+  private static final Logger LOGGER = LogManager.getLogger(DatabaseServiceImpl.class);
+  private final PostgresClient pgSQLClient;
+
   public DatabaseServiceImpl(PostgresClient pgClient) {
     // TODO Auto-generated constructor stub
     this.pgSQLClient = pgClient;
@@ -38,24 +46,25 @@ public class DatabaseServiceImpl implements DatabaseService {
     Future<JsonObject> getGISURL = getURLInDb(request.getString("id"));
     getGISURL.onComplete(getUserApiKeyHandler -> {
       if (getUserApiKeyHandler.succeeded()) {
-        LOGGER.info("DATABASE_READ_SUCCESS");
+        LOGGER.debug("DATABASE_READ_SUCCESS");
         handler.handle(Future.succeededFuture(getUserApiKeyHandler.result()));
       } else {
-        LOGGER.info("DATABASE_READ_FAILURE");
+        LOGGER.debug("DATABASE_READ_FAILURE");
       }
     });
     return this;
   }
 
   @Override
-  public DatabaseService insertIntoDb(JsonObject request,
-      Handler<AsyncResult<JsonObject>> handler) {
+  public DatabaseService insertIntoDb(
+      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     handler.handle(Future.succeededFuture(new JsonObject().put("a", "b")));
     return this;
   }
 
   @Override
-  public DatabaseService insertAdminDetails(JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public DatabaseService insertAdminDetails(
+      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String resourceId = request.getString(ID);
     String serverUrl = request.getString(SERVER_URL);
     Long serverPort = request.getLong(SERVER_PORT);
@@ -77,9 +86,10 @@ public class DatabaseServiceImpl implements DatabaseService {
       JsonObject accessObject = accessInfo.get();
       String username = accessObject.getString(USERNAME);
       String password = accessObject.getString(PASSWORD);
-      insertQuery = insertQuery.replace("$5", username).replace("$6", password);
+      String tokenUrl=accessObject.getString(TOKEN_URL);
+      insertQuery = insertQuery.replace("$5", username).replace("$6", password).replace("$7",tokenUrl);
     } else {
-      insertQuery = insertQuery.replace("$5", "").replace("$6", "");
+      insertQuery = insertQuery.replace("$5", "").replace("$6", "").replace("$7","");
     }
 
     String finalInsertQuery = insertQuery;
@@ -97,7 +107,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         })
         .onSuccess(ar -> {
           LOGGER.debug("Insert admin details operation successful");
-          handler.handle(Future.succeededFuture(new JsonObject().put(TYPE, SUCCESS)));
+          handler.handle(Future.succeededFuture(new JsonObject().put(DETAIL, SUCCESS)));
         })
         .onFailure(ar -> {
           LOGGER.error("Insert admin operation failed due to: {}", ar.getLocalizedMessage());
@@ -108,7 +118,8 @@ public class DatabaseServiceImpl implements DatabaseService {
   }
 
   @Override
-  public DatabaseService updateAdminDetails(JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public DatabaseService updateAdminDetails(
+      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String resourceId = request.getString(ID);
     String serverUrl = request.getString(SERVER_URL);
     Long serverPort = request.getLong(SERVER_PORT);
@@ -119,7 +130,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     if (isRequestInvalid(isSecure, accessInfo, handler)) {
       return this;
     }
-
     String searchQuery = SELECT_ADMIN_DETAILS_QUERY.replace("$1", resourceId);
     String updateQuery = UPDATE_ADMIN_DETAILS_QUERY.replace("$1", serverUrl)
         .replace("$2", serverPort.toString())
@@ -130,9 +140,10 @@ public class DatabaseServiceImpl implements DatabaseService {
       JsonObject accessObject = accessInfo.get();
       String username = accessObject.getString(USERNAME);
       String password = accessObject.getString(PASSWORD);
-      updateQuery = updateQuery.replace("$4", username).replace("$5", password);
+      String tokenUrl=accessObject.getString(TOKEN_URL);
+      updateQuery = updateQuery.replace("$4", username).replace("$5", password).replace("$7",tokenUrl);;
     } else {
-      updateQuery = updateQuery.replace("$4", "").replace("$5", "");
+      updateQuery = updateQuery.replace("$4", "").replace("$5", "").replace("$7", "");
     }
 
     String finalUpdateQuery = updateQuery;
@@ -150,7 +161,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         })
         .onSuccess(ar -> {
           LOGGER.debug("Update admin details operation successful!");
-          handler.handle(Future.succeededFuture(new JsonObject().put(TYPE, SUCCESS)));
+          handler.handle(Future.succeededFuture(new JsonObject().put(DETAIL, SUCCESS)));
         })
         .onFailure(ar -> {
           LOGGER.error("Update admin operation failed due to: {}", ar.getLocalizedMessage());
@@ -161,7 +172,8 @@ public class DatabaseServiceImpl implements DatabaseService {
   }
 
   @Override
-  public DatabaseService deleteAdminDetails(String resourceId, Handler<AsyncResult<JsonObject>> handler) {
+  public DatabaseService deleteAdminDetails(
+      String resourceId, Handler<AsyncResult<JsonObject>> handler) {
     String searchQuery = SELECT_ADMIN_DETAILS_QUERY.replace("$1", resourceId);
     String deleteQuery = DELETE_ADMIN_DETAILS_QUERY.replace("$1", resourceId);
 
@@ -179,7 +191,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         })
         .onSuccess(ar -> {
           LOGGER.debug("Delete admin details operation successful!");
-          handler.handle(Future.succeededFuture(new JsonObject().put(TYPE, SUCCESS)));
+          handler.handle(Future.succeededFuture(new JsonObject().put(DETAIL, SUCCESS)));
         })
         .onFailure(ar -> {
           LOGGER.error("Delete admin operation failed due to: {}", ar.getLocalizedMessage());
@@ -191,11 +203,10 @@ public class DatabaseServiceImpl implements DatabaseService {
 
   Future<JsonObject> getURLInDb(String id) {
 
-    LOGGER.debug("Info : PSQLClient#getUserInDb() started");
+    LOGGER.trace("Info : PSQLClient#getUserInDb() started");
     Promise<JsonObject> promise = Promise.promise();
     JsonObject response = new JsonObject();
     String query = SELECT_GIS_SERVER_URL.replace("$1", id);
-    LOGGER.debug("Info : " + query);
     // Check in DB, get username and password
     pgSQLClient.executeAsync(query).onComplete(db -> {
       LOGGER.debug("Info : PSQLClient#getUserInDb()executeAsync completed");
@@ -206,12 +217,11 @@ public class DatabaseServiceImpl implements DatabaseService {
         RowSet<Row> result = db.result();
         if (db.result().size() > 0) {
           for (Row row : result) {
-            LOGGER.info("URL: "+row.getString(1));
+            LOGGER.debug("URL: "+row.getString(1));
             url = row.getString(1);
           }
         }
         response.put("URL", url);
-        LOGGER.info("Response "+response);
         promise.complete(response);
       } else {
         LOGGER.fatal("Fail : PSQLClient#getUserInDb()executeAsync failed");
@@ -221,9 +231,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     return promise.future();
   }
 
-  private boolean isRequestInvalid(Boolean isSecure,
-                                   Optional<JsonObject> accessInfo,
-                                   Handler<AsyncResult<JsonObject>> handler) {
+  private boolean isRequestInvalid(
+      Boolean isSecure, Optional<JsonObject> accessInfo, Handler<AsyncResult<JsonObject>> handler) {
     if (!isSecure) {
       return false;
     }
@@ -232,8 +241,9 @@ public class DatabaseServiceImpl implements DatabaseService {
       JsonObject accessObject = accessInfo.get();
       String username = accessObject.getString(USERNAME);
       String password = accessObject.getString(PASSWORD);
-      if (username==null || username.isEmpty() || password==null || password.isEmpty()) {
-        errorMessage = "Username and Password cannot be empty fields";
+      String tokenUrl=accessObject.getString(TOKEN_URL);
+      if (username==null || username.isEmpty() || password==null || password.isEmpty() || tokenUrl==null || tokenUrl.isEmpty()) {
+        errorMessage = "Access Info cannot contain empty fields.";
       } else {
         return false;
       }

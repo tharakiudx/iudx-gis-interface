@@ -2,6 +2,7 @@ package iudx.gis.server.metering;
 
 import static iudx.gis.server.metering.util.Constants.API;
 import static iudx.gis.server.metering.util.Constants.ID;
+import static iudx.gis.server.metering.util.Constants.IID;
 import static iudx.gis.server.metering.util.Constants.USER_ID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,8 +40,7 @@ public class MeteringServiceTest {
   static void startVertex(Vertx vertx, VertxTestContext vertxTestContext) {
     vertxObj = vertx;
     config = new Configuration();
-    JsonObject dbConfig = config.configLoader(2, vertx);
-    LOGGER.info(dbConfig);
+    JsonObject dbConfig = config.configLoader(3, vertx);
     databaseIP = dbConfig.getString("meteringDatabaseIP");
     databasePort = dbConfig.getInteger("meteringDatabasePort");
     databaseName = dbConfig.getString("meteringDatabaseName");
@@ -52,12 +52,6 @@ public class MeteringServiceTest {
     id = "89a36273d77dac4cf38114fca1bbe64392547f86";
     vertxTestContext.completeNow();
   }
-
-  // @AfterAll
-  // public void finish(VertxTestContext testContext) {
-  // logger.info("finishing");
-  // vertxObj.close(testContext.succeeding(response -> testContext.completeNow()));
-  // }
 
   @Test
   @DisplayName("Testing Write Query")
@@ -72,9 +66,27 @@ public class MeteringServiceTest {
             response ->
                 vertxTestContext.verify(
                     () -> {
-                      LOGGER.info("RESPONSE" + response.getString("title"));
                       assertTrue(response.getString("title").equals("Success"));
                       vertxTestContext.completeNow();
                     })));
   }
+
+  @Test
+  @DisplayName("Testing Write Query for admin api.")
+  void writeAdminData(VertxTestContext vertxTestContext) {
+    JsonObject request = new JsonObject();
+    request.put(USER_ID, "15c7506f-c800-48d6-adeb-0542b03947c6");
+    request.put(IID, "rs.iudx.io");
+    request.put(API, "/admin/gis/serverInfo");
+    meteringService.executeWriteQuery(
+        request,
+        vertxTestContext.succeeding(
+            response ->
+                vertxTestContext.verify(
+                    () -> {
+                      assertTrue(response.getString("title").equals("Success"));
+                      vertxTestContext.completeNow();
+                    })));
+  }
+
 }
