@@ -47,8 +47,8 @@
 							}
 						],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -111,8 +111,8 @@
 							}
 						],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -170,8 +170,8 @@
 							}
 						],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -248,8 +248,8 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -309,8 +309,8 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -370,8 +370,8 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -431,8 +431,8 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -492,8 +492,8 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -553,8 +553,8 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -615,8 +615,8 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -676,8 +676,8 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -728,8 +728,8 @@
 							}
 						],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -786,8 +786,8 @@
 							}
 						],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR050",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR050",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -844,8 +844,8 @@
 							}
 						],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo?id=open-resource-id",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=open-resource-id",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
@@ -902,8 +902,8 @@
 							}
 						],
 						"url": {
-							"raw": "http://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta",
-							"protocol": "http",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta",
+							"protocol": "https",
 							"host": [
 								"{{host}}"
 							],
