@@ -83,7 +83,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   private HttpServer server;
   private Router router;
-  private int port = 8080;
+  private int port;
   private boolean isSSL, isProduction;
   private String keystore;
   private String keystorePassword;
@@ -130,10 +130,9 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
 
     router.route().handler(BodyHandler.create());
-
+    port=config().getInteger("port");
     /* Read ssl configuration. */
     isSSL = config().getBoolean("ssl");
-
     /* Read server deployment configuration. */
     isProduction = config().getBoolean("production");
 
