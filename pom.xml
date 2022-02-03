@@ -12,6 +12,7 @@
 		<hazelcast.version>3.6.3</hazelcast.version>
 		<micrometer.version>1.5.2</micrometer.version>
 		<curator.version>4.0.1</curator.version>
+		<jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -172,6 +173,54 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>post-unit-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>target/jacoco.exec</dataFile>
+							<outputDirectory>target/jacoco-site</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<systemPropertyVariables>
+						<jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
+					</systemPropertyVariables>
+					<excludes>
+						<!-- classes are excluded since they are not testable or don't add
+                            any value if test cases are written. -->
+						<!-- ApiServerVerticle testing is covered in integration for now. -->
+						<exclude>iudx/gis/server/apiserver/*.class</exclude>
+						<exclude>**/*VertxEBProxy.class</exclude>
+						<exclude>**/Constants.class</exclude>
+						<exclude>**/*VertxProxyHandler.class</exclude>
+						<exclude>**/*Verticle.class</exclude>
+						<exclude>iudx/gis/server/deploy/*.class</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
