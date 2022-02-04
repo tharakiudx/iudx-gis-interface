@@ -7,7 +7,7 @@ networks:
 services:
 
   test:
-    image: ghcr.io/karun-singh/gis-test:latest
+    image: ghcr.io/datakaveri/gis-test:latest
     environment:
       - RS_URL=https://rs.iudx.org.in
       - LOG_LEVEL=INFO
@@ -28,7 +28,7 @@ services:
     command: bash -c "docker/runTests.sh"
 
   integTest:
-    image: ghcr.io/karun-singh/gis-test:latest
+    image: ghcr.io/datakaveri/gis-test:latest
     environment:
       - RS_URL=https://rs.iudx.org.in
       - LOG_LEVEL=INFO

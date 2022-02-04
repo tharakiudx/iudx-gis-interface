@@ -1,10 +1,10 @@
 pipeline {
   environment {
-    devRegistry = 'ghcr.io/karun-singh/gis-dev'
-    deplRegistry = 'ghcr.io/karun-singh/gis-depl'
-    testRegistry = 'ghcr.io/karun-singh/gis-test:latest'
+    devRegistry = 'ghcr.io/datakaveri/gis-dev'
+    deplRegistry = 'ghcr.io/datakaveri/gis-depl'
+    testRegistry = 'ghcr.io/datakaveri/gis-test:latest'
     registryUri = 'https://ghcr.io'
-    registryCredential = 'karun-ghcr'
+    registryCredential = 'datakaveri-ghcr'
     GIT_HASH = GIT_COMMIT.take(7)
   }
   agent { 
