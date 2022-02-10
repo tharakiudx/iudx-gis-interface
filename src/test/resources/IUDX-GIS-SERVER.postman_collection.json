@@ -10,6 +10,33 @@
 			"item": [
 				{
 					"name": "200 (Success) url request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");",
+									"    const resultsjsonData = body.results[0];",
+									"    pm.expect(resultsjsonData).to.have.property(\"URL\", \"https://map.varanasismartcity.gov.in/varanasismartcity\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -20,7 +47,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
+							"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
 							"protocol": "https",
 							"host": [
 								"{{host}}"
@@ -34,13 +61,13 @@
 							"query": [
 								{
 									"key": "id",
-									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
-									"disabled": true
+									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055"
 								},
 								{
 									"key": "id",
 									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
-									"description": "closed"
+									"description": "closed",
+									"disabled": true
 								}
 							]
 						}
@@ -49,6 +76,31 @@
 				},
 				{
 					"name": "404 (failed) invalid id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 404 (Not Found)\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -73,11 +125,6 @@
 							"query": [
 								{
 									"key": "id",
-									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
-									"disabled": true
-								},
-								{
-									"key": "id",
 									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
 									"description": "closed"
 								}
@@ -87,7 +134,32 @@
 					"response": []
 				},
 				{
-					"name": "404 (failed) invalid token",
+					"name": "401 (failed) invalid token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 401 (Not Authorized)\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Not Authorized\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -98,7 +170,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
+							"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
 							"protocol": "https",
 							"host": [
 								"{{host}}"
@@ -112,13 +184,13 @@
 							"query": [
 								{
 									"key": "id",
-									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
-									"disabled": true
+									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055"
 								},
 								{
 									"key": "id",
 									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
-									"description": "closed"
+									"description": "closed",
+									"disabled": true
 								}
 							]
 						}
@@ -132,6 +204,31 @@
 			"item": [
 				{
 					"name": "200 (SUCCESS) OPEN ADMIN_BASE_PATH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -167,15 +264,39 @@
 					"response": []
 				},
 				{
-					"name": "401 (FAILED) OPEN ADMIN_BASE_PATH",
+					"name": "400 (FAILED) OPEN ADMIN_BASE_PATH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 400 (Bad Request Data)\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Bad Request\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
 							{
 								"key": "token",
 								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
-								"type": "text",
-								"disabled": true
+								"type": "text"
 							}
 						],
 						"body": {
@@ -205,6 +326,31 @@
 				},
 				{
 					"name": "401 (FAILED) INVALID TOKEN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 401 (Not Authorized)\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Not Authorized\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -241,6 +387,31 @@
 				},
 				{
 					"name": "200 (SUCCESS) CLOSE ADMIN_BASE_PATH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -252,7 +423,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n   \"id\": \"close-resource-id\",\n   \"server-url\": \"URL\",\n   \"server-port\": 1234,\n   \"isSecure\": false,\n   \"accessInfo\": {\n       \"username\": \"username\",\n       \"password\": \"pass\",\n       \"tokenURL\": \"URL\"\n   }\n}\n",
+							"raw": "{\n   \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta\",\n   \"server-url\": \"URL\",\n   \"server-port\": 1234,\n   \"isSecure\": false,\n   \"accessInfo\": {\n       \"username\": \"username\",\n       \"password\": \"pass\",\n       \"tokenURL\": \"URL\"\n   }\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -277,6 +448,31 @@
 				},
 				{
 					"name": "200 (SUCCESS) CLOSE ADMIN_BASE_PATH PUT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -288,7 +484,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"iudx_resource_id\" : \"open-resource-id\",\n\"server-url\":\"URL\",\n\"server-port\":\"1234\",\n\"isSecure\":\"true/false\",\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
+							"raw": "{\n\"id\" : \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":true,\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -312,7 +508,32 @@
 					"response": []
 				},
 				{
-					"name": "400 (FAILED) ID NOT PRESENT",
+					"name": "400 (FAILED) INVALID ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 400 (Bad Request Data)\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Bad Request\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -324,7 +545,69 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"iudx_resource_id\" : \"open-resource-id\",\n\"server-url\":\"URL\",\n\"server-port\":\"1234\",\n\"isSecure\":\"true/false\",\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
+							"raw": "{\n\"id\" : \"open-resource-id\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":true,\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"admin",
+								"gis",
+								"serverInfo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "400 (FAILED) INVALID ID Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 400 (Bad Request)\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Bad Request\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"Update operation failed because passed resource ID does not exist in DB\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "token",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"id\" : \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR058\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":true,\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -349,6 +632,31 @@
 				},
 				{
 					"name": "200 (SUCCESS) OPEN ADMIN_BASE_PATH PUT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -360,7 +668,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"id\" : \"close-resource-id\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":false\n}\n",
+							"raw": "{\n\"id\" : \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":false\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -385,6 +693,31 @@
 				},
 				{
 					"name": "200 (SUCCESS) OPEN ADMIN_BASE_PATH DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -395,7 +728,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=open-resource-id",
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059",
 							"protocol": "https",
 							"host": [
 								"{{host}}"
@@ -409,7 +742,65 @@
 							"query": [
 								{
 									"key": "id",
-									"value": "open-resource-id"
+									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "400 (FAILED) ID Does not Exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 400 (Bad Request)\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"detail\", \"Given resource ID does not exist in DB\");  ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR050",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"admin",
+								"gis",
+								"serverInfo"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR050"
 								}
 							]
 						}
@@ -418,6 +809,31 @@
 				},
 				{
 					"name": "400 (FAILED) INVALID ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 400 (Bad Request)\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"detail\", \"Validation error : Invalid id\");  ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -451,6 +867,31 @@
 				},
 				{
 					"name": "200 (SUCCESS) CLOSE ADMIN_BASE_PATH DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "DELETE",
 						"header": [
