@@ -17,9 +17,10 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		
 		<exec.mainClass>iudx.gis.server.deploy.Deployer</exec.mainClass>
-		<exec.mainClassDev>iudx.gis.server.deploy.DeployerDev
-		</exec.mainClassDev>
+        <exec.mainClassDev>iudx.gis.server.deploy.DeployerDev</exec.mainClassDev>
+        <config-dev.file>config-dev.json</config-dev.file>
 	</properties>
 
 	<dependencyManagement>
