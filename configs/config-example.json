@@ -4,7 +4,6 @@
     "zookeeper"
   ],
   "clusterId": "",
-  "host": "",
   "modules": [
     {
       "id": "iudx.gis.server.apiserver.ApiServerVerticle",
@@ -20,6 +19,7 @@
     {
       "id": "iudx.gis.server.authenticator.AuthenticationVerticle",
       "verticleInstances": 1,
+      "audience": "",
       "authServerHost": "",
       "host": "",
       "catServerHost": "",

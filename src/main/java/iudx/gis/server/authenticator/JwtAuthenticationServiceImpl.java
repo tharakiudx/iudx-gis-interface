@@ -64,7 +64,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
   public JwtAuthenticationServiceImpl(Vertx vertx, final JWTAuth jwtAuth, final JsonObject config) {
     this.jwtAuth = jwtAuth;
-    this.audience = config.getString("host");
+    this.audience = config.getString("audience");
     this.iss = config.getString("authServerHost");
     this.host = config.getString("catServerHost");
     this.port = config.getInteger("catServerPort");
