@@ -46,6 +46,32 @@
       "meteringDatabaseUserName": "",
       "meteringDatabasePassword": "",
       "meteringPoolSize": 25
+    }, {
+      "id":"iudx.gis.server.database.postgres.PostgresVerticle",
+      "isWorkerVerticle":true,
+      "verticleInstances": 1,
+      "databaseIp": "",
+      "databasePort": 1,
+      "databaseName": "",
+      "databaseUserName": "",
+      "databasePassword": "",
+      "poolSize": 25
+
+    },               {
+      "id": "iudx.gis.server.databroker.DataBrokerVerticle",
+      "verticleInstances": 1,
+      "dataBrokerIP": "",
+      "dataBrokerPort": 1,
+      "dataBrokerUserName": "",
+      "dataBrokerVhost": "",
+      "dataBrokerPassword": "",
+      "dataBrokerManagementPort": 1,
+      "connectionTimeout": 1,
+      "requestedHeartbeat": 0,
+      "handshakeTimeout": 0,
+      "requestedChannelMax": 1,
+      "networkRecoveryInterval": 2,
+      "automaticRecoveryEnabled": true
     }
   ]
 }

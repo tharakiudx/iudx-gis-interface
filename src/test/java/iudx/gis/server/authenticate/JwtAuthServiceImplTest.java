@@ -15,6 +15,7 @@ import iudx.gis.server.authenticator.AuthenticationVerticle;
 import iudx.gis.server.authenticator.JwtAuthenticationServiceImpl;
 import iudx.gis.server.authenticator.authorization.Api;
 import iudx.gis.server.authenticator.model.JwtData;
+import iudx.gis.server.cache.CacheService;
 import iudx.gis.server.configuration.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +35,7 @@ public class JwtAuthServiceImplTest {
   private static String openId;
   private static String closeId;
   private static String invalidId;
+  private static CacheService cacheService;
 
   @BeforeAll
   @DisplayName("Initialize Vertx and deploy Auth Verticle")
@@ -56,7 +58,7 @@ public class JwtAuthServiceImplTest {
 
               JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
               jwtAuthenticationService =
-                  new JwtAuthenticationServiceImpl(vertx, jwtAuth, authConfig);
+                  new JwtAuthenticationServiceImpl(vertx, jwtAuth, authConfig,cacheService);
 
               // since test token doesn't contain valid id's, so forcibly put some dummy id in cache
               // for test.

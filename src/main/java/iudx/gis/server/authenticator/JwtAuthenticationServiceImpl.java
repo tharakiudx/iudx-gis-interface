@@ -29,9 +29,12 @@ import iudx.gis.server.authenticator.authorization.IudxRole;
 import iudx.gis.server.authenticator.authorization.JwtAuthorization;
 import iudx.gis.server.authenticator.authorization.Method;
 import iudx.gis.server.authenticator.model.JwtData;
+import iudx.gis.server.cache.CacheService;
+import iudx.gis.server.cache.cacheImpl.CacheType;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import org.apache.http.HttpStatus;
@@ -49,6 +52,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   final String path;
   final String audience;
   final String iss;
+  final CacheService cache;
   // resourceIdCache will contain info about resources available(& their ACL) in resource server.
   public Cache<String, String> resourceIdCache =
       CacheBuilder.newBuilder()
@@ -62,14 +66,18 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
           .expireAfterAccess(Constants.CACHE_TIMEOUT_AMOUNT, TimeUnit.MINUTES)
           .build();
 
-  public JwtAuthenticationServiceImpl(Vertx vertx, final JWTAuth jwtAuth, final JsonObject config) {
+  public JwtAuthenticationServiceImpl(
+      Vertx vertx,
+      final JWTAuth jwtAuth,
+      final JsonObject config,
+      final CacheService cacheService) {
     this.jwtAuth = jwtAuth;
     this.audience = config.getString("audience");
     this.iss = config.getString("authServerHost");
     this.host = config.getString("catServerHost");
     this.port = config.getInteger("catServerPort");
     this.path = Constants.CAT_RSG_PATH;
-
+    this.cache = cacheService;
     WebClientOptions options = new WebClientOptions();
     options.setTrustAll(true).setVerifyHost(false).setSsl(true);
     catWebClient = WebClient.create(vertx, options);
@@ -93,7 +101,15 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
                 result.jwtData = decodeHandler;
                 return isValidAudienceValue(result.jwtData);
               })
-          .compose(audienceHandler -> isValidIid(result.jwtData))
+          .compose(
+              audienceHandler -> {
+                if (!result.jwtData.getIss().equals(result.jwtData.getSub())) {
+                  return isRevokedClientToken(result.jwtData);
+                } else {
+                  return Future.succeededFuture(true);
+                }
+              })
+          .compose(revokeClientTokenHandler -> isValidIid(result.jwtData))
           .compose(IdHandler -> isValidRole(result.jwtData))
           .onSuccess(successHandler -> handler.handle(Future.succeededFuture(successHandler)))
           .onFailure(
@@ -106,7 +122,15 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
                 result.jwtData = decodeHandler;
                 return isValidAudienceValue(result.jwtData);
               })
-          .compose(audienceHandler -> isValidIssuerValue(result.jwtData))
+          .compose(
+              audienceHandler -> {
+                if (!result.jwtData.getIss().equals(result.jwtData.getSub())) {
+                  return isRevokedClientToken(result.jwtData);
+                } else {
+                  return Future.succeededFuture(true);
+                }
+              })
+          .compose(revokeClientTokenHandler -> isValidIssuerValue(result.jwtData))
           .compose(
               issuerHandler -> {
                 if (!result.jwtData.getIss().equals(result.jwtData.getSub())) {
@@ -277,7 +301,6 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     Promise<JsonObject> promise = Promise.promise();
     String jwtId = jwtData.getIid().split(":")[1];
     String role = jwtData.getRole();
-    LOGGER.debug("ROLE " + role);
     JsonObject jsonResponse = new JsonObject();
     if (role.equalsIgnoreCase("admin")) {
       jsonResponse.put(JSON_USERID, jwtData.getSub());
@@ -353,6 +376,42 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
                 }
               });
     }
+    return promise.future();
+  }
+
+  Future<Boolean> isRevokedClientToken(JwtData jwtData) {
+    LOGGER.trace("isRevokedClientToken started param : ");
+    Promise<Boolean> promise = Promise.promise();
+    CacheType cacheType = CacheType.REVOKED_CLIENT;
+    String subId = jwtData.getSub();
+    JsonObject requestJson = new JsonObject().put("type", cacheType).put("key", subId);
+
+    cache.get(
+        requestJson,
+        handler -> {
+          if (handler.succeeded()) {
+
+            JsonObject responseJson = handler.result();
+            String timestamp = responseJson.getString("value");
+
+            LocalDateTime revokedAt = ZonedDateTime.parse(timestamp).toLocalDateTime();
+            LocalDateTime jwtIssuedAt =
+                (LocalDateTime.ofInstant(
+                    Instant.ofEpochSecond(jwtData.getIat()), ZoneId.systemDefault()));
+
+            if (jwtIssuedAt.isBefore(revokedAt)) {
+              LOGGER.error("Privileges for client are revoked.");
+              JsonObject result = new JsonObject().put("401", "revoked token passes");
+              promise.fail(result.toString());
+            } else {
+              promise.complete(true);
+            }
+          } else {
+            // since no value in cache, this means client_id is valid and not revoked
+            LOGGER.error("cache call result : [fail] " + handler.cause());
+            promise.complete(true);
+          }
+        });
     return promise.future();
   }
 

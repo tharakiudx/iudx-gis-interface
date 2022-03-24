@@ -150,12 +150,30 @@
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-hazelcast</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-rabbitmq-client</artifactId>
+
+		</dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast-zookeeper</artifactId>
             <version>${hazelcast.version}</version>
         </dependency>
-		<!-- -->
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>3.11.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>3.11.1</version>
+			<scope>test</scope>
+		</dependency>
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-x-discovery</artifactId>
