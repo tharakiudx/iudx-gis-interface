@@ -1,5 +1,7 @@
 package iudx.gis.server.database;
 
+import static iudx.gis.server.common.Constants.DATABASE_SERVICE_ADDRESS;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
@@ -10,7 +12,7 @@ import io.vertx.sqlclient.PoolOptions;
 
 public class DatabaseVerticle extends AbstractVerticle {
   private DatabaseService database;
-  private static final String DATABASE_SERVICE_ADDRESS = "iudx.gis.database.service";
+  private static final String SERVICE_ADDRESS = DATABASE_SERVICE_ADDRESS;
   private ServiceBinder binder;
   private MessageConsumer<JsonObject> consumer;
 
@@ -55,7 +57,7 @@ public class DatabaseVerticle extends AbstractVerticle {
     binder = new ServiceBinder(vertx);
     database = new DatabaseServiceImpl(pgClient);
     consumer =
-        binder.setAddress(DATABASE_SERVICE_ADDRESS).register(DatabaseService.class, database);
+        binder.setAddress(SERVICE_ADDRESS).register(DatabaseService.class, database);
   }
 
 
