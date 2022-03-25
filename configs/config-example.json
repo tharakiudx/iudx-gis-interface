@@ -72,6 +72,9 @@
       "requestedChannelMax": 1,
       "networkRecoveryInterval": 2,
       "automaticRecoveryEnabled": true
+    }, {
+      "id": "iudx.gis.server.cache.CacheVerticle",
+      "verticleInstances": 1
     }
   ]
 }
