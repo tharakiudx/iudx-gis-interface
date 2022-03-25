@@ -11,7 +11,7 @@ services:
     environment:
       - RS_URL=https://rs.iudx.org.in
       - LOG_LEVEL=INFO
-      - RS_JAVA_OPTS=-Xmx1024m
+      - GIS_JAVA_OPTS=-Xmx1024m
     volumes:
       - /home/ubuntu/configs/gis-config-test.json:/usr/share/app/configs/config-test.json
       - /home/ubuntu/configs/keystore-gis.jks:/usr/share/app/configs/keystore.jks
@@ -32,7 +32,7 @@ services:
     environment:
       - RS_URL=https://rs.iudx.org.in
       - LOG_LEVEL=INFO
-      - RS_JAVA_OPTS=-Xmx1024m
+      - GIS_JAVA_OPTS=-Xmx1024m
     volumes:
       - /home/ubuntu/configs/gis-config-test.json:/usr/share/app/configs/config-dev.json
       - /home/ubuntu/configs/keystore-gis.jks:/usr/share/app/configs/keystore.jks
