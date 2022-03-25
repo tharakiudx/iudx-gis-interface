@@ -19,12 +19,11 @@ ENV JAR="iudx.gis.interface-cluster-${VERSION}-fat.jar"
 
 WORKDIR /usr/share/app
 
-# Copying dev fatjar from builder stage to final image
+# Copying cluster fatjar from builder stage to final image
 COPY --from=builder /usr/share/app/target/${JAR} ./fatjar.jar
-
-EXPOSE 8080
-EXPOSE 8443
+# Expose http, https and metrics port
+EXPOSE 8080 8443 9000
 # Creating a non-root user
-RUN useradd -r -u 1001 -g root rs-user
+RUN useradd -r -u 1001 -g root gis-user
 # Setting non-root user to use when container starts
-USER rs-user
+USER gis-user

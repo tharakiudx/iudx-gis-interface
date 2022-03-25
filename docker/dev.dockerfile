@@ -22,8 +22,7 @@ WORKDIR /usr/share/app
 # Copying dev fatjar from builder stage to final image
 COPY --from=builder /usr/share/app/target/${JAR} ./fatjar.jar
 
-EXPOSE 8080
-EXPOSE 8443
+EXPOSE 8080 8443
 # Creating a non-root user
 RUN useradd -r -u 1001 -g root gis-user
 # Setting non-root user to use when container starts
