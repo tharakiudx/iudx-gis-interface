@@ -1,8 +1,12 @@
 package iudx.gis.server.authenticate;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import io.micrometer.core.ipc.http.HttpSender.Method;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -23,6 +27,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 @ExtendWith(VertxExtension.class)
 public class JwtAuthServiceImplTest {
@@ -35,7 +42,7 @@ public class JwtAuthServiceImplTest {
   private static String openId;
   private static String closeId;
   private static String invalidId;
-  private static CacheService cacheService;
+  private static CacheService cacheServiceMock;
 
   @BeforeAll
   @DisplayName("Initialize Vertx and deploy Auth Verticle")
@@ -43,6 +50,7 @@ public class JwtAuthServiceImplTest {
     config = new Configuration();
     authConfig = config.configLoader(1, vertx);
 
+    cacheServiceMock=Mockito.mock(CacheService.class);
     authenticationVerticle
         .getJwtPublicKey(vertx, authConfig)
         .onSuccess(
@@ -58,7 +66,7 @@ public class JwtAuthServiceImplTest {
 
               JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
               jwtAuthenticationService =
-                  new JwtAuthenticationServiceImpl(vertx, jwtAuth, authConfig,cacheService);
+                  new JwtAuthenticationServiceImpl(vertx, jwtAuth, authConfig,cacheServiceMock);
 
               // since test token doesn't contain valid id's, so forcibly put some dummy id in cache
               // for test.
@@ -130,6 +138,20 @@ public class JwtAuthServiceImplTest {
     authInfo.put("method", Method.GET);
 
     JsonObject request = new JsonObject();
+    
+    
+    AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
+    when(asyncResult.succeeded()).thenReturn(false);
+
+
+    Mockito.doAnswer(new Answer<AsyncResult<JsonObject>>() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
+        ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(1)).handle(asyncResult);
+        return null;
+      }
+    }).when(cacheServiceMock).get(any(), any());
 
     jwtAuthenticationService.tokenIntrospect(
         request,
@@ -177,6 +199,20 @@ public class JwtAuthServiceImplTest {
     authInfo.put("token", JwtTokenHelper.AdminToken);
     authInfo.put("apiEndpoint", "/admin/gis/serverInfo");
     authInfo.put("method", Method.POST);
+    
+    
+    AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
+    when(asyncResult.succeeded()).thenReturn(false);
+
+
+    Mockito.doAnswer(new Answer<AsyncResult<JsonObject>>() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
+        ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(1)).handle(asyncResult);
+        return null;
+      }
+    }).when(cacheServiceMock).get(any(), any());
 
     jwtAuthenticationService.tokenIntrospect(
         request,
