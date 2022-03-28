@@ -1,7 +1,7 @@
 version: '3.7'
 
 networks:
-  rs-net:
+  gis-net:
     driver: bridge
 
 services:
@@ -11,22 +11,25 @@ services:
     environment:
       - RS_URL=https://rs.iudx.org.in
       - LOG_LEVEL=INFO
-      - RS_JAVA_OPTS=-Xmx4096m
+      - GIS_JAVA_OPTS=-Xmx4096m
     volumes:
       - ./configs/config-depl.json:/usr/share/app/configs/config.json
       - ./configs/keystore.jks:/usr/share/app/configs/keystore.jks
     ports:
-      - "443:8443"
+      - "8080:8080"
+      - "8443:8443"
       - "9000:9000"
     restart: on-failure
+    depends_on:
+      - "zookeeper"
     networks: 
-      - rs-net
+      - gis-net
     logging:
          driver: "json-file"
          options:
              max-file: "5"
              max-size: "100m"
-    command: bash -c "exec java $$RS_JAVA_OPTS  -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar ./fatjar.jar  --host $$(hostname) -c configs/config.json"
+    command: bash -c "exec java $$GIS_JAVA_OPTS  -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar ./fatjar.jar  --host $$(hostname) -c configs/config.json"
 
 
   dev:
@@ -34,26 +37,27 @@ services:
     environment:
       - RS_URL=https://rs.iudx.org.in
       - LOG_LEVEL=DEBUG
-      - RS_JAVA_OPTS=-Xmx1024m
+      - GIS_JAVA_OPTS=-Xmx1024m
     volumes:
       - ./configs/config-dev.json:/usr/share/app/configs/config.json
       - ./configs/keystore.jks:/usr/share/app/configs/keystore.jks
     ports:
       - "8080:8080"
+      - "8443:8443"
       - "9000:9000"
     restart: on-failure
     networks: 
-      - rs-net
+      - gis-net
     logging:
          driver: "json-file"
          options:
              max-file: "5"
              max-size: "100m"
-    command: bash -c "exec java $$RS_JAVA_OPTS  -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar ./fatjar.jar  --host $$(hostname) -c configs/config.json"
+    command: bash -c "exec java $$GIS_JAVA_OPTS  -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar ./fatjar.jar  --host $$(hostname) -c configs/config.json"
 
   zookeeper:
     image: zookeeper:latest
     expose: 
       - "2181"
     networks:
-      - rs-net
+      - gis-net
