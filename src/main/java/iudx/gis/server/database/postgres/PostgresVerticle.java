@@ -29,8 +29,6 @@ public class PostgresVerticle extends AbstractVerticle {
   private PoolOptions poolOptions;
   private PgPool pool;
   private PostgresClient pgClient;
-
-  /* DataBase properties */
   private String databaseIP;
   private int databasePort;
   private String databaseName;
@@ -49,7 +47,6 @@ public class PostgresVerticle extends AbstractVerticle {
     databaseUserName = config().getString("databaseUserName");
     databasePassword = config().getString("databasePassword");
     poolSize = config().getInteger("poolSize");
-
     this.connectOptions =
         new PgConnectOptions()
             .setPort(databasePort)
@@ -59,7 +56,6 @@ public class PostgresVerticle extends AbstractVerticle {
             .setPassword(databasePassword)
             .setReconnectAttempts(2)
             .setReconnectInterval(1000);
-
     this.poolOptions = new PoolOptions().setMaxSize(poolSize);
     this.pool = PgPool.pool(vertx, connectOptions, poolOptions);
 
@@ -81,4 +77,5 @@ public class PostgresVerticle extends AbstractVerticle {
   public void stop() {
     binder.unregister(consumer);
   }
+
 }
