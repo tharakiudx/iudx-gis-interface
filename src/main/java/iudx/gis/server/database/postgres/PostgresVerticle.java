@@ -63,13 +63,11 @@ public class PostgresVerticle extends AbstractVerticle {
 
     pgClient = new PostgresClient(vertx, connectOptions, poolOptions);
     binder = new ServiceBinder(vertx);
-    database = new DatabaseServiceImpl(pgClient);
 
     pgService = new PostgresServiceImpl(this.pool);
 
-    consumer = binder.setAddress(DATABASE_SERVICE_ADDRESS).register(DatabaseService.class, database);
 
-    consumer2 = binder.setAddress(PG_SERVICE_ADDRESS).register(PostgresService.class, pgService);
+    consumer = binder.setAddress(PG_SERVICE_ADDRESS).register(PostgresService.class, pgService);
     LOGGER.info("Postgres verticle started.");
   }
 
