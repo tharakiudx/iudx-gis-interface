@@ -48,10 +48,9 @@
       "meteringPoolSize": 25},
     {
       "id":"iudx.gis.server.database.postgres.PostgresVerticle",
-      "isWorkerVerticle":false,
       "verticleInstances": 1,
       "databaseIp": "",
-      "databasePort": 12324,
+      "databasePort": 1234,
       "databaseName": "",
       "databaseUserName": "",
       "databasePassword": "",
