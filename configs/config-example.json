@@ -8,7 +8,7 @@
     {
       "id": "iudx.gis.server.apiserver.ApiServerVerticle",
       "ssl": true,
-      "port":123,
+      "port":12344,
       "production": false,
       "keystore": "",
       "keystorePassword": "",
@@ -45,7 +45,37 @@
       "meteringDatabaseName": "",
       "meteringDatabaseUserName": "",
       "meteringDatabasePassword": "",
-      "meteringPoolSize": 25
+      "meteringPoolSize": 25},
+    {
+      "id":"iudx.gis.server.database.postgres.PostgresVerticle",
+      "verticleInstances": 1,
+      "databaseIp": "",
+      "databasePort": 1234,
+      "databaseName": "",
+      "databaseUserName": "",
+      "databasePassword": "",
+      "poolSize": 25
+
+    },               {
+      "id": "iudx.gis.server.databroker.DataBrokerVerticle",
+      "verticleInstances": 1,
+      "dataBrokerIP": "",
+      "dataBrokerPort": 1,
+      "dataBrokerUserName": "",
+      "dataBrokerVhost": "",
+      "dataBrokerPassword": "",
+      "dataBrokerManagementPort": 1,
+      "connectionTimeout": 1,
+      "requestedHeartbeat": 0,
+      "handshakeTimeout": 0,
+      "requestedChannelMax": 1,
+      "networkRecoveryInterval": 2,
+      "automaticRecoveryEnabled": true
+
+    }, 
+    {
+      "id": "iudx.gis.server.cache.CacheVerticle",
+      "verticleInstances": 1
     }
   ]
 }

@@ -1,5 +1,8 @@
 package iudx.gis.server.authenticator;
 
+import static iudx.gis.server.common.Constants.AUTHENTICATION_SERVICE_ADDRESS;
+import static iudx.gis.server.common.Constants.CACHE_SERVICE_ADDRESS;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -12,6 +15,7 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.serviceproxy.ServiceBinder;
+import iudx.gis.server.cache.CacheService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,12 +32,13 @@ import org.apache.logging.log4j.Logger;
  */
 public class AuthenticationVerticle extends AbstractVerticle {
 
-  private static final String AUTH_SERVICE_ADDRESS = "iudx.gis.authentication.service";
+  private static final String AUTH_SERVICE_ADDRESS = AUTHENTICATION_SERVICE_ADDRESS;
   private static final Logger LOGGER = LogManager.getLogger(AuthenticationVerticle.class);
   private AuthenticationService jwtAuthenticationService;
   private ServiceBinder binder;
   private MessageConsumer<JsonObject> consumer;
   private WebClient webClient;
+  private CacheService cacheService;
 
   static WebClient createWebClient(Vertx vertx, JsonObject config) {
     return createWebClient(vertx, config, false);
@@ -79,8 +84,8 @@ public class AuthenticationVerticle extends AbstractVerticle {
                     "JWT ignore expiration set to true, do not set IgnoreExpiration in production!!");
               }
               JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
-
-              jwtAuthenticationService = new JwtAuthenticationServiceImpl(vertx, jwtAuth, config());
+              cacheService = CacheService.createProxy(vertx, CACHE_SERVICE_ADDRESS);
+              jwtAuthenticationService = new JwtAuthenticationServiceImpl(vertx, jwtAuth, config(),cacheService);
 
               /* Publish the Authentication service with the Event Bus against an address. */
               consumer =
