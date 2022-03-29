@@ -2,6 +2,7 @@ package iudx.gis.server.databroker;
 
 import static iudx.gis.server.common.Constants.CACHE_SERVICE_ADDRESS;
 import static iudx.gis.server.common.Constants.DATABROKER_SERVICE_ADDRESS;
+import static iudx.gis.server.common.Constants.GIS_INVALID_SUB;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import io.vertx.core.AbstractVerticle;
@@ -107,11 +108,9 @@ public class DataBrokerVerticle extends AbstractVerticle {
 
   private void startRevokedClientListener(CacheService cacheService) {
 
-    client.basicConsumer("invalid-tokens", options, revokedTokenReceivedHandler -> {
+    client.basicConsumer(GIS_INVALID_SUB, options, revokedTokenReceivedHandler -> {
 
       if (revokedTokenReceivedHandler.succeeded()) {
-        LOGGER.info("HERE success");
-
         RabbitMQConsumer mqConsumer = revokedTokenReceivedHandler.result();
         mqConsumer.handler(message -> {
           Buffer body = message.body();
