@@ -1,0 +1,458 @@
+openapi: 3.0.2
+
+schemes:
+  - "http"
+  - "https"
+
+produces:
+  - "application/json"
+  - "text/plain"
+
+consumes:
+  - "application/json"
+  - "text/plain"
+
+info:
+  title: "IUDX Resource Server APIs"
+  version: 3.0.0
+  description: |
+    # Introduction
+    
+    The GIS interface is a resource server which defines the interactions between the consumers interested in GIS data and the upstream GIS Servers.
+    It allows data *admins* to publish gis related info as per the IUDX .
+    It enables *Consumers* of datasources to search and query for data using HTTPs APIs.
+    
+    # API HTTP Responses
+    Apart from the response codes specified in each API, the API server may respond with certain 4xx and 5xx error codes which are related to common API Gateway behaviours.
+    The application should address them accordingly.
+    
+    
+    # Tokens
+    All the <b>*API*</b>  calls to the gis interface should now contain a valid IUDX auth token presented in the query header. To search (or) access a *Secure / Closed* resource, a consumer must get a token for the *Secure / Closed* resource along with the associated constraints from the IUDX Auth Server. For publication of a resource, a consumer must get a token along with the associated constraints from the IUDX Auth Server.
+
+  contact:
+    name: For support contact IUDX Team at
+    email: support@iudx.org.in
+
+tags:
+  - name: Latest Search
+    x-displayName: "Latest URL"
+    description: |
+      A entity search is used by IUDX Data *Consumers* for querying a resource using a <b>valid IUDX</b> `id`. <br/> 
+
+  - name: Admin API
+    x-displayName: "Admin Apis"
+    description: |
+      This API allows an admin to post, put or delete gis related info as per IUDX .
+
+
+paths:
+
+  /ngsi-ld/v1/entities/{id}:
+    get:
+      tags:
+        - Latest Search
+      summary: Latest URL
+      operationId: latest-entities
+      parameters:
+        - name: token
+          in: header
+          description: A <b> valid IUDX Auth token </b> to process the request. <br/> This field is <b> mandatory </b> for accessing a <b> resource </b> .  <br/> If not provided with a valid token, user will be responded with <b> 401 Unauthorized </b> .
+          required: true
+          schema:
+            type: string
+            maxLength: 512
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+
+        - name: id
+          in: path
+          description: A <b> valid IUDX ID </b> of the resource.
+          required: true
+          schema:
+            type: string
+            maxLength: 512
+
+      responses:
+        200:
+          description: 'Successful query'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/entityresponse'
+        204:
+          description: 'Empty Response'
+
+        400:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/standardBadRequestErrorResponse"
+          description: 'Bad query'
+
+        401:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/standardInvalidTokenErrorResponse"
+          description: 'Unauthorized'
+
+        404:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/standardResourceNotFoundErrorResponse"
+          description: 'Not Found'
+
+
+      description: |
+        This <b> API </b> is used to get the data of a resource. <br /> It uses the <b> IUDX ID </b> a.k.a `id` to query the resource server. <br />  To get data a <b> valid IUDX Auth token</b> is mandatory.  <br/> The `/entities` end point followed by `id` as a <b>path parameter</b> is used to get the latest data.
+
+      deprecated: false
+
+
+  /admin/gis/serverInfo:
+    post:
+      tags:
+        - Admin API
+      summary: Publish GIS information
+      operationId: registergisinforequest
+      parameters:
+        - name: token
+          in: header
+          description: 'IUDX auth token for accessing API.'
+          required: true
+          style: simple
+          schema:
+            type: string
+            maxLength: 512
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/registergisinforequest'
+        required: true
+      responses:
+        200:
+          description: 'Successful query'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registerInformation'
+
+        400:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/postInfoBadRequestErrorResponse"
+          description: 'Bad query'
+
+        401:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/standardInvalidTokenErrorResponse"
+          description: 'Unauthorized'
+
+      description: |
+        Post Admin API allows an admin to publish the GIS info into the database. Based on the input provided, the API validates the access control of the user with IUDX Auth server to allow or deny access to the API.
+      deprecated: false
+
+    put:
+      tags:
+        - Admin API
+      summary: Update GIS information
+      operationId: editGisInfoRequest
+      parameters:
+        - name: token
+          in: header
+          description: 'IUDX auth token for accessing API.'
+          required: true
+          style: simple
+          schema:
+            type: string
+            maxLength: 512
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/editgisinforequest'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registerInformation'
+          description: 'Successful query'
+
+        400:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/postInfoBadRequestErrorResponse"
+          description: 'Bad query'
+
+        404:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/putInfoBadRequestErrorResponse"
+          description: 'Unauthorized'
+
+
+      description: |
+        Put Admin API allows an admin to update the GIS info present. Based on the input provided, the API validates the access control of the user with IUDX Auth server to allow or deny access to the API.
+
+  /admin/gis/serverInfo/{id}:
+    delete:
+      tags:
+        - Admin API
+      summary: Delete GIS information
+      operationId: deleteInfo
+      parameters:
+        - name: token
+          in: header
+          description: 'IUDX auth token for accessing API.'
+          required: true
+          style: simple
+          schema:
+            type: string
+            maxLength: 512
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+
+        - name: id
+          in: path
+          description: 'id of the Gis information.'
+          required: true
+          style: simple
+          schema:
+            type: string
+            maxLength: 512
+      responses:
+        200:
+          description: 'Successful query'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registerInformation'
+
+        400:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/deleteInfoBadRequestErrorResponse"
+          description: 'Bad query'
+
+        404:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/putInfoBadRequestErrorResponse"
+          description: 'Resource not found'
+
+      description: |
+        Delete admin API allows an admin to delete Gis information. Based on the input provided, the API validates the access control of the user with IUDX Auth server to allow or deny access to the API. 
+
+
+components:
+  schemas:
+
+    registergisinforequest:
+      title: registergisinforequest
+      required:
+        - entities
+      type: object
+      properties:
+        entities:
+          type: array
+          items:
+            type: string
+      example:
+        id:
+          'iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059'
+        server: URL
+        server-port: 1234
+        isSecure: false
+
+    editgisinforequest:
+      title: editgisinforequest
+      required:
+        - entities
+      type: object
+      properties:
+        entities:
+          type: array
+          items:
+            type: string
+      example:
+        id:
+          'iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059'
+        server: URL
+        server-port: 1234
+        isSecure: true
+
+    entityresponse:
+      title: entityresponse
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        results:
+          type: object
+          properties:
+            id:
+              type: string
+            observationDateTime:
+              type: string
+            trip_id:
+              type: string
+            route_id:
+              type: string
+        limit:
+          type: string
+        offset:
+          type: string
+        totalHits:
+          type: string
+
+      example:
+        type: urn:dx:rs:success
+        title: Successful Operation
+        results: [
+          {
+            "URL": "https://map.varanasismartcity.gov.in/varanasismartcity"
+          }
+        ]
+
+
+    registerInformation:
+      title: registerInformation
+      required:
+        - username
+        - apiKey
+        - id
+        - URL
+        - port
+        - vHost
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        results:
+          type: object
+          properties:
+            username:
+              type: string
+            apiKey:
+              type: string
+            id:
+              type: string
+            URL:
+              type: string
+            port:
+              type: string
+            vHost:
+              type: string
+      example:
+        type: urn:dx:rs:success
+        title: Successful Operation
+        detail: Success
+
+
+
+
+
+    standardBadRequestErrorResponse:
+      title: standardBadRequestErrorResponse
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+      example:
+        type: urn:dx:rs:badRequest
+        title: Bad Request Data
+        detail: Empty response | Missing/Invalid  parameters
+
+    standardInvalidTokenErrorResponse:
+      title: standardInvalidTokenErrorResponse
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+      example:
+        type: urn:dx:rs:invalidAuthorizationToken
+        title: Not Authorized
+        detail: Not Authorized
+
+    standardResourceNotFoundErrorResponse:
+      title: standardResourceNotFoundErrorResponse
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+      example:
+        type: urn:dx:rs:resourceNotFound
+        title: Not Found
+        detail: Resource Not Found
+
+
+    postInfoBadRequestErrorResponse:
+      title: postInfoBadRequestErrorResponse
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+      example:
+        type: urn:dx:gis:invalidPayloadFormat
+        title: Bad Request
+        detail: provided string should respect pattern ^[a-zA-Z0-9.]{4,100}/{1}[a-zA-Z0-9.]{4,100}/{1}[a-zA-Z.]{4,100}/{1}[a-zA-Z-_.]{4,100}/{1}[a-zA-Z0-9-_.]{4,100}$
+
+    putInfoBadRequestErrorResponse:
+      title: putInfoBadRequestErrorResponse
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+      example:
+        type: urn:dx:gis:invalidPayloadFormat
+        title: Bad Request
+        detail: Update operation failed because passed resource ID does not exist in DB
+
+    deleteInfoBadRequestErrorResponse:
+      title: deleteInfoBadRequestErrorResponse
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+      example:
+        type: urn:dx:gis:invalidPayloadFormat
+        title: Bad Request
+        detail: "Validation error : Invalid id"
