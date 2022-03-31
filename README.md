@@ -108,7 +108,16 @@ $ java $RS_JAVA_OPTS -jar target/iudx.gis.interface-dev-0.0.1-SNAPSHOT-fat.jar .
 2. Run the unit tests and generate a surefire report
    `mvn clean test-compile surefire:test surefire-report:report`
 3. Reports are stored in `./target/`
-
+### Integration tests
+Integration tests are through Postman/Newman whose script can be found from [here](src/test/resources/IUDX-GIS-SERVER.postman_collection.json).
+1. Install prerequisites
+   - [postman](https://www.postman.com/) + [newman](https://www.npmjs.com/package/newman)
+   - [newman reporter-htmlextra](https://www.npmjs.com/package/newman-reporter-htmlextra)
+2. Example Postman environment can be found [here](src/test/resources/gis.iudx.io.postman_environment.json)
+3. Run the server through either docker, maven or redeployer
+4. Run the integration tests and generate the newman report
+   `newman run <postman-collection-path> -e <postman-environment> --insecure -r htmlextra --reporter-htmlextra-export .`
+5. Reports are stored in `./target/`
 
 ## Contributing
 We follow Git Merge based workflow
