@@ -109,7 +109,7 @@ $ java $RS_JAVA_OPTS -jar target/iudx.gis.interface-dev-0.0.1-SNAPSHOT-fat.jar .
    `mvn clean test-compile surefire:test surefire-report:report`
 3. Reports are stored in `./target/`
 ### Integration tests
-Integration tests are through Postman/Newman whose script can be found from [here](src/test/resources/IUDX-GIS-SERVER.postman_collection.json).
+Integration tests are through Postman/Newman whose script can be found from [here](src/test/resources/IUDX_GIS_Server_V3.5.postman_collection.json).
 1. Install prerequisites
    - [postman](https://www.postman.com/) + [newman](https://www.npmjs.com/package/newman)
    - [newman reporter-htmlextra](https://www.npmjs.com/package/newman-reporter-htmlextra)
