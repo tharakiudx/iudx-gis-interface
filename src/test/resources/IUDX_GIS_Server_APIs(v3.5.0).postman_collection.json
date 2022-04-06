@@ -271,7 +271,7 @@
 							"script": {
 								"exec": [
 									"// Test the response code",
-									"pm.test(\"response is 200 (OK)\", function () {",
+									"pm.test(\"response is 409 (CONFLICT)\", function () {",
 									"    pm.response.to.have.status(409);",
 									"});",
 									"",
@@ -637,7 +637,7 @@
 							"script": {
 								"exec": [
 									"// Test the response code",
-									"pm.test(\"response is 400 (Bad Request)\", function () {",
+									"pm.test(\"response is 404 (Not Found)\", function () {",
 									"    pm.response.to.have.status(404);",
 									"});",
 									"",
@@ -818,8 +818,8 @@
 							"script": {
 								"exec": [
 									"// Test the response code",
-									"pm.test(\"response is 400 (Bad Request)\", function () {",
-									"    pm.response.to.have.status(400);",
+									"pm.test(\"response is 404 (Not Found)\", function () {",
+									"    pm.response.to.have.status(404);",
 									"});",
 									"",
 									"// Test the response header",
