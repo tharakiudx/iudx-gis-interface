@@ -28,6 +28,7 @@ import static iudx.gis.server.apiserver.util.Constants.MIME_APPLICATION_JSON;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_ID;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_IDPATTERN;
 import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
+import static iudx.gis.server.apiserver.util.Constants.ROUTE_STATIC_SPEC;
 import static iudx.gis.server.apiserver.util.Constants.USER_ID;
 
 import io.vertx.core.AbstractVerticle;
@@ -215,7 +216,14 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(AuthHandler.create(vertx))
         .handler(this::handleDeleteAdminPath)
         .failureHandler(validationsFailureHandler);
-
+    router
+        .get(ROUTE_STATIC_SPEC)
+        .produces(MIME_APPLICATION_JSON)
+        .handler(
+            routingContext -> {
+              HttpServerResponse response = routingContext.response();
+              response.sendFile("docs/openapi.yaml");
+            });
     router
         .route()
         .last()
