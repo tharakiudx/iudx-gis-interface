@@ -25,9 +25,11 @@ import static iudx.gis.server.apiserver.util.Constants.JSON_RESULT;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TITLE;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TYPE;
 import static iudx.gis.server.apiserver.util.Constants.MIME_APPLICATION_JSON;
+import static iudx.gis.server.apiserver.util.Constants.MIME_TEXT_HTML;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_ID;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_IDPATTERN;
 import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
+import static iudx.gis.server.apiserver.util.Constants.ROUTE_DOC;
 import static iudx.gis.server.apiserver.util.Constants.ROUTE_STATIC_SPEC;
 import static iudx.gis.server.apiserver.util.Constants.USER_ID;
 
@@ -224,6 +226,16 @@ public class ApiServerVerticle extends AbstractVerticle {
               HttpServerResponse response = routingContext.response();
               response.sendFile("docs/openapi.yaml");
             });
+    /* Get redoc */
+    router
+        .get(ROUTE_DOC)
+        .produces(MIME_TEXT_HTML)
+        .handler(
+            routingContext -> {
+              HttpServerResponse response = routingContext.response();
+              response.sendFile("docs/apidoc.html");
+            });
+
     router
         .route()
         .last()
