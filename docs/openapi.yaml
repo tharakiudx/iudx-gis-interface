@@ -305,7 +305,7 @@ components:
         results:
           type: object
       example:
-        type: urn:dx:gis:success
+        type: urn:dx:rs:success
         title: Successful Operation
         results: [
           {
@@ -331,7 +331,7 @@ components:
             id:
               type: string
       example:
-        type: urn:dx:gis:success
+        type: urn:dx:rs:success
         title: Successful Operation
         detail: Success
 
@@ -345,7 +345,7 @@ components:
         detail:
           type: string
       example:
-        type: urn:dx:gis:invalidAuthorizationToken
+        type: urn:dx:rs:invalidAuthorizationToken
         title: Not Authorized
         detail: Not Authorized
 
@@ -359,7 +359,7 @@ components:
         detail:
           type: string
       example:
-        type: urn:dx:gis:resourceNotFound
+        type: urn:dx:rs:resourceNotFound
         title: Not Found
         detail: Not Found
 
@@ -374,7 +374,7 @@ components:
         detail:
           type: string
       example:
-        type: urn:dx:gis:invalidPayloadFormat
+        type: urn:dx:rs:invalidPayloadFormat
         title: Bad Request
         detail: provided string should respect pattern ^[a-zA-Z0-9.]{4,100}/{1}[a-zA-Z0-9.]{4,100}/{1}[a-zA-Z.]{4,100}/{1}[a-zA-Z-_.]{4,100}/{1}[a-zA-Z0-9-_.]{4,100}$
 
@@ -388,7 +388,7 @@ components:
         detail:
           type: string
       example:
-        type: urn:dx:gis:resourceNotFound
+        type: urn:dx:rs:resourceNotFound
         title: Not Found
         detail: Update operation failed because passed resource ID does not exist in DB
 
@@ -402,7 +402,7 @@ components:
         detail:
           type: string
       example:
-        type: urn:dx:gis:invalidPayloadFormat
+        type: urn:dx:rs:invalidPayloadFormat
         title: Bad Request
         detail: "Validation error : Invalid id"
 
@@ -416,7 +416,7 @@ components:
         detail:
           type: string
       example:
-        type: urn:dx:gis:resourceAlreadyExists
+        type: urn:dx:rs:resourceAlreadyExists
         title: Conflict
         detail: Insert operation failed because given resource ID already exists in the DB
 
@@ -430,6 +430,6 @@ components:
         detail:
           type: string
       example:
-        type: urn:dx:gis:resourceNotFound
+        type: urn:dx:rs:resourceNotFound
         title: Not Found
         detail: Given resource ID does not exist in DB
