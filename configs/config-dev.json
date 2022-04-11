@@ -8,8 +8,7 @@
     {
       "id": "iudx.gis.server.apiserver.ApiServerVerticle",
       "ssl": true,
-      "port":12344,
-      "production": false,
+      "httpPort":12344,
       "keystore": "",
       "keystorePassword": "",
       "verticleInstances": 2,
