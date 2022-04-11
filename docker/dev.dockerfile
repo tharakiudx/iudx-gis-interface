@@ -18,6 +18,8 @@ ARG VERSION
 ENV JAR="iudx.gis.interface-dev-${VERSION}-fat.jar"
 
 WORKDIR /usr/share/app
+# Copying openapi docs 
+COPY docs docs
 
 # Copying dev fatjar from builder stage to final image
 COPY --from=builder /usr/share/app/target/${JAR} ./fatjar.jar
