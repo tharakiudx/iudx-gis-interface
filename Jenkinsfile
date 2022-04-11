@@ -54,7 +54,7 @@ pipeline {
     stage('Run GIS interface server'){
       steps{
         script{
-            sh 'scp src/test/resources/IUDX_GIS_Server_APIs(v3.5.0).postman_collection.json jenkins@jenkins-master:/var/lib/jenkins/iudx/gis/Newman/'
+            sh 'scp src/test/resources/IUDX_GIS_Server_APIs\(v3.5.0\).postman_collection.json jenkins@jenkins-master:/var/lib/jenkins/iudx/gis/Newman/'
             sh 'docker-compose -f docker-compose.test.yml up -d integTest'
             sh 'sleep 45'
         }
