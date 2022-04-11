@@ -42,7 +42,7 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "{{consumer_token}}",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzEyMTQxNjgsImlhdCI6MTYzMTE3MDk2OCwiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJjb25zdW1lciIsImNvbnMiOnt9fQ.ATXT7FUkuWiEkfQECW4kIjuiGmUbYh51k-8as5-XLUXrWJVFI6LaJnk2JE6gr_RKknNksGEuxodO2rGzkEhfLQ",
 								"type": "text"
 							}
 						],
@@ -234,7 +234,7 @@
 							},
 							{
 								"key": "token",
-								"value": "{{admin_token}}",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
 								"type": "text"
 							}
 						],
@@ -544,7 +544,7 @@
 							},
 							{
 								"key": "token",
-								"value": "{{admin_token}}",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
 								"type": "text"
 							}
 						],
