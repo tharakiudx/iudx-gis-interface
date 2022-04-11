@@ -90,7 +90,7 @@ pipeline {
     stage('Push Image') {
       when{
         expression {
-          return env.GIT_BRANCH == 'origin/v3.5.0';
+          return env.GIT_BRANCH == 'origin/master';
         }
       }
       steps{
