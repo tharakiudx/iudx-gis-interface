@@ -25,9 +25,12 @@ import static iudx.gis.server.apiserver.util.Constants.JSON_RESULT;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TITLE;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TYPE;
 import static iudx.gis.server.apiserver.util.Constants.MIME_APPLICATION_JSON;
+import static iudx.gis.server.apiserver.util.Constants.MIME_TEXT_HTML;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_ID;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_IDPATTERN;
 import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
+import static iudx.gis.server.apiserver.util.Constants.ROUTE_DOC;
+import static iudx.gis.server.apiserver.util.Constants.ROUTE_STATIC_SPEC;
 import static iudx.gis.server.apiserver.util.Constants.USER_ID;
 
 import io.vertx.core.AbstractVerticle;
@@ -193,9 +196,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationHandler adminCrudPathIdValidationHandler =
         new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH_DELETE);
 
-    router.get(ADMIN_BASE_PATH).handler(this::handleGetAdminPath);
-
-
     router
         .post(ADMIN_BASE_PATH)
         .handler(adminCrudPathValidationHandler)
@@ -216,6 +216,23 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(AuthHandler.create(vertx))
         .handler(this::handleDeleteAdminPath)
         .failureHandler(validationsFailureHandler);
+    router
+        .get(ROUTE_STATIC_SPEC)
+        .produces(MIME_APPLICATION_JSON)
+        .handler(
+            routingContext -> {
+              HttpServerResponse response = routingContext.response();
+              response.sendFile("docs/openapi.yaml");
+            });
+    /* Get redoc */
+    router
+        .get(ROUTE_DOC)
+        .produces(MIME_TEXT_HTML)
+        .handler(
+            routingContext -> {
+              HttpServerResponse response = routingContext.response();
+              response.sendFile("docs/apidoc.html");
+            });
 
     router
         .route()
@@ -230,10 +247,6 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
 
     catalogueService = new CatalogueService(vertx, config());
-  }
-
-  private void handleGetAdminPath(RoutingContext routingContext) {
-    handleResponse(routingContext.response(), HttpStatusCode.METHOD_NOT_ALLOWED, METHOD_NOT_FOUND);
   }
 
   private void handleDeleteAdminPath(RoutingContext routingContext) {
@@ -290,7 +303,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             LOGGER.debug("Success: Insert operation successful");
 
             handleSuccessResponse(
-                response, ResponseType.Ok.getCode(), ar.result().getString(JSON_DETAIL));
+                response, ResponseType.Created.getCode(), ar.result().getString(JSON_DETAIL));
           } else {
             LOGGER.error("Fail: Insert operation Failed");
             processBackendResponse(response, ar.cause().getMessage());

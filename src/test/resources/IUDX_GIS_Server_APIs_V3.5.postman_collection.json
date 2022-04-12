@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5c54c654-5216-4834-b97b-89883ed5a54d",
+		"_postman_id": "c048a02c-5647-4f21-9e0c-b42ee48f2e09",
 		"name": "IUDX-GIS-SERVER",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -9,7 +9,7 @@
 			"name": "/entities",
 			"item": [
 				{
-					"name": "200 (Success) url request",
+					"name": "200 (SUCCESS) URL REQUEST",
 					"event": [
 						{
 							"listen": "test",
@@ -62,12 +62,6 @@
 								{
 									"key": "id",
 									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055"
-								},
-								{
-									"key": "id",
-									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
-									"description": "closed",
-									"disabled": true
 								}
 							]
 						}
@@ -75,7 +69,7 @@
 					"response": []
 				},
 				{
-					"name": "404 (failed) invalid id",
+					"name": "404 (FAILED) INVALID ID",
 					"event": [
 						{
 							"listen": "test",
@@ -134,7 +128,7 @@
 					"response": []
 				},
 				{
-					"name": "401 (failed) invalid token",
+					"name": "401 (FAILED) INVALID TOKEN",
 					"event": [
 						{
 							"listen": "test",
@@ -203,15 +197,15 @@
 			"name": "/admin",
 			"item": [
 				{
-					"name": "200 (SUCCESS) OPEN ADMIN_BASE_PATH",
+					"name": "201 (SUCCESS) OPEN ADMIN_BASE_PATH",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
 									"// Test the response code",
-									"pm.test(\"response is 200 (OK)\", function () {",
-									"    pm.response.to.have.status(200);",
+									"pm.test(\"response is 201 (Created)\", function () {",
+									"    pm.response.to.have.status(201);",
 									"});",
 									"",
 									"// Test the response header",
@@ -223,6 +217,73 @@
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
 									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "token",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059\",\n    \"server-url\": \"URL\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"admin",
+								"gis",
+								"serverInfo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "409 (CONFLICT) OPEN ADMIN_BASE_PATH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(409);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Conflict\");  ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -264,6 +325,67 @@
 					"response": []
 				},
 				{
+					"name": "201 (SUCCESS) CLOSE ADMIN_BASE_PATH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 201 (Created)\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta\",\n   \"server-url\": \"URL\",\n   \"server-port\": 1234,\n   \"isSecure\": false,\n   \"accessInfo\": {\n       \"username\": \"username\",\n       \"password\": \"pass\",\n       \"tokenURL\": \"URL\"\n   }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"admin",
+								"gis",
+								"serverInfo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "400 (FAILED) OPEN ADMIN_BASE_PATH",
 					"event": [
 						{
@@ -271,7 +393,7 @@
 							"script": {
 								"exec": [
 									"// Test the response code",
-									"pm.test(\"response is 400 (Bad Request Data)\", function () {",
+									"pm.test(\"response is 400 (Bad Request)\", function () {",
 									"    pm.response.to.have.status(400);",
 									"});",
 									"",
@@ -386,67 +508,6 @@
 					"response": []
 				},
 				{
-					"name": "200 (SUCCESS) CLOSE ADMIN_BASE_PATH",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 200 (OK)\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n   \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta\",\n   \"server-url\": \"URL\",\n   \"server-port\": 1234,\n   \"isSecure\": false,\n   \"accessInfo\": {\n       \"username\": \"username\",\n       \"password\": \"pass\",\n       \"tokenURL\": \"URL\"\n   }\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "https",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"admin",
-								"gis",
-								"serverInfo"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "200 (SUCCESS) CLOSE ADMIN_BASE_PATH PUT",
 					"event": [
 						{
@@ -476,6 +537,11 @@
 					"request": {
 						"method": "PUT",
 						"header": [
+							{
+								"key": "token",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"type": "text"
+							},
 							{
 								"key": "token",
 								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
@@ -515,7 +581,7 @@
 							"script": {
 								"exec": [
 									"// Test the response code",
-									"pm.test(\"response is 400 (Bad Request Data)\", function () {",
+									"pm.test(\"response is 400 (Bad Request)\", function () {",
 									"    pm.response.to.have.status(400);",
 									"});",
 									"",
@@ -569,15 +635,15 @@
 					"response": []
 				},
 				{
-					"name": "400 (FAILED) INVALID ID Copy",
+					"name": "404 (FAILED) ID DOES NOT EXIST",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
 									"// Test the response code",
-									"pm.test(\"response is 400 (Bad Request)\", function () {",
-									"    pm.response.to.have.status(400);",
+									"pm.test(\"response is 404 (Not Found)\", function () {",
+									"    pm.response.to.have.status(404);",
 									"});",
 									"",
 									"// Test the response header",
@@ -588,7 +654,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"title\", \"Bad Request\");",
+									"    pm.expect(body).to.have.property(\"title\", \"Not Found\");",
 									"    pm.expect(body).to.have.property(\"detail\", \"Update operation failed because passed resource ID does not exist in DB\");",
 									"});"
 								],
@@ -724,6 +790,12 @@
 							{
 								"key": "token",
 								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "token",
+								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
 								"type": "text"
 							}
 						],
@@ -750,15 +822,15 @@
 					"response": []
 				},
 				{
-					"name": "400 (FAILED) ID Does not Exist",
+					"name": "404 (FAILED) ID DOES NOT EXIST",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
 									"// Test the response code",
-									"pm.test(\"response is 400 (Bad Request)\", function () {",
-									"    pm.response.to.have.status(400);",
+									"pm.test(\"response is 404 (Not Found)\", function () {",
+									"    pm.response.to.have.status(404);",
 									"});",
 									"",
 									"// Test the response header",
