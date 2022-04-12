@@ -394,7 +394,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
             JsonObject responseJson = handler.result();
             String timestamp = responseJson.getString("value");
 
-            LocalDateTime revokedAt = ZonedDateTime.parse(timestamp).toLocalDateTime();
+            LocalDateTime revokedAt = LocalDateTime.parse(timestamp);
             LocalDateTime jwtIssuedAt =
                 (LocalDateTime.ofInstant(
                     Instant.ofEpochSecond(jwtData.getIat()), ZoneId.systemDefault()));
