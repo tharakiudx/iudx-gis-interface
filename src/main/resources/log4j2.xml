@@ -10,7 +10,7 @@
     <Appenders>
         <Console name="ConsoleAppender" target="SYSTEM_OUT" follow="true">
             <PatternLayout pattern="${CONSOLE_LOG_PATTERN}" />
-        </Console> https://gis.iudx.org.in 
+        </Console>
 		<!-- <RollingFile name="RollingFile" append="false" ignoreExceptions="false">
             <FileName>/tmp/iudx/rs.log</FileName>
             <FilePattern>/tmp/iudx/rs.log</FilePattern>
