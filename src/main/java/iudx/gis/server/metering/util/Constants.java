@@ -22,6 +22,6 @@ public class Constants {
   public static final String API = "api";
   public static final String USER_ID = "userid";
   public static final String WRITE_QUERY =
-      "INSERT INTO gisauditingtable (id,api,userid,epochtime,resourceid,isotime,providerid) VALUES ('$1','$2','$3',$4,'$5','$6','$7')";
+      "INSERT INTO rsauditingtable (id,api,userid,epochtime,resourceid,isotime,providerid) VALUES ('$1','$2','$3',$4,'$5','$6','$7')";
   public static final String MESSAGE = "message";
 }
