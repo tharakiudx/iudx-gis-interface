@@ -14,7 +14,7 @@ services:
       - GIS_JAVA_OPTS=-Xmx4096m
     volumes:
       - ./configs/config-depl.json:/usr/share/app/configs/config.json
-      - ./configs/keystore.jks:/usr/share/app/configs/keystore.jks
+      - ./configs/keystore_old.jks:/usr/share/app/configs/keystore_old.jks
     ports:
       - "8080:8080"
       - "8443:8443"
@@ -40,7 +40,7 @@ services:
       - GIS_JAVA_OPTS=-Xmx1024m
     volumes:
       - ./configs/config-dev.json:/usr/share/app/configs/config.json
-      - ./configs/keystore.jks:/usr/share/app/configs/keystore.jks
+      - ./configs/keystore_old.jks:/usr/share/app/configs/keystore_old.jks
     ports:
       - "8080:8080"
       - "8443:8443"
