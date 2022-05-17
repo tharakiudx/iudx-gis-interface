@@ -462,8 +462,31 @@ public class JwtAuthServiceImplTest {
               }
             });
   }
+    @Test
+    @DisplayName("failure - invalid audience")
+    public void invalidAudienceCheck(VertxTestContext testContext) {
+        JwtData jwtData = new JwtData();
+        jwtData.setIss("auth.test.com");
+        jwtData.setAud("abc.iudx.io1");
+        jwtData.setExp(1627408865);
+        jwtData.setIat(1627408865);
+        jwtData.setIid(
+                "rg:datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.io/pune-env-flood/FWR053");
+        jwtData.setRole("provider");
+        jwtData.setCons(new JsonObject().put("access", new JsonArray().add("ingest")));
+        jwtAuthenticationService
+                .isValidAudienceValue(jwtData)
+                .onComplete(
+                        handler -> {
+                            if (handler.failed()) {
+                                testContext.completeNow();
+                            } else {
+                                testContext.failNow("fail");
+                            }
+                        });
+    }
 
-  @Test
+    @Test
   @DisplayName("failure - invalid validId check")
   public void invalidIdCheck4JwtToken(VertxTestContext testContext) {
     JwtData jwtData = new JwtData();
@@ -490,27 +513,41 @@ public class JwtAuthServiceImplTest {
             });
   }
 
-  @Test
-  @DisplayName("failure - invalid audience")
-  public void invalidAudienceCheck(VertxTestContext testContext) {
-    JwtData jwtData = new JwtData();
-    jwtData.setIss("auth.test.com");
-    jwtData.setAud("abc.iudx.io1");
-    jwtData.setExp(1627408865);
-    jwtData.setIat(1627408865);
-    jwtData.setIid(
-        "rg:datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.io/pune-env-flood/FWR053");
-    jwtData.setRole("provider");
-    jwtData.setCons(new JsonObject().put("access", new JsonArray().add("ingest")));
-    jwtAuthenticationService
-        .isValidAudienceValue(jwtData)
-        .onComplete(
-            handler -> {
-              if (handler.failed()) {
-                testContext.completeNow();
-              } else {
-                testContext.failNow("fail");
-              }
-            });
-  }
+    @Test
+    @DisplayName("Success Case for Resource Exist")
+    public void isResourceExistTest(VertxTestContext testContext) {
+
+        JwtData jwtData = new JwtData();
+
+        String id= "rg:datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.io/pune-env-flood/FWR053";
+        jwtAuthenticationService.isResourceExist(id,"OPEN")
+                .onComplete(handle->{
+                    if(handle.succeeded()){
+                        testContext.completeNow();
+                    }
+                    else {
+                        testContext.failNow("Id doesn't exist");
+                    }
+                });
+
+//        jwtData.setIss("auth.test.com");
+//        jwtData.setAud("abc.iudx.io1");
+//        jwtData.setExp(1627408865);
+//        jwtData.setIat(1627408865);
+//        jwtData.setIid(
+//                "rg:datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.io/pune-env-flood/FWR053");
+//        jwtData.setRole("provider");
+//        jwtData.setCons(new JsonObject().put("access", new JsonArray().add("ingest")));
+//        jwtAuthenticationService
+//                .isValidAudienceValue(jwtData)
+//                .onComplete(
+//                        handler -> {
+//                            if (handler.failed()) {
+//                                testContext.completeNow();
+//                            } else {
+//                                testContext.failNow("fail");
+//                            }
+//                        });
+    }
+
 }

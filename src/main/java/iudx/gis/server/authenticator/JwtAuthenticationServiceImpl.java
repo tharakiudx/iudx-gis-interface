@@ -338,8 +338,8 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
     return promise.future();
   }
-
-  private Future<Boolean> isResourceExist(String id, String groupACL) {
+  //I changed this from private to default
+   public Future<Boolean> isResourceExist(String id, String groupACL) {
     LOGGER.trace("isResourceExist() started");
     Promise<Boolean> promise = Promise.promise();
     String resourceExist = resourceIdCache.getIfPresent(id);
