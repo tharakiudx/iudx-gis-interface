@@ -1,71 +1,71 @@
 {
-  "version": "1.0",
+  "version": "",
   "zookeepers": [
-    "zookeeper"
+    ""
   ],
-  "clusterId": "iudx-gis-server-cluster",
-  "host": "rs.iudx.io",
+  "clusterId": "",
+  "host": "",
   "modules": [
     {
-      "id": "iudx.gis.server.apiserver.ApiServerVerticle",
+      "id": "",
       "ssl": true,
       "port": 8090,
       "production": false,
-      "keystore": "configs/keystore.jks",
-      "keystorePassword": "password",
+      "keystore": "",
+      "keystorePassword": "",
       "verticleInstances": 2,
-      "catServerHost": "api.cat-test.iudx.io",
+      "catServerHost": "",
       "catServerPort": 443
     },
     {
-      "id": "iudx.gis.server.authenticator.AuthenticationVerticle",
+      "id": "",
       "verticleInstances": 1,
-      "audience": "rs.iudx.io",
-      "authServerHost": "authvertx.iudx.io",
-      "host": "rs.iudx.io",
-      "catServerHost": "api.cat-test.iudx.io",
+      "audience": "",
+      "authServerHost": "",
+      "host": "",
+      "catServerHost": "",
       "catServerPort": 443,
-      "serverMode": "production",
+      "serverMode": "",
       "jwtIgnoreExpiry": true
     },
     {
-      "id": "iudx.gis.server.database.DatabaseVerticle",
+      "id": "",
       "verticleInstances": 2,
-      "databaseIP": "database.iudx.io",
+      "databaseIP": "",
       "databasePort": 32508,
-      "databaseName": "iudx",
-      "databaseUserName": "iudx_user",
-      "databasePassword": "0NU^S@=hAY1PX+!^",
+      "databaseName": "",
+      "databaseUserName": "",
+      "databasePassword": "",
       "dbClientPoolSize": 25
     },
     {
-      "id": "iudx.gis.server.metering.MeteringVerticle",
+      "id": "",
       "verticleInstances": 1,
-      "meteringDatabaseIP": "52.140.124.157",
+      "meteringDatabaseIP": "",
       "meteringDatabasePort": 32508,
-      "meteringDatabaseName": "metering",
-      "meteringDatabaseUserName": "immudb",
-      "meteringDatabasePassword": "M]hA?DD+QtF%6nXAv$8O",
+      "meteringDatabaseName": "",
+      "meteringDatabaseUserName": "",
+      "meteringDatabasePassword": "",
       "meteringPoolSize": 25
     }, {
-      "id":"iudx.gis.server.database.postgres.PostgresVerticle",
+      "id":"",
       "isWorkerVerticle":false,
       "verticleInstances": 1,
-      "databaseIp": "database.iudx.io",
+      "databaseIp": "",
       "databasePort": 32508,
-      "databaseName": "iudx",
-      "databaseUserName": "iudx_user",
-      "databasePassword": "0NU^S@=hAY1PX+!^",
+      "databaseName": "",
+      "databaseUserName": "",
+      "databasePassword": "",
       "poolSize": 25
 
     },               {
-      "id": "iudx.gis.server.databroker.DataBrokerVerticle",
+      "id": "",
       "verticleInstances": 1,
-      "dataBrokerIP": "databroker.iudx.io",
+      "dataBrokerIP": "",
       "dataBrokerPort": 29042,
-      "dataBrokerUserName": "admin",
-      "dataBrokerVhost": "IUDX",
-      "dataBrokerPassword": "eBoVQtMB77U6hBd9uisZ",
+      "dataBrokerUserName": "",
+      "dataBrokerVhost": "",
+      "dataBrokerPassword": "",
       "dataBrokerManagementPort": 30042,
       "connectionTimeout": 6000,
       "requestedHeartbeat": 60,
@@ -75,7 +75,7 @@
       "automaticRecoveryEnabled": true
     },
     {
-      "id": "iudx.gis.server.cache.CacheVerticle",
+      "id": "",
       "verticleInstances": 1
     }
   ]
