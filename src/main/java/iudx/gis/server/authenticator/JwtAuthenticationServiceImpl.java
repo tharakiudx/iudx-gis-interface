@@ -338,7 +338,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
     return promise.future();
   }
-  //I changed this from private to default
+
    public Future<Boolean> isResourceExist(String id, String groupACL) {
     LOGGER.trace("isResourceExist() started");
     Promise<Boolean> promise = Promise.promise();
@@ -415,7 +415,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     return promise.future();
   }
 
-  private Future<String> getGroupAccessPolicy(String groupId) {
+  public Future<String> getGroupAccessPolicy(String groupId) {
     LOGGER.trace("getGroupAccessPolicy() started");
     Promise<String> promise = Promise.promise();
     String groupACL = resourceGroupCache.getIfPresent(groupId);

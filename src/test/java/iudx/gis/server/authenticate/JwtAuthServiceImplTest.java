@@ -1,9 +1,12 @@
 package iudx.gis.server.authenticate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.hazelcast.internal.diagnostics.SlowOperationPlugin;
 import io.micrometer.core.ipc.http.HttpSender.Method;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -13,6 +16,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.PubSecKeyOptions;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
+import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.gis.server.authenticator.AuthenticationVerticle;
@@ -23,18 +27,20 @@ import iudx.gis.server.cache.CacheService;
 import iudx.gis.server.configuration.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
 @ExtendWith(VertxExtension.class)
 public class JwtAuthServiceImplTest {
-
-  private static final Logger LOGGER = LogManager.getLogger(JwtAuthServiceImplTest.class);
+    private static final Logger LOGGER = LogManager.getLogger(JwtAuthServiceImplTest.class);
   private static final AuthenticationVerticle authenticationVerticle = new AuthenticationVerticle();
   private static JsonObject authConfig;
   private static JwtAuthenticationServiceImpl jwtAuthenticationService;
@@ -515,39 +521,64 @@ public class JwtAuthServiceImplTest {
 
     @Test
     @DisplayName("Success Case for Resource Exist")
-    public void isResourceExistTest(VertxTestContext testContext) {
+    public void isResourceExistTest(VertxTestContext testContext){
+        String orginal_id= "datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.io/pune-env-flood/FWR053";
+        String duplicate_id="rg:datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.io/pune-env-flood/FWR053";
+        jwtAuthenticationService.isResourceExist(orginal_id,"OPEN")
+                .onComplete(handle->{
+                   if(handle.succeeded()){
+                       testContext.completeNow();
+                   }
+                   else {
+                       testContext.failNow("Resource Doesn't exist");
+                   }
+                });
+    }
 
-        JwtData jwtData = new JwtData();
-
-        String id= "rg:datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.io/pune-env-flood/FWR053";
-        jwtAuthenticationService.isResourceExist(id,"OPEN")
+    @Test
+    @DisplayName("Fail Case for Resource Exist")
+    public void isResourceNotExistTest(VertxTestContext testContext){
+        String orginal_id= "datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.io/pune-env-flood/FWR053";
+        String duplicate_id="rg:datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.io/pune-env-flood/FWR053";
+        jwtAuthenticationService.isResourceExist(duplicate_id,"OPEN")
                 .onComplete(handle->{
                     if(handle.succeeded()){
-                        testContext.completeNow();
+                        testContext.failNow("Resource exist");
                     }
                     else {
-                        testContext.failNow("Id doesn't exist");
+                        testContext.completeNow();
                     }
                 });
+    }
 
-//        jwtData.setIss("auth.test.com");
-//        jwtData.setAud("abc.iudx.io1");
-//        jwtData.setExp(1627408865);
-//        jwtData.setIat(1627408865);
-//        jwtData.setIid(
-//                "rg:datakaveri.org/04a15c9960ffda227e9546f3f46e629e1fe4132b/rs.iudx.io/pune-env-flood/FWR053");
-//        jwtData.setRole("provider");
-//        jwtData.setCons(new JsonObject().put("access", new JsonArray().add("ingest")));
-//        jwtAuthenticationService
-//                .isValidAudienceValue(jwtData)
-//                .onComplete(
-//                        handler -> {
-//                            if (handler.failed()) {
-//                                testContext.completeNow();
-//                            } else {
-//                                testContext.failNow("fail");
-//                            }
-//                        });
+    @Test
+    @DisplayName("Success case for Group Access Policy")
+    public void isgetGroupAccessPolicyTest(VertxTestContext testContext){
+      String gId="iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood";
+      jwtAuthenticationService.getGroupAccessPolicy(gId)
+              .onComplete(handle->{
+                 if(handle.succeeded()){
+                     testContext.completeNow();
+                 }
+                 else {
+                     testContext.failNow("Cannot get Group Access Policy");
+                 }
+              });
+    }
+
+    @Test
+    @DisplayName("Failed case for Group Access Policy")
+    public void isgetGroupAccessPolicyFailTest(VertxTestContext testContext){
+        String wrong_gId="rg:iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood";
+        jwtAuthenticationService.getGroupAccessPolicy(wrong_gId)
+                .onComplete(handle->{
+                    if(handle.succeeded()){
+                        testContext.failNow("Cannot get Group Access Policy");
+                    }
+                    else {
+                        testContext.completeNow();
+                    }
+                });
     }
 
 }
