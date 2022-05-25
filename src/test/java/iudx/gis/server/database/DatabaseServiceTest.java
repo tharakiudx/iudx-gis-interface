@@ -1,5 +1,7 @@
 package iudx.gis.server.database;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
@@ -7,17 +9,25 @@ import io.vertx.junit5.VertxTestContext;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.PoolOptions;
+import iudx.gis.server.apiserver.response.ResponseUrn;
+import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.configuration.Configuration;
+import iudx.gis.server.database.postgres.PostgresService;
+import iudx.gis.server.database.postgres.PostgresServiceImpl;
+import iudx.gis.server.database.util.Constants;
+import iudx.gis.server.database.util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static iudx.gis.server.database.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(VertxExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -244,4 +254,83 @@ public class DatabaseServiceTest {
       }
     });
   }
+
+  @Test
+  @DisplayName("Execute Query Failed test case")
+  @Order(7)
+  public void executeQueryFailed(VertxTestContext testContext){
+    PostgresServiceImpl postgresServiceImpl= new PostgresServiceImpl(pgPool);
+    String query= "SELECT * FROM giss WHERE iudx_resource_id = '$1'";
+    postgresServiceImpl.executeQuery(query,handler->{
+      if (handler.succeeded())
+      {
+        testContext.failNow(handler.cause());
+      }
+      else
+      {
+        testContext.completeNow();
+      }
+    });
+  }
+
+  @Test
+  @DisplayName("Execute Query Passed Case")
+  @Order(8)
+  public void excuteQueryPassedCase(VertxTestContext testContext){
+    PostgresServiceImpl postgresService = new PostgresServiceImpl(pgPool);
+    postgresService.executeQuery(SELECT_ADMIN_DETAILS_QUERY,handler->{
+      if(handler.succeeded())
+      {
+        testContext.completeNow();
+      }
+      else {
+        testContext.failNow(handler.cause());
+      }
+    });
+  }
+
+  @Test
+  @DisplayName("Execute Prepaid Query Passed Case")
+  @Order(9)
+  public void excutePreQueryPassedCase(VertxTestContext testContext){
+    JsonObject queryParams= (JsonObject) new JsonObject();
+    PostgresServiceImpl postgresService = new PostgresServiceImpl(pgPool);
+    postgresService.executePreparedQuery(SELECT_ADMIN_DETAILS_QUERY, queryParams ,handler->{
+      if(handler.succeeded())
+      {
+        testContext.completeNow();
+      }
+      else {
+        testContext.failNow(handler.cause());
+      }
+    });
+  }
+
+  @Test
+  @DisplayName("Execute Prepaid Query Failed Case")
+  @Order(10)
+  public void excutePreQueryFailedCase(VertxTestContext testContext){
+    JsonObject queryParams= (JsonObject) new JsonObject().put(ID,resId1);
+    PostgresServiceImpl postgresService = new PostgresServiceImpl(pgPool);
+    postgresService.executePreparedQuery(SELECT_ADMIN_DETAILS_QUERY, queryParams ,handler->{
+      if(handler.succeeded())
+      {
+        testContext.failNow(handler.cause());
+       }
+      else {
+        testContext.completeNow();
+        }
+    });
+  }
+
+ /* @Test
+  @DisplayName("Testing Database Util Class")
+  @Order(11)
+  public void utilTest(VertxTestContext testContext){
+    Util util= new Util();
+    var value= util.getResponse( HttpStatusCode.CONFLICT,
+                    null,
+                    "Nothing to return");
+    assertEquals(value.getString("urn"),null);
+  }*/
 }

@@ -48,18 +48,18 @@ public class CatalogueService {
         new WebClientOptions().setTrustAll(true).setVerifyHost(false).setSsl(true);
     catWebClient = WebClient.create(vertx, options);
 
-//    populateGroupCache(catWebClient).onComplete(handler -> populateResourceCache(catWebClient));
-//
-//    cacheGroupTimerId = vertx.setPeriodic(TimeUnit.DAYS.toMillis(1), handler -> {
-//     populateGroupCache(catWebClient);
-//    });
-//
-//   cacheResTimerId = vertx.setPeriodic(TimeUnit.DAYS.toMillis(1), handler -> {
-//    populateResourceCache(catWebClient);
-//   });
+    populateGroupCache(catWebClient).onComplete(handler -> populateResourceCache(catWebClient));
+
+    cacheGroupTimerId = vertx.setPeriodic(TimeUnit.DAYS.toMillis(1), handler -> {
+     populateGroupCache(catWebClient);
+    });
+
+   cacheResTimerId = vertx.setPeriodic(TimeUnit.DAYS.toMillis(1), handler -> {
+    populateResourceCache(catWebClient);
+   });
   }
 
-  private Future<Boolean> populateGroupCache(WebClient client) {
+  public Future<Boolean> populateGroupCache(WebClient client) {
     Promise<Boolean> promise = Promise.promise();
     catWebClient.get(catPort, catHost, catSearchPath).addQueryParam("property", "[type]")
         .addQueryParam("value", "[[iudx:ResourceGroup]]")
@@ -83,7 +83,7 @@ public class CatalogueService {
     return promise.future();
   }
 
-  private Future<Boolean> populateResourceCache(WebClient client) {
+  public Future<Boolean> populateResourceCache(WebClient client) {
     Promise<Boolean> promise = Promise.promise();
     catWebClient.get(catPort, catHost, catSearchPath).addQueryParam("property", "[type]")
         .addQueryParam("value", "[[iudx:Resource]]").addQueryParam("filter", "[accessPolicy,id]")
