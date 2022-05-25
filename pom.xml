@@ -252,6 +252,9 @@
 						<exclude>iudx/gis/server/apiserver/*.class</exclude>
 						<exclude>**/*VertxEBProxy.class</exclude>
 						<exclude>**/Constants.class</exclude>
+						<exclude>**/*ResponseType.class</exclude>
+						<exclude>**/*HttpStatusCode.class</exclude>
+						<exclude>**/*RequestType.class</exclude>
 						<exclude>**/*AuthenticationService.class</exclude>
 						<exclude>**/*VertxProxyHandler.class</exclude>
 						<exclude>**/*DataBrokerServiceImpl.class</exclude>
@@ -261,6 +264,7 @@
 						<exclude>**/*Util.class</exclude>
 						<exclude>**/*Verticle.class</exclude>
 						<exclude>iudx/gis/server/deploy/*.class</exclude>
+						DataBrokerServiceImpl.java
 					</excludes>
 				</configuration>
 			</plugin>
