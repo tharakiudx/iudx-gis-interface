@@ -51,12 +51,12 @@ public class CatalogueService {
     populateGroupCache(catWebClient).onComplete(handler -> populateResourceCache(catWebClient));
 
     cacheGroupTimerId = vertx.setPeriodic(TimeUnit.DAYS.toMillis(1), handler -> {
-      populateGroupCache(catWebClient);
+     populateGroupCache(catWebClient);
     });
 
-    cacheResTimerId = vertx.setPeriodic(TimeUnit.DAYS.toMillis(1), handler -> {
-      populateResourceCache(catWebClient);
-    });
+   cacheResTimerId = vertx.setPeriodic(TimeUnit.DAYS.toMillis(1), handler -> {
+    populateResourceCache(catWebClient);
+   });
   }
 
   private Future<Boolean> populateGroupCache(WebClient client) {
