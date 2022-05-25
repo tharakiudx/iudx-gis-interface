@@ -1,68 +1,66 @@
 {
   "version": "1.0",
   "zookeepers": [
-    ""
+    "zookeeper"
   ],
   "clusterId": "",
-  "host": "",
   "modules": [
     {
-      "id": "",
+      "id": "iudx.gis.server.apiserver.ApiServerVerticle",
       "ssl": true,
-      "port": 8090,
-      "production": false,
+      "httpPort":12344,
       "keystore": "",
       "keystorePassword": "",
       "verticleInstances": 2,
       "catServerHost": "",
-      "catServerPort": 443
+      "catServerPort": 0
     },
     {
-      "id": "",
+      "id": "iudx.gis.server.authenticator.AuthenticationVerticle",
       "verticleInstances": 1,
       "audience": "",
       "authServerHost": "",
       "host": "",
       "catServerHost": "",
-      "catServerPort": 443,
+      "catServerPort": 0,
       "serverMode": "",
       "jwtIgnoreExpiry": true
     },
     {
-      "id": "",
+      "id": "iudx.gis.server.database.DatabaseVerticle",
       "verticleInstances": 2,
       "databaseIP": "",
-      "databasePort": 32508,
+      "databasePort": 0,
       "databaseName": "",
       "databaseUserName": "",
       "databasePassword": "",
       "dbClientPoolSize": 25
     },
     {
-      "id": "",
+      "id": "iudx.gis.server.metering.MeteringVerticle",
       "verticleInstances": 1,
-      "meteringDatabaseIP": "",
-      "meteringDatabasePort": 32508,
+      "meteringDatabaseIP": "0",
+      "meteringDatabasePort": 0,
       "meteringDatabaseName": "",
       "meteringDatabaseUserName": "",
       "meteringDatabasePassword": "",
       "meteringPoolSize": 25
-    }, {
-      "id":"",
-      "isWorkerVerticle":false,
+    },
+    {
+      "id":"iudx.gis.server.database.postgres.PostgresVerticle",
       "verticleInstances": 1,
       "databaseIp": "",
-      "databasePort": 32508,
+      "databasePort": 1234,
       "databaseName": "",
       "databaseUserName": "",
       "databasePassword": "",
       "poolSize": 25
 
     },               {
-      "id": "",
+      "id": "iudx.gis.server.databroker.DataBrokerVerticle",
       "verticleInstances": 1,
       "dataBrokerIP": "",
-      "dataBrokerPort": 29042,
+      "dataBrokerPort": 5468,
       "dataBrokerUserName": "",
       "dataBrokerVhost": "",
       "dataBrokerPassword": "",
@@ -73,11 +71,10 @@
       "requestedChannelMax": 5,
       "networkRecoveryInterval": 500,
       "automaticRecoveryEnabled": true
-    },
+    }, 
     {
-      "id": "",
+      "id": "iudx.gis.server.cache.CacheVerticle",
       "verticleInstances": 1
     }
   ]
-
 }
