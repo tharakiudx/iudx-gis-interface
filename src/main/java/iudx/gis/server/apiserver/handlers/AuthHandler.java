@@ -94,7 +94,7 @@ public class AuthHandler implements Handler<RoutingContext> {
         });
   }
 
-  private void processAuthFailure(RoutingContext ctx, String result) {
+  public void processAuthFailure(RoutingContext ctx, String result) {
     if (result.contains("Not Found")) {
       LOGGER.error("Error : Item Not Found");
       HttpStatusCode statusCode = HttpStatusCode.getByValue(404);
@@ -112,7 +112,7 @@ public class AuthHandler implements Handler<RoutingContext> {
     }
   }
 
-  private String getNormalizedPath(String url) {
+  public String getNormalizedPath(String url) {
     LOGGER.debug("URL : {}", url);
     String path = null;
     if (url.matches(NGSILD_ENTITIES_URL)) path = NGSILD_ENTITIES_URL;
