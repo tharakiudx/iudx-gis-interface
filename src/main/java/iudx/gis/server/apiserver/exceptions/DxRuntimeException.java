@@ -2,7 +2,7 @@ package iudx.gis.server.apiserver.exceptions;
 
 import iudx.gis.server.apiserver.response.ResponseUrn;
 
-public final class DxRuntimeException extends RuntimeException {
+public class DxRuntimeException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 

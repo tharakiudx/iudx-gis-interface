@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
 import iudx.gis.server.apiserver.handlers.ValidationHandler;
+import iudx.gis.server.apiserver.util.Constants;
 import iudx.gis.server.apiserver.util.RequestType;
 import iudx.gis.server.apiserver.validation.ValidatorsHandlersFactory;
 import iudx.gis.server.apiserver.validation.types.Validator;
@@ -33,9 +34,7 @@ public class ValidationHandlerTest {
    @BeforeEach
     public void setUp(){
         vertx= mock(Vertx.class);
-        //requestTypeMock= mock(RequestType.class);
-        //validationHandler =new ValidationHandler(vertx,requestTypeMock);
-        validationHandler= mock(ValidationHandler.class);
+        validationHandler =new ValidationHandler(vertx,RequestType.ENTITY_QUERY);
    }
 
     @Test
@@ -45,24 +44,22 @@ public class ValidationHandlerTest {
         MultiMap multiMapMock= mock(MultiMap.class);
         RoutingContext routingContextMock= mock(RoutingContext.class);
         HttpServerRequest httpServerRequestMock = mock(HttpServerRequest.class);
-        Map mapMock= mock(Map.class);
         JsonObject jsonObjectMock= mock(JsonObject.class);
         List listMock= mock(List.class);
         Validator validatorMock= mock(Validator.class);
 
         when(routingContextMock.request()).thenReturn(httpServerRequestMock);
-        when(httpServerRequestMock.params()).thenReturn(multiMapMock);
 
-        when(routingContextMock.request()).thenReturn(httpServerRequestMock);
+        MultiMap parameters = MultiMap.caseInsensitiveMultiMap();
+        parameters.set(Constants.ID, "asdasd/asdasd/adasd/adasd/adasd");
+
+        when(httpServerRequestMock.params()).thenReturn(parameters);
+
         when(httpServerRequestMock.headers()).thenReturn(multiMapMock);
 
-        when(routingContextMock.pathParams()).thenReturn(mapMock);
         when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
 
-        //validatorsHandlersFactoryMock.build(vertx,requestTypeMock,multiMapMock,multiMapMock,jsonObjectMock);
-        when(validatorsHandlersFactoryMock.build(any(),any(),any(),any(),any())).thenReturn(listMock);
-        validationHandler.handle(routingContextMock);
-
+       validationHandler.handle(routingContextMock);
     }
 
 
