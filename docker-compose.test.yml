@@ -14,7 +14,7 @@ services:
       - GIS_JAVA_OPTS=-Xmx1024m
     volumes:
       - /home/ubuntu/configs/gis-config-test.json:/usr/share/app/configs/config-test.json
-      - /home/ubuntu/configs/keystore-gis.jks:/usr/share/app/configs/keystore_old.jks
+      - /home/ubuntu/configs/keystore-gis.jks:/usr/share/app/configs/keystore.jks
       - ./docker/runTests.sh:/usr/share/app/docker/runTests.sh
       - ./src/:/usr/share/app/src
       - ${WORKSPACE}:/tmp/test
@@ -35,7 +35,7 @@ services:
       - GIS_JAVA_OPTS=-Xmx1024m
     volumes:
       - /home/ubuntu/configs/gis-config-test.json:/usr/share/app/configs/config-dev.json
-      - /home/ubuntu/configs/keystore-gis.jks:/usr/share/app/configs/keystore_old.jks
+      - /home/ubuntu/configs/keystore-gis.jks:/usr/share/app/configs/keystore.jks
       - ./src/:/usr/share/app/src
     ports:
       - "8443:8443"
