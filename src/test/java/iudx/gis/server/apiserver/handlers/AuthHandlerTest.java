@@ -1,4 +1,4 @@
-package iudx.gis.server.apiserver;
+package iudx.gis.server.apiserver.handlers;
 
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
@@ -9,6 +9,7 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import iudx.gis.server.apiserver.handlers.AuthHandler;
 import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.authenticator.AuthenticationService;
@@ -22,8 +23,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static iudx.gis.server.apiserver.util.Constants.HEADER_TOKEN;
-import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
+import static iudx.gis.server.apiserver.util.Constants.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith({VertxExtension.class, MockitoExtension.class})
@@ -62,9 +64,9 @@ public class AuthHandlerTest {
 
     @Test
     @DisplayName("Process AuthFailure NotFound")
-    public void processAuthFailureNotFound(){
+    public void processAuthFailureNotFound(VertxTestContext vertxTestContext){
         RoutingContext routingContextMock= mock(RoutingContext.class);
-        //HttpStatusCode httpStatusCodeMock= mock(HttpStatusCode.class);
+
         HttpServerResponse httpServerResponseMock = mock(HttpServerResponse.class);
         Future<Void> voidFutureMock = mock(Future.class);
 
@@ -74,10 +76,16 @@ public class AuthHandlerTest {
         when(httpServerResponseMock.end(anyString())).thenReturn(voidFutureMock);
         authHandler.processAuthFailure(routingContextMock,"Not Found");
 
+        verify(httpServerResponseMock, times(1)).setStatusCode(anyInt());
+        verify(httpServerResponseMock, times(1)).putHeader(anyString(),anyString());
+        verify(httpServerResponseMock, times(1)).end(anyString());
+
+        vertxTestContext.completeNow();
+
     }
     @Test
     @DisplayName("Process AuthFailure Except Found")
-    public void processAuthFailureExceptFound(){
+    public void processAuthFailureExceptFound(VertxTestContext vertxTestContext){
         RoutingContext routingContextMock= mock(RoutingContext.class);
         HttpServerResponse httpServerResponseMock = mock(HttpServerResponse.class);
         Future<Void> voidFutureMock = mock(Future.class);
@@ -87,11 +95,28 @@ public class AuthHandlerTest {
         when(httpServerResponseMock.setStatusCode(anyInt())).thenReturn(httpServerResponseMock);
         when(httpServerResponseMock.end(anyString())).thenReturn(voidFutureMock);
         authHandler.processAuthFailure(routingContextMock,"");
+        verify(httpServerResponseMock, times(1)).setStatusCode(anyInt());
+        verify(httpServerResponseMock, times(1)).putHeader(anyString(),anyString());
+        verify(httpServerResponseMock, times(1)).end(anyString());
+
+        vertxTestContext.completeNow();
 
     }
 
     @Test
-    public void getNormalizedPathTest(){
-        authHandler.getNormalizedPath(NGSILD_ENTITIES_URL);
+    public void getNormalizedPathTest(VertxTestContext vertxTestContext){
+        String authString= authHandler.getNormalizedPath(NGSILD_ENTITIES_URL);
+        assertEquals(authString , NGSILD_ENTITIES_URL);
+        String authString2= authHandler.getNormalizedPath(ADMIN_BASE_PATH);
+        assertEquals(authString2 , ADMIN_BASE_PATH);
+        vertxTestContext.completeNow();
+    }
+    @Test
+    @DisplayName("Test static method: create")
+    public void testCreate(VertxTestContext vertxTestContext)
+    {
+        AuthHandler res =  AuthHandler.create(Vertx.vertx());
+        assertNotNull(res);
+        vertxTestContext.completeNow();
     }
 }
