@@ -1,4 +1,4 @@
-package iudx.gis.server.apiserver;
+package iudx.gis.server.apiserver.service;
 
 import io.netty.util.Constant;
 import io.vertx.core.AsyncResult;

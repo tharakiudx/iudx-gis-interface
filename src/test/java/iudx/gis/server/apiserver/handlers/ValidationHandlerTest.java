@@ -1,4 +1,4 @@
-package iudx.gis.server.apiserver;
+package iudx.gis.server.apiserver.handlers;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -6,25 +6,17 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 import iudx.gis.server.apiserver.exceptions.DxRuntimeException;
-import iudx.gis.server.apiserver.handlers.ValidationHandler;
 import iudx.gis.server.apiserver.util.Constants;
 import iudx.gis.server.apiserver.util.RequestType;
-import iudx.gis.server.apiserver.validation.ValidatorsHandlersFactory;
-import iudx.gis.server.apiserver.validation.types.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.MalformedParameterizedTypeException;
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +35,7 @@ public class ValidationHandlerTest {
 
     @Test
     @DisplayName("Validation Successful")
-    public void testHandle(){
+    public void testHandle(VertxTestContext vertxTestContext){
         MultiMap multiMapMock= mock(MultiMap.class);
         RoutingContext routingContextMock= mock(RoutingContext.class);
         HttpServerRequest httpServerRequestMock = mock(HttpServerRequest.class);
@@ -60,6 +52,7 @@ public class ValidationHandlerTest {
         when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
 
        validationHandler.handle(routingContextMock);
+       vertxTestContext.completeNow();
     }
 
     /*@Test
