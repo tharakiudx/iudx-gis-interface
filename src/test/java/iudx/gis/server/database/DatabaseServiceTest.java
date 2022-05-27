@@ -12,7 +12,14 @@ import io.vertx.sqlclient.PoolOptions;
 import iudx.gis.server.apiserver.response.ResponseUrn;
 import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.configuration.Configuration;
+
 import iudx.gis.server.database.postgres.PostgresServiceImpl;
+
+import iudx.gis.server.database.postgres.PostgresService;
+import iudx.gis.server.database.postgres.PostgresServiceImpl;
+import iudx.gis.server.database.util.Constants;
+import iudx.gis.server.database.util.Util;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
@@ -319,14 +326,5 @@ public class DatabaseServiceTest {
         }
     });
   }
-
-
-  /*@Test
-  @DisplayName("Testing Search Query")
-  @Order(11)
-  public void searchQuery(VertxTestContext testContext){
-    String request= new JsonObject().getString("ID");
-    database.searchQuery()
-    }*/
 
 }
