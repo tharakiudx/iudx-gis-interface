@@ -26,10 +26,12 @@ public class AuthorizationRequestTest {
 
     @Test
     @DisplayName("authRequest should have same hashcode")
+
     public void authRequestShouldhaveSameHash(VertxTestContext vertxTestContext) {
         AuthorizationRequest authR1= new AuthorizationRequest(Method.GET, Api.ENTITIES);
         AuthorizationRequest authR2= new AuthorizationRequest(Method.GET, Api.ENTITIES);
         assertEquals(authR1.hashCode(), authR2.hashCode());
         vertxTestContext.completeNow();
+
     }
 }

@@ -48,7 +48,11 @@ public class CatalogueService {
         new WebClientOptions().setTrustAll(true).setVerifyHost(false).setSsl(true);
     catWebClient = WebClient.create(vertx, options);
 
+
    //populateGroupCache(catWebClient).onComplete(handler -> populateResourceCache(catWebClient));
+
+
+
 
     cacheGroupTimerId = vertx.setPeriodic(TimeUnit.DAYS.toMillis(1), handler -> {
      populateGroupCache(catWebClient);

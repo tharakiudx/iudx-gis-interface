@@ -1,5 +1,7 @@
 package iudx.gis.server.database;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
@@ -7,18 +9,29 @@ import io.vertx.junit5.VertxTestContext;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.PoolOptions;
+import iudx.gis.server.apiserver.response.ResponseUrn;
+import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.configuration.Configuration;
+<<<<<<< HEAD
 import iudx.gis.server.database.postgres.PostgresServiceImpl;
+=======
+import iudx.gis.server.database.postgres.PostgresService;
+import iudx.gis.server.database.postgres.PostgresServiceImpl;
+import iudx.gis.server.database.util.Constants;
+import iudx.gis.server.database.util.Util;
+>>>>>>> 2bc540660e7157af722b19c77a5632c4a1388f07
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static iudx.gis.server.database.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(VertxExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -313,12 +326,5 @@ public class DatabaseServiceTest {
         }
     });
   }
-
-  /*@Test
-  @DisplayName("Testing Search Query")
-  @Order(11)
-  public void searchQuery(VertxTestContext testContext){
-    String request= new JsonObject().getString("ID");
-    database.searchQuery()
-    }*/
+  
 }
