@@ -24,18 +24,25 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.UUID;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static iudx.gis.server.database.DatabaseServiceImpl.SELECT_GIS_SERVER_URL;
 import static iudx.gis.server.database.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(VertxExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DatabaseServiceTest {
+  @Mock
+  DatabaseServiceImpl databaseService;
   private static DatabaseService database;
 
   private static String resId1;
@@ -326,5 +333,39 @@ public class DatabaseServiceTest {
         }
     });
   }
+
+  @Test
+  @DisplayName("Get URLIN DB Test")
+  @Order(11)
+  public void getURLInDbTest(VertxTestContext vertxTestContext){
+    DatabaseServiceImpl databaseService1= new DatabaseServiceImpl(pgClient);
+    databaseService1.getURLInDb(resId1);
+    assertNotEquals(SELECT_GIS_SERVER_URL,databaseService1.getURLInDb(resId1));
+    vertxTestContext.completeNow();
+  }
+
+  /*@Test
+  @DisplayName("Search query test")
+  @Order(11)
+  public void searchQueryTest(VertxTestContext vertxTestContext){
+    JsonObject jsonObject = new JsonObject().put(ID,"asdf");
+
+    //jsonObject.put(ID,"id");
+    Handler<AsyncResult<JsonObject>> handler = mock(Handler.class);
+    AsyncResult asyncResult= mock(AsyncResult.class);
+    String id= jsonObject.getString(ID);
+    Future<JsonObject> future = mock(Future.class);
+    databaseService.searchQuery(jsonObject,handlers->{
+      if(handlers.succeeded()){
+        vertxTestContext.completeNow();
+      }
+      else{
+        vertxTestContext.failNow("Failed");
+      }
+    });
+
+
+
+  }*/
 
 }

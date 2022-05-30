@@ -258,6 +258,8 @@
 						<exclude>**/*PostgresService.class</exclude>
 						<exclude>**/*DataBrokerService.class</exclude>
 						<exclude>**/*DatabaseService.class</exclude>
+						<exclude>**/*Validator.class</exclude>
+						<exclude>**/*CacheService.class</exclude>
 						<exclude>**/*Util.class</exclude>
 						<exclude>**/*Verticle.class</exclude>
 						<exclude>iudx/gis/server/deploy/*.class</exclude>

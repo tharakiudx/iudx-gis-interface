@@ -1,23 +1,28 @@
 package iudx.gis.server.metering;
 
-import static iudx.gis.server.metering.util.Constants.API;
-import static iudx.gis.server.metering.util.Constants.ID;
-import static iudx.gis.server.metering.util.Constants.IID;
-import static iudx.gis.server.metering.util.Constants.USER_ID;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static iudx.gis.server.metering.util.Constants.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import iudx.gis.server.apiserver.response.ResponseUrn;
 import iudx.gis.server.configuration.Configuration;
 import java.util.UUID;
+
+import iudx.gis.server.metering.util.ResponseBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 
 @ExtendWith({VertxExtension.class})
 public class MeteringServiceTest {
@@ -89,4 +94,16 @@ public class MeteringServiceTest {
                     })));
   }
 
+  @Test
+  @DisplayName("Set Type And Title Test")
+  public void setTypeAndTitleTest(VertxTestContext vertxTestContext){
+    ResponseBuilder responseBuilder= new ResponseBuilder("200");
+    responseBuilder.setTypeAndTitle(200);
+    assertEquals("Successful operation",ResponseUrn.SUCCESS.getMessage());
+    responseBuilder.setTypeAndTitle(204);
+    assertEquals("Success",SUCCESS);
+    responseBuilder.setTypeAndTitle(400);
+    assertEquals("bad request parameter",ResponseUrn.BAD_REQUEST_URN.getMessage());
+    vertxTestContext.completeNow();
+  }
 }
