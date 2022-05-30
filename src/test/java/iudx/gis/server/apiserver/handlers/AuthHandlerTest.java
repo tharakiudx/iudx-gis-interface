@@ -1,8 +1,6 @@
 package iudx.gis.server.apiserver.handlers;
 
-import io.vertx.core.Future;
-import io.vertx.core.MultiMap;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -21,7 +19,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 
 import static iudx.gis.server.apiserver.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,33 +34,69 @@ public class AuthHandlerTest {
     private static final String AUTH_SERVICE_ADDRESS = "iudx.gis.authentication.service";
     private static final Logger LOGGER = LogManager.getLogger(AuthHandlerTest.class);
     AuthHandler authHandler;
+    @Mock
+    RoutingContext routingContextMock;
+    @Mock
+    HttpServerResponse httpServerResponse;
+    @Mock
+    HttpServerRequest httpServerRequest;
     @BeforeEach
     public void setUp(){
         authHandler=new AuthHandler();
+        lenient().doReturn(httpServerRequest).when(routingContextMock).request();
+        lenient().doReturn(httpServerResponse).when(routingContextMock).response();
+
     }
-/*
-    @Test
-    public void test(){
-        RoutingContext routingContextMock= mock(RoutingContext.class);
-        HttpServerRequest httpServerRequestMock = mock(HttpServerRequest.class);
+
+   /* @Test
+    public void test(VertxTestContext vertxTestContext){
+        //RoutingContext routingContextMock= mock(RoutingContext.class);
+        //HttpServerRequest httpServerRequestMock = mock(HttpServerRequest.class);
+        //HttpServerResponse httpServerResponse = mock(HttpServerResponse.class);
         JsonObject jsonObjectMock = mock(JsonObject.class);
         MultiMap multiMapMock= mock(MultiMap.class);
         HttpMethod httpMethodMock= mock(HttpMethod.class);
         AuthenticationService authenticationServiceMock= mock(AuthenticationService.class);
+        AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
 
-        when(routingContextMock.request()).thenReturn(httpServerRequestMock);
+        when(routingContextMock.request()).thenReturn(httpServerRequest);
+
         when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
-        when(httpServerRequestMock.path()).thenReturn("Some path");
 
-        when(httpServerRequestMock.headers()).thenReturn(multiMapMock);
-        when(multiMapMock.get(anyString())).thenReturn("token");
+        doReturn(NGSILD_ENTITIES_URL).when(httpServerRequest).path();
 
-        when(routingContextMock.request()).thenReturn(httpServerRequestMock);
-        when(httpServerRequestMock.method()).thenReturn(httpMethodMock);
-        when(httpMethodMock.toString()).thenReturn("");
+        when(httpServerRequest.headers()).thenReturn(multiMapMock);
+        when(multiMapMock.get(HEADER_TOKEN)).thenReturn("asd.asd.sad.sad");
 
-        authenticationServiceMock.tokenIntrospect(jsonObjectMock,jsonObjectMock,handler->{});
+
+        when(routingContextMock.request()).thenReturn(httpServerRequest);
+        when(httpServerRequest.method()).thenReturn(httpMethodMock);
+        when(httpMethodMock.toString()).thenReturn("anyString()");
+
+        when(httpServerRequest.getParam(ID)).thenReturn("asdad/asdasdsd/asdasd");
+
+        when(asyncResult.succeeded()).thenReturn(true);
+
+        when(asyncResult.result()).thenReturn(new JsonObject().put(IID,"aasadas"));
+
+        when(asyncResult.result()).thenReturn(new JsonObject().put(USER_ID,"aasadastyui"));
+
+        when(asyncResult.result()).thenReturn(new JsonObject().put(EXPIRY,"25 05 2022"));
+
+        Mockito.doAnswer(new Answer<AsyncResult<JsonObject>>() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
+                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2)).handle(asyncResult);
+                return null;
+            }
+        }).when(authenticationServiceMock).tokenIntrospect(any(),any(),any());
+
+        //authenticationServiceMock.tokenIntrospect(jsonObjectMock,jsonObjectMock,handler->{});
         authHandler.handle(routingContextMock);
+
+        //verify(routingContextMock,times(1)).next();
+        vertxTestContext.completeNow();
     }*/
 
     @Test

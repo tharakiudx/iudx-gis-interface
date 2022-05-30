@@ -10,15 +10,16 @@ import io.vertx.junit5.VertxTestContext;
 import iudx.gis.server.apiserver.exceptions.DxRuntimeException;
 import iudx.gis.server.apiserver.util.Constants;
 import iudx.gis.server.apiserver.util.RequestType;
+import iudx.gis.server.apiserver.validation.types.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({VertxExtension.class, MockitoExtension.class})
 public class ValidationHandlerTest {
@@ -26,6 +27,8 @@ public class ValidationHandlerTest {
     Vertx vertx;
     RequestType requestTypeMock;
     MultiMap parameters;
+    @Mock
+    Validator validator;
 
    @BeforeEach
     public void setUp(){
@@ -50,27 +53,33 @@ public class ValidationHandlerTest {
         when(httpServerRequestMock.headers()).thenReturn(multiMapMock);
 
         when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
-
-       validationHandler.handle(routingContextMock);
-       vertxTestContext.completeNow();
+        assertFalse(validator.isValid());
+        validationHandler.handle(routingContextMock);
+        verify(routingContextMock,times(1)).next();
+        vertxTestContext.completeNow();
     }
 
-    /*@Test
+    @Test
     @DisplayName("Validation Failure")
-    public void testHandle2(){
+    public void testHandle2(VertxTestContext vertxTestContext){
         MultiMap multiMapMock= mock(MultiMap.class);
         RoutingContext routingContextMock= mock(RoutingContext.class);
         HttpServerRequest httpServerRequestMock = mock(HttpServerRequest.class);
         JsonObject jsonObjectMock= mock(JsonObject.class);
+
+        when(routingContextMock.request()).thenReturn(httpServerRequestMock);
+
         parameters = MultiMap.caseInsensitiveMultiMap();
         parameters.set(Constants.ID, "asdasd/asdasd");
         when(httpServerRequestMock.params()).thenReturn(parameters);
         when(httpServerRequestMock.headers()).thenReturn(multiMapMock);
 
-        //when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
-        //validationHandler2 = new ValidationHandler(vertx,RequestType.ENTITY_WRONG_PATH);
-        assertThrows(DxRuntimeException.class, ()-> validationHandler.handle(routingContextMock));
-    }*/
+        validationHandler2 = new ValidationHandler(vertx,RequestType.ENTITY_QUERY);
+
+        assertThrows(Exception.class, ()-> validationHandler.handle(routingContextMock));
+        vertxTestContext.completeNow();
+
+    }
 
 
 }
