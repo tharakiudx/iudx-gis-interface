@@ -100,14 +100,14 @@ public class DatabaseServiceTest {
     tokenUrl=UUID.randomUUID().toString();
     serverPort = ThreadLocalRandom.current().nextInt(1, 5000);
     accessInfo = new JsonObject()
-        .put(USERNAME, username)
-        .put(PASSWORD, password)
-        .put(TOKEN_URL,tokenUrl);
+            .put(USERNAME, username)
+            .put(PASSWORD, password)
+            .put(TOKEN_URL,tokenUrl);
 
     /* Set Connection Object */
     if (connectOptions == null) {
       connectOptions = new PgConnectOptions().setPort(databasePort).setHost(databaseIP)
-          .setDatabase(databaseName).setUser(databaseUserName).setPassword(databasePassword);
+              .setDatabase(databaseName).setUser(databaseUserName).setPassword(databasePassword);
     }
 
     /* Pool options */
@@ -129,13 +129,13 @@ public class DatabaseServiceTest {
   @Order(1)
   void successfullyInsertAdminDetailsWithoutAccessInfo(VertxTestContext testContext) {
     JsonObject request = new JsonObject()
-        .put(ID, resId1)
-        .put(SERVER_URL, serverUrl)
-        .put(SERVER_PORT, serverPort)
-        .put(SECURE, false);
+            .put(ID, resId1)
+            .put(SERVER_URL, serverUrl)
+            .put(SERVER_PORT, serverPort)
+            .put(SECURE, false);
 
     JsonObject expected = new JsonObject()
-        .put(DETAIL, SUCCESS);
+            .put(DETAIL, SUCCESS);
 
     database.insertAdminDetails(request, ar -> {
       if (ar.succeeded()) {
@@ -154,14 +154,14 @@ public class DatabaseServiceTest {
   @Order(2)
   void successfullyInsertAdminDetailsWithAccessInfo(VertxTestContext testContext) {
     JsonObject request = new JsonObject()
-        .put(ID, resId2)
-        .put(SERVER_URL, serverUrl)
-        .put(SERVER_PORT, serverPort)
-        .put(SECURE, true)
-        .put(ACCESS_INFO, accessInfo);
+            .put(ID, resId2)
+            .put(SERVER_URL, serverUrl)
+            .put(SERVER_PORT, serverPort)
+            .put(SECURE, true)
+            .put(ACCESS_INFO, accessInfo);
 
     JsonObject expected = new JsonObject()
-        .put(DETAIL, SUCCESS);
+            .put(DETAIL, SUCCESS);
 
     database.insertAdminDetails(request, ar -> {
       if (ar.succeeded()) {
@@ -180,13 +180,13 @@ public class DatabaseServiceTest {
   @Order(3)
   void successfullyUpdateAdminDetailsWithoutAccessInfo(VertxTestContext testContext) {
     JsonObject request = new JsonObject()
-        .put(ID, resId2)
-        .put(SERVER_URL, serverUrl)
-        .put(SERVER_PORT, serverPort)
-        .put(SECURE, false);
+            .put(ID, resId2)
+            .put(SERVER_URL, serverUrl)
+            .put(SERVER_PORT, serverPort)
+            .put(SECURE, false);
 
     JsonObject expected = new JsonObject()
-        .put(DETAIL, SUCCESS);
+            .put(DETAIL, SUCCESS);
 
     database.updateAdminDetails(request, ar -> {
       if (ar.succeeded()) {
@@ -205,14 +205,14 @@ public class DatabaseServiceTest {
   @Order(4)
   void successfullyUpdateAdminDetailsWithAccessInfo(VertxTestContext testContext) {
     JsonObject request = new JsonObject()
-        .put(ID, resId1)
-        .put(SERVER_URL, serverUrl)
-        .put(SERVER_PORT, serverPort)
-        .put(SECURE, true)
-        .put(ACCESS_INFO, accessInfo);
+            .put(ID, resId1)
+            .put(SERVER_URL, serverUrl)
+            .put(SERVER_PORT, serverPort)
+            .put(SECURE, true)
+            .put(ACCESS_INFO, accessInfo);
 
     JsonObject expected = new JsonObject()
-        .put(DETAIL, SUCCESS);
+            .put(DETAIL, SUCCESS);
 
     database.updateAdminDetails(request, ar -> {
       if (ar.succeeded()) {
@@ -233,7 +233,7 @@ public class DatabaseServiceTest {
     String request = resId1;
 
     JsonObject expected = new JsonObject()
-        .put(DETAIL, SUCCESS);
+            .put(DETAIL, SUCCESS);
 
     database.deleteAdminDetails(request, ar -> {
       if (ar.succeeded()) {
@@ -254,7 +254,7 @@ public class DatabaseServiceTest {
     String request = resId2;
 
     JsonObject expected = new JsonObject()
-        .put(DETAIL, SUCCESS);
+            .put(DETAIL, SUCCESS);
 
     database.deleteAdminDetails(request, ar -> {
       if (ar.succeeded()) {
