@@ -24,12 +24,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-<<<<<<< HEAD
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-=======
-
->>>>>>> 0b70a364b42cf3536b46bb9ba49817673e701e66
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -47,11 +41,6 @@ public class CatalogueServiceTest {
    // WebClientFactory webClientFactory;
     @Mock
     AsyncResult<HttpResponse<Buffer>> asyncResultMock;
-<<<<<<< HEAD
-=======
-    @Mock
->>>>>>> 0b70a364b42cf3536b46bb9ba49817673e701e66
-
     CatalogueService catalogueService;
 
     String catSearchPath=Constants.CAT_RSG_PATH;
@@ -63,19 +52,10 @@ public class CatalogueServiceTest {
         config.put("catServerPort",12345);
         config.put("catServerHost","anyhost");
 
-<<<<<<< HEAD
         catalogueService= new CatalogueService(vertx,config);
         WebClientOptions options =
                 new WebClientOptions().setTrustAll(true).setVerifyHost(false).setSsl(true);
         //webClient = WebClient.create(vertx, options);
-=======
-
-        catalogueService= new CatalogueService(vertx,config);
-        WebClientOptions options =
-                new WebClientOptions().setTrustAll(true).setVerifyHost(false).setSsl(true);
-        webClient = WebClient.create(vertx, options);
-
->>>>>>> 0b70a364b42cf3536b46bb9ba49817673e701e66
     }
 
     /*@Test
@@ -165,7 +145,6 @@ public class CatalogueServiceTest {
     /*@Test
     @DisplayName("Item Present Test Case")
     public void isItemPresents(VertxTestContext testContext){
-<<<<<<< HEAD
         String id="abcdef/xyz.usd/asd";
         catalogueService.isItemExist(id);
         testContext.completeNow();
@@ -238,13 +217,6 @@ public class CatalogueServiceTest {
         //verify(httpRequest, times(1)).expect(any());
         //verify(httpRequest, times(1)).send(any());
     }*/
-=======
-
-        String id="abcdef/xyz.usd/asd";
-        catalogueService.isItemExist(id);
->>>>>>> 0b70a364b42cf3536b46bb9ba49817673e701e66
-
-
     /*@Test
     @DisplayName("Call catalogue Item Api Test Case")
     public void iscallCatalogueItemApi(VertxTestContext testContext){
