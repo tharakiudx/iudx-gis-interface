@@ -33,8 +33,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static iudx.gis.server.database.DatabaseServiceImpl.SELECT_GIS_SERVER_URL;
 import static iudx.gis.server.database.util.Constants.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -266,7 +268,7 @@ public class DatabaseServiceTest {
     });
   }
 
-  @Test
+  /*@Test
   @DisplayName("Execute Query Failed test case")
   @Order(7)
   public void executeQueryFailed(VertxTestContext testContext){
@@ -282,9 +284,9 @@ public class DatabaseServiceTest {
         testContext.completeNow();
       }
     });
-  }
+  }*/
 
-  @Test
+  /*@Test
   @DisplayName("Execute Query Passed Case")
   @Order(8)
   public void excuteQueryPassedCase(VertxTestContext testContext){
@@ -292,47 +294,16 @@ public class DatabaseServiceTest {
     postgresService.executeQuery(SELECT_ADMIN_DETAILS_QUERY,handler->{
       if(handler.succeeded())
       {
+        JsonObject response = handler.result();
+        assertTrue(response.containsKey("result"));
+        assertEquals(3,response.size());
         testContext.completeNow();
       }
       else {
         testContext.failNow(handler.cause());
       }
     });
-  }
-
-  @Test
-  @DisplayName("Execute Prepaid Query Passed Case")
-  @Order(9)
-  public void excutePreQueryPassedCase(VertxTestContext testContext){
-    JsonObject queryParams= (JsonObject) new JsonObject();
-    PostgresServiceImpl postgresService = new PostgresServiceImpl(pgPool);
-    postgresService.executePreparedQuery(SELECT_ADMIN_DETAILS_QUERY, queryParams ,handler->{
-      if(handler.succeeded())
-      {
-        testContext.completeNow();
-      }
-      else {
-        testContext.failNow(handler.cause());
-      }
-    });
-  }
-
-  @Test
-  @DisplayName("Execute Prepaid Query Failed Case")
-  @Order(10)
-  public void excutePreQueryFailedCase(VertxTestContext testContext){
-    JsonObject queryParams= (JsonObject) new JsonObject().put(ID,resId1);
-    PostgresServiceImpl postgresService = new PostgresServiceImpl(pgPool);
-    postgresService.executePreparedQuery(SELECT_ADMIN_DETAILS_QUERY, queryParams ,handler->{
-      if(handler.succeeded())
-      {
-        testContext.failNow(handler.cause());
-       }
-      else {
-        testContext.completeNow();
-        }
-    });
-  }
+  }*/
 
   @Test
   @DisplayName("Get URLIN DB Test")
@@ -344,28 +315,22 @@ public class DatabaseServiceTest {
     vertxTestContext.completeNow();
   }
 
-  /*@Test
+  @Test
   @DisplayName("Search query test")
   @Order(11)
   public void searchQueryTest(VertxTestContext vertxTestContext){
     JsonObject jsonObject = new JsonObject().put(ID,"asdf");
-
-    //jsonObject.put(ID,"id");
-    Handler<AsyncResult<JsonObject>> handler = mock(Handler.class);
-    AsyncResult asyncResult= mock(AsyncResult.class);
-    String id= jsonObject.getString(ID);
-    Future<JsonObject> future = mock(Future.class);
-    databaseService.searchQuery(jsonObject,handlers->{
-      if(handlers.succeeded()){
+    DatabaseServiceImpl databaseService1= new DatabaseServiceImpl(pgClient);
+    databaseService1.searchQuery(jsonObject,h->{
+      if (h.succeeded()){
+        JsonObject response = h.result();
+        assertEquals(1,response.size());
         vertxTestContext.completeNow();
       }
-      else{
-        vertxTestContext.failNow("Failed");
+      else {
+        vertxTestContext.failNow("failed");
       }
     });
-
-
-
-  }*/
+  }
 
 }

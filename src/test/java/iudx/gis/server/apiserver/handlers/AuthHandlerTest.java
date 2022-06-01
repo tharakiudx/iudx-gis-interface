@@ -24,6 +24,9 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static iudx.gis.server.apiserver.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,49 +44,71 @@ public class AuthHandlerTest {
     @Mock
     HttpServerRequest httpServerRequest;
     @BeforeEach
-    public void setUp(){
-        authHandler=new AuthHandler();
+    public void setUp(VertxTestContext vertxTestContext, Vertx vertx){
+        authHandler= AuthHandler.create(vertx);
         lenient().doReturn(httpServerRequest).when(routingContextMock).request();
         lenient().doReturn(httpServerResponse).when(routingContextMock).response();
-
+        vertxTestContext.completeNow();
     }
 
-   /* @Test
-    public void test(VertxTestContext vertxTestContext){
-        //RoutingContext routingContextMock= mock(RoutingContext.class);
-        //HttpServerRequest httpServerRequestMock = mock(HttpServerRequest.class);
-        //HttpServerResponse httpServerResponse = mock(HttpServerResponse.class);
-        JsonObject jsonObjectMock = mock(JsonObject.class);
+    @Test
+    public void testHandleSuccess(VertxTestContext vertxTestContext){
+        JsonObject jsonObjectMock = new JsonObject().put("id","iddd");
         MultiMap multiMapMock= mock(MultiMap.class);
         HttpMethod httpMethodMock= mock(HttpMethod.class);
+        Map map = new HashMap<String,Object>() ;
         AuthenticationService authenticationServiceMock= mock(AuthenticationService.class);
         AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
-
         when(routingContextMock.request()).thenReturn(httpServerRequest);
-
         when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
-
         doReturn(NGSILD_ENTITIES_URL).when(httpServerRequest).path();
-
         when(httpServerRequest.headers()).thenReturn(multiMapMock);
         when(multiMapMock.get(HEADER_TOKEN)).thenReturn("asd.asd.sad.sad");
-
-
         when(routingContextMock.request()).thenReturn(httpServerRequest);
         when(httpServerRequest.method()).thenReturn(httpMethodMock);
-        when(httpMethodMock.toString()).thenReturn("anyString()");
+        when(httpMethodMock.toString()).thenReturn("POST");
+        when(httpServerRequest.getParam(ID)).thenReturn("qeret/dfasfa/zxcvvb");
+        JsonObject authinfo = new JsonObject();
+        lenient().when(asyncResult.succeeded()).thenReturn(true);
+        lenient().when(asyncResult.result()).thenReturn(new JsonObject().put(IID,"aasadas")
+                .put(USER_ID,"aasadastyui")
+                .put(EXPIRY,"25 05 2022"));
+        Mockito.lenient().doAnswer(new Answer<AsyncResult<JsonObject>>() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
+                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2 )).handle(asyncResult);
+                return null;
+            }
+        }).when(authenticationServiceMock).tokenIntrospect(any(),any(),any());
 
-        when(httpServerRequest.getParam(ID)).thenReturn("asdad/asdasdsd/asdasd");
+        authHandler.handle(routingContextMock);
+        //verify(routingContextMock, times(1)).next();
 
-        when(asyncResult.succeeded()).thenReturn(true);
+        vertxTestContext.completeNow();
+    }
+    @Test
+    public void testHandleFail(VertxTestContext vertxTestContext){
+        JsonObject jsonObjectMock = new JsonObject().put("id","iddd");
+        MultiMap multiMapMock= mock(MultiMap.class);
+        HttpMethod httpMethodMock= mock(HttpMethod.class);
+        Map map = new HashMap<String,Object>() ;
+        AuthenticationService authenticationServiceMock= mock(AuthenticationService.class);
+        AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
+        when(routingContextMock.request()).thenReturn(httpServerRequest);
+        when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
+        doReturn(NGSILD_ENTITIES_URL).when(httpServerRequest).path();
+        when(httpServerRequest.headers()).thenReturn(multiMapMock);
+        when(multiMapMock.get(HEADER_TOKEN)).thenReturn("asd.asd.sad.sad");
+        when(routingContextMock.request()).thenReturn(httpServerRequest);
+        when(httpServerRequest.method()).thenReturn(httpMethodMock);
+        when(httpMethodMock.toString()).thenReturn("POST");
+        when(httpServerRequest.getParam(ID)).thenReturn("qeret/dfasfa/zxcvvb");
+        JsonObject authinfo = new JsonObject();
+        lenient().when(asyncResult.succeeded()).thenReturn(false);
+        lenient().when(asyncResult.cause()).thenReturn(new Throwable("fail"));
 
-        when(asyncResult.result()).thenReturn(new JsonObject().put(IID,"aasadas"));
-
-        when(asyncResult.result()).thenReturn(new JsonObject().put(USER_ID,"aasadastyui"));
-
-        when(asyncResult.result()).thenReturn(new JsonObject().put(EXPIRY,"25 05 2022"));
-
-        Mockito.doAnswer(new Answer<AsyncResult<JsonObject>>() {
+        Mockito.lenient().doAnswer(new Answer<AsyncResult<JsonObject>>() {
             @SuppressWarnings("unchecked")
             @Override
             public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
@@ -92,12 +117,12 @@ public class AuthHandlerTest {
             }
         }).when(authenticationServiceMock).tokenIntrospect(any(),any(),any());
 
-        //authenticationServiceMock.tokenIntrospect(jsonObjectMock,jsonObjectMock,handler->{});
         authHandler.handle(routingContextMock);
-
-        //verify(routingContextMock,times(1)).next();
+        //Mockito.verify(httpServerResponse, times(0)).putHeader(anyString(), anyString());
+        //Mockito.verify(httpServerResponse, times(0)).setStatusCode(anyInt());
+        //Mockito.verify(httpServerResponse, times(0)).end(anyString());
         vertxTestContext.completeNow();
-    }*/
+    }
 
     @Test
     @DisplayName("Process AuthFailure NotFound")

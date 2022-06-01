@@ -31,8 +31,7 @@ public class ValidationHandlerTest {
     Validator validator;
 
    @BeforeEach
-    public void setUp(){
-        vertx= mock(Vertx.class);
+    public void setUp(Vertx vertx){
         validationHandler =new ValidationHandler(vertx,RequestType.ENTITY_QUERY);
    }
 
