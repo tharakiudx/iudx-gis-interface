@@ -49,7 +49,7 @@ public class ValidationFailureHandler implements Handler<RoutingContext> {
       context.response()
           .putHeader(CONTENT_TYPE, APPLICATION_JSON)
           .setStatusCode(HttpStatus.SC_BAD_REQUEST)
-          .end((Buffer) validationFailureResponse());
+          .end( validationFailureResponse().toString());
     }
     context.next();
     return;
