@@ -11,6 +11,7 @@ public class Constants {
 
   // path regex
   public static final String ENTITITES_URL_REGEX = NGSILD_ENTITIES_URL + "(.*)";
+
   // admin API endpoints
   public static final String ADMIN_BASE_PATH = "/admin/gis/serverInfo";
   /** API Documentation endpoint */
