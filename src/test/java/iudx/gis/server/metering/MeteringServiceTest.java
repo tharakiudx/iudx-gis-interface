@@ -99,6 +99,7 @@ public class MeteringServiceTest {
                       vertxTestContext.completeNow();
                     })));
   }
+
   @Test
   @DisplayName("Testing Write Query for admin api.")
   void writeAdminDatas(VertxTestContext vertxTestContext) {
@@ -117,6 +118,7 @@ public class MeteringServiceTest {
                                       vertxTestContext.completeNow();
                                     })));
   }
+
   @Test
   @DisplayName("Set Type And Title Test")
   public void setTypeAndTitleTest(VertxTestContext vertxTestContext){
