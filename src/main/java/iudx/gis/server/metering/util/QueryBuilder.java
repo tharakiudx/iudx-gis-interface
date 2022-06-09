@@ -6,6 +6,8 @@ import static iudx.gis.server.metering.util.Constants.API;
 import static iudx.gis.server.metering.util.Constants.ID;
 import static iudx.gis.server.metering.util.Constants.IID;
 import static iudx.gis.server.metering.util.Constants.QUERY_KEY;
+import static iudx.gis.server.metering.util.Constants.RESPONSE_SIZE;
+import static iudx.gis.server.metering.util.Constants.TABLE_NAME;
 import static iudx.gis.server.metering.util.Constants.USER_ID;
 import static iudx.gis.server.metering.util.Constants.WRITE_QUERY;
 
@@ -32,7 +34,8 @@ public class QueryBuilder {
         api.equals(ADMIN_BASE_PATH)
             ? ADMIN
             : resourceId.substring(0, resourceId.indexOf('/', resourceId.indexOf('/') + 1));
-
+    long response_size = request.getLong(RESPONSE_SIZE);
+    String databaseTableName = request.getString(TABLE_NAME);
     ZonedDateTime zst = ZonedDateTime.now();
     long time = getEpochTime(zst);
     String isoTime =
@@ -44,14 +47,15 @@ public class QueryBuilder {
     StringBuilder query =
         new StringBuilder(
             WRITE_QUERY
+                .replace("$0", databaseTableName)
                 .replace("$1", primaryKey)
                 .replace("$2", api)
                 .replace("$3", userId)
                 .replace("$4", Long.toString(time))
                 .replace("$5", resourceId)
                 .replace("$6", isoTime)
-                .replace("$7", providerID));
-
+                .replace("$7", providerID)
+                .replace("$8", Long.toString(response_size)));
     return new JsonObject().put(QUERY_KEY, query);
   }
 
