@@ -1,7 +1,6 @@
 package iudx.gis.server.apiserver;
 
 import static iudx.gis.server.apiserver.response.ResponseUrn.BACKING_SERVICE_FORMAT;
-import static iudx.gis.server.apiserver.response.ResponseUrn.METHOD_NOT_FOUND;
 import static iudx.gis.server.apiserver.response.ResponseUrn.SUCCESS;
 import static iudx.gis.server.apiserver.response.ResponseUrn.YET_NOT_IMPLEMENTED;
 import static iudx.gis.server.apiserver.util.Constants.ADMIN_BASE_PATH;
@@ -29,6 +28,7 @@ import static iudx.gis.server.apiserver.util.Constants.MIME_TEXT_HTML;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_ID;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_IDPATTERN;
 import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
+import static iudx.gis.server.apiserver.util.Constants.RESPONSE_SIZE;
 import static iudx.gis.server.apiserver.util.Constants.ROUTE_DOC;
 import static iudx.gis.server.apiserver.util.Constants.ROUTE_STATIC_SPEC;
 import static iudx.gis.server.apiserver.util.Constants.USER_ID;
@@ -136,7 +136,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     /* Read ssl configuration. */
     isSSL = config().getBoolean("ssl");
 
-
     HttpServerOptions serverOptions = new HttpServerOptions();
     if (isSSL) {
 
@@ -152,7 +151,8 @@ public class ApiServerVerticle extends AbstractVerticle {
 
       /* Setup the HTTPs server properties, APIs and port. */
 
-      serverOptions.setSsl(true)
+      serverOptions
+          .setSsl(true)
           .setKeyStoreOptions(new JksOptions().setPath(keystore).setPassword(keystorePassword));
       LOGGER.info("Info: Starting HTTPs server at port" + port);
 
@@ -166,7 +166,6 @@ public class ApiServerVerticle extends AbstractVerticle {
        */
       port = config().getInteger("httpPort") == null ? 8080 : config().getInteger("httpPort");
       LOGGER.info("Info: Starting HTTP server at port" + port);
-
     }
 
     serverOptions.setCompressionSupported(true).setCompressionLevel(5);
@@ -259,9 +258,10 @@ public class ApiServerVerticle extends AbstractVerticle {
         ar -> {
           if (ar.succeeded()) {
             LOGGER.debug("Success: Delete operation successful");
-            Future.future(fu -> updateAuditTable(routingContext));
             handleSuccessResponse(
                 response, ResponseType.Ok.getCode(), ar.result().getString(JSON_DETAIL));
+            routingContext.data().put(RESPONSE_SIZE, 0);
+            Future.future(fu -> updateAuditTable(routingContext));
           } else {
             LOGGER.error("Fail: Delete operation Failed");
             processBackendResponse(response, ar.cause().getMessage());
@@ -280,9 +280,10 @@ public class ApiServerVerticle extends AbstractVerticle {
         ar -> {
           if (ar.succeeded()) {
             LOGGER.debug("Success: Update operation successful");
-            Future.future(fu -> updateAuditTable(routingContext));
             handleSuccessResponse(
                 response, ResponseType.Ok.getCode(), ar.result().getString(JSON_DETAIL));
+            routingContext.data().put(RESPONSE_SIZE, 0);
+            Future.future(fu -> updateAuditTable(routingContext));
           } else {
             LOGGER.error("Fail: Update operation Failed");
             processBackendResponse(response, ar.cause().getMessage());
@@ -299,11 +300,11 @@ public class ApiServerVerticle extends AbstractVerticle {
         requestBody,
         ar -> {
           if (ar.succeeded()) {
-            Future.future(fu -> updateAuditTable(routingContext));
             LOGGER.debug("Success: Insert operation successful");
-
             handleSuccessResponse(
                 response, ResponseType.Created.getCode(), ar.result().getString(JSON_DETAIL));
+            routingContext.data().put(RESPONSE_SIZE, 0);
+            Future.future(fu -> updateAuditTable(routingContext));
           } else {
             LOGGER.error("Fail: Insert operation Failed");
             processBackendResponse(response, ar.cause().getMessage());
@@ -318,7 +319,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     HttpServerRequest request = routingContext.request();
     /* Handles HTTP response from server to client */
     HttpServerResponse response = routingContext.response();
-    // get query paramaters
+    // get query parameters
     String id = request.getParam(ID);
     JsonObject json = new JsonObject();
     json.put(ID, id);
@@ -339,8 +340,9 @@ public class ApiServerVerticle extends AbstractVerticle {
         handler -> {
           if (handler.succeeded()) {
             LOGGER.debug("Success: Search Success");
-            Future.future(fu -> updateAuditTable(context));
             handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result());
+            context.data().put(RESPONSE_SIZE, response.bytesWritten());
+            Future.future(fu -> updateAuditTable(context));
             LOGGER.debug("CONTEXT " + context);
           } else if (handler.failed()) {
             LOGGER.error("Fail: Search Fail");
@@ -431,6 +433,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     request.put(IID, authInfo.getValue(IID));
     request.put(ID, authInfo.getValue(ID));
     request.put(API, authInfo.getValue(API_ENDPOINT));
+    request.put(RESPONSE_SIZE, context.data().get(RESPONSE_SIZE));
     meteringService.executeWriteQuery(
         request,
         handler -> {
