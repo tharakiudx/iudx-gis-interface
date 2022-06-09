@@ -4,6 +4,7 @@ import static iudx.gis.server.metering.util.Constants.FAILED;
 import static iudx.gis.server.metering.util.Constants.MESSAGE;
 import static iudx.gis.server.metering.util.Constants.QUERY_KEY;
 import static iudx.gis.server.metering.util.Constants.SUCCESS;
+import static iudx.gis.server.metering.util.Constants.TABLE_NAME;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -33,6 +34,7 @@ public class MeteringServiceImpl implements MeteringService {
   private String databaseName;
   private String databaseUserName;
   private String databasePassword;
+  private String databaseTableName;
   private int databasePoolSize;
   private ResponseBuilder responseBuilder;
 
@@ -45,6 +47,7 @@ public class MeteringServiceImpl implements MeteringService {
       databaseUserName = propObj.getString("meteringDatabaseUserName");
       databasePassword = propObj.getString("meteringDatabasePassword");
       databasePoolSize = propObj.getInteger("meteringPoolSize");
+      databaseTableName = propObj.getString("meteringDatabaseTableName");
     }
 
     this.connectOptions =
@@ -65,7 +68,7 @@ public class MeteringServiceImpl implements MeteringService {
   @Override
   public MeteringService executeWriteQuery(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-
+    request.put(TABLE_NAME, databaseTableName);
     query = queryBuilder.buildWritingQuery(request);
     Future<JsonObject> result = writeInDatabase(query);
     result.onComplete(
