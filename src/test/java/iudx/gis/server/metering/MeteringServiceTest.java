@@ -116,7 +116,6 @@ public class MeteringServiceTest {
                                       vertxTestContext.completeNow();
                                     })));
   }
-
   @Test
   @DisplayName("Set Type And Title Test")
   public void setTypeAndTitleTest(VertxTestContext vertxTestContext){
