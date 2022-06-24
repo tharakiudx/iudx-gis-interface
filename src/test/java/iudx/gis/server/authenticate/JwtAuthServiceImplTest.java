@@ -512,6 +512,10 @@ public class JwtAuthServiceImplTest {
             });
   }
 
+  
+  //TODO : Refactor JwtAuthServiceImpl Class and remove catalogue service methods. catalogue service related methods should be inside 
+  //catalogueService class.
+  /*
   @Disabled
   @Test
   @DisplayName("Success Case for Resource Exist")
@@ -579,5 +583,6 @@ public class JwtAuthServiceImplTest {
         });
   }
 
+*/
 
 }
