@@ -89,7 +89,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private String keystorePassword;
   private CatalogueService catalogueService;
   private MeteringService meteringService;
-//  private DatabaseService database;
+  // private DatabaseService database;
   private PostgresService postgresService;
   private AuthenticationService authenticator;
 
@@ -173,7 +173,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     /* Get a handler for the Service Discovery interface. */
 
-//    database = DatabaseService.createProxy(vertx, DATABASE_SERVICE_ADDRESS);
+    // database = DatabaseService.createProxy(vertx, DATABASE_SERVICE_ADDRESS);
     authenticator = AuthenticationService.createProxy(vertx, AUTHENTICATION_SERVICE_ADDRESS);
     meteringService = MeteringService.createProxy(vertx, METERING_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, PG_SERVICE_ADDRESS);
@@ -367,19 +367,21 @@ public class ApiServerVerticle extends AbstractVerticle {
    */
   private void executeSearchQuery(
       RoutingContext context, JsonObject json, HttpServerResponse response) {
-    postgresService.executeQuery(
-        json.toString(),
-        handler -> {
-          if (handler.succeeded()) {
-            LOGGER.debug("Success: Search Success");
-            Future.future(fu -> updateAuditTable(context));
-            handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result());
-            LOGGER.debug("CONTEXT " + context);
-          } else if (handler.failed()) {
-            LOGGER.error("Fail: Search Fail");
-            processBackendResponse(response, handler.cause().getMessage());
-          }
-        });
+
+    String id = json.getString("id");
+    String query = PgsqlQueryBuilder.getAdminDetailsQuery(id);
+
+    postgresService.executeQuery(query, handler -> {
+      if (handler.succeeded()) {
+        LOGGER.debug("Success: Search Success");
+        Future.future(fu -> updateAuditTable(context));
+        handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result());
+        LOGGER.debug("CONTEXT " + context);
+      } else if (handler.failed()) {
+        LOGGER.error("Fail: Search Fail");
+        processBackendResponse(response, handler.cause().getMessage());
+      }
+    });
   }
 
   private void handleSuccessResponse(

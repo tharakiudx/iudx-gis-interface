@@ -33,6 +33,7 @@ public final class PostgresServiceImpl implements PostgresService {
   public PostgresService executeQuery(final String query,
       Handler<AsyncResult<JsonObject>> handler) {
 
+    LOGGER.debug("query : {}"+query);
     Collector<Row, ?, List<JsonObject>> rowCollector =
         Collectors.mapping(row -> row.toJson(), Collectors.toList());
 
