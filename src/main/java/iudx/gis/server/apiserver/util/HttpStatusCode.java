@@ -9,6 +9,7 @@ public enum HttpStatusCode {
   EARLY_HINTS(103, "Early Hints", "urn:dx:rs:earlyHints"),
 
   // 2XX: codes
+  CREATED(201, "Successful Operation", "urn:dx:rs:success"),
   SUCCESS(200, "Successful Operation", "urn:dx:rs:success"),
   NO_CONTENT(204, "No Content", "urn:dx:rs:noContent"),
 

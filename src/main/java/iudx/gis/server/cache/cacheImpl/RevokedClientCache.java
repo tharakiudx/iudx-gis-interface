@@ -60,7 +60,6 @@ public class RevokedClientCache implements IudxCache {
                   this.cache.put(key, value);
                 });
           }
-          LOGGER.info("database res " + handler.result());
         });
   }
 }

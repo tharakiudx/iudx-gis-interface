@@ -1,5 +1,6 @@
 package iudx.gis.server.metering;
 
+import static iudx.gis.server.common.Constants.*;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
@@ -9,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 
 public class MeteringVerticle extends AbstractVerticle {
 
-  private static final String METERING_SERVICE_ADDRESS = "iudx.gis.metering.service";
   private static final Logger LOGGER = LogManager.getLogger(MeteringVerticle.class);
   private String databaseIP;
   private int databasePort;

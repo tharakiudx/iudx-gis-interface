@@ -4,6 +4,7 @@ import java.util.stream.Stream;
 
 public enum ResponseUrn {
   SUCCESS("urn:dx:rs:success", "Successful operation"),
+  CREATED("urn:dx:rs:success", "Successful operation"),
   INVALID_ATTR_PARAM("urn:dx:rs:invalidAttributeParam", "Invalid attribute param"),
   INVALID_ATTR_VALUE("urn:dx:rs:invalidAttributeValue", "Invalid attribute value"),
   INVALID_OPERATION("urn:dx:rs:invalidOperation", "Invalid operation"),

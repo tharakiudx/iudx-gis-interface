@@ -1,9 +1,8 @@
 {
 	"info": {
-		"_postman_id": "cb0c8b1d-7219-47b3-9523-8e4b20889c12",
+		"_postman_id": "dbcaeba2-bf6a-484b-95cd-0c7aee3231c1",
 		"name": "IUDX-GIS-SERVER-APIs-V3.5",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "3868286"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -153,9 +152,9 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");",
-									"    const resultsjsonData = body.results[0];",
-									"    pm.expect(resultsjsonData).to.have.property(\"URL\", \"https://map.varanasismartcity.gov.in/varanasismartcity\");",
+									"    pm.expect(body).to.have.property(\"title\", \"successful operation\");",
+									"    const resultsjsonData = body.result[0];",
+									"    pm.expect(resultsjsonData).to.have.property(\"url\", \"https://map.varanasismartcity.gov.in/varanasismartcity\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -711,7 +710,7 @@
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
 									"    pm.expect(body).to.have.property(\"title\", \"Not Found\");",
-									"    pm.expect(body).to.have.property(\"detail\", \"Update operation failed because passed resource ID does not exist in DB\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"Not Found\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -834,7 +833,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"detail\", \"Given resource ID does not exist in DB\");  ",
+									"    pm.expect(body).to.have.property(\"detail\", \"Not Found\");  ",
 									"});"
 								],
 								"type": "text/javascript"

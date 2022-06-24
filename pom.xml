@@ -18,10 +18,10 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
+
 		<exec.mainClass>iudx.gis.server.deploy.Deployer</exec.mainClass>
-        <exec.mainClassDev>iudx.gis.server.deploy.DeployerDev</exec.mainClassDev>
-        <config-dev.file>config-dev.json</config-dev.file>
+		<exec.mainClassDev>iudx.gis.server.deploy.DeployerDev</exec.mainClassDev>
+		<config-dev.file>config-dev.json</config-dev.file>
 	</properties>
 
 	<dependencyManagement>
@@ -33,7 +33,8 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<!--  log4j2 bom to keep org.apache.logging.log4j artifacts version in sync -->
+			<!-- log4j2 bom to keep org.apache.logging.log4j artifacts version in 
+				sync -->
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-bom</artifactId>
@@ -83,11 +84,8 @@
 			<artifactId>maven-checkstyle-plugin</artifactId>
 			<version>3.1.1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.8.1</version>
-		</dependency>
+		<!-- <dependency> <groupId>org.apache.commons</groupId> <artifactId>commons-lang3</artifactId> 
+			<version>3.8.1</version> </dependency> -->
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-junit5</artifactId>
@@ -96,7 +94,7 @@
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-pg-client</artifactId>
 		</dependency>
-		<!-- log4j2 logging dependencies-->
+		<!-- log4j2 logging dependencies -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
@@ -123,7 +121,7 @@
 			<artifactId>micrometer-registry-prometheus</artifactId>
 			<version>${micrometer.version}</version>
 		</dependency>
-		<!--LMAX Disruptor for enabling Asynchronous log4j2 Logging  -->
+		<!--LMAX Disruptor for enabling Asynchronous log4j2 Logging -->
 		<dependency>
 			<groupId>com.lmax</groupId>
 			<artifactId>disruptor</artifactId>
@@ -156,20 +154,38 @@
 			<artifactId>vertx-rabbitmq-client</artifactId>
 
 		</dependency>
-        <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast-zookeeper</artifactId>
-            <version>${hazelcast.version}</version>
-        </dependency>
-<!-- for postgres container -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-zookeeper</artifactId>
+			<version>${hazelcast.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>1.15.3</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- for postgres container -->
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>1.17.2</version>
+			<version>1.16.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.3.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>1.15.3</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- Thanks for using https://jar-download.com -->
-<!--                    -->
+		<!-- -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
@@ -182,11 +198,11 @@
 			<version>3.11.1</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-x-discovery</artifactId>
-            <version>${curator.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-x-discovery</artifactId>
+			<version>${curator.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.curator</groupId>
 			<artifactId>curator-x-discovery</artifactId>
@@ -254,8 +270,8 @@
 						<jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
 					</systemPropertyVariables>
 					<excludes>
-						<!-- classes are excluded since they are not testable or don't add
-                            any value if test cases are written. -->
+						<!-- classes are excluded since they are not testable or don't add 
+							any value if test cases are written. -->
 						<!-- ApiServerVerticle testing is covered in integration for now. -->
 						<exclude>iudx/gis/server/apiserver/*.class</exclude>
 						<exclude>**/*VertxEBProxy.class</exclude>
