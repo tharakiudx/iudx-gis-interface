@@ -3,7 +3,7 @@ package iudx.gis.server.common;
 import java.util.stream.Stream;
 
 public enum ResponseUrn {
-  SUCCESS_URN("urn:dx:rs:success", "successful operations"),
+  SUCCESS_URN("urn:dx:rs:success", "successful operation"),
   INVALID_OPERATION_URN("urn:dx:rs:invalidOperation", "Invalid operation"),
   UNAUTHORIZED_ENDPOINT_URN(
       "urn:dx:rs:unauthorizedEndpoint", "Access to endpoint is not available"),

@@ -332,7 +332,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         } else {
           postgresService.executeQuery(insertAdminDetailsQuery, insertHandler -> {
             if (insertHandler.succeeded()) {
-              handleResponse(response, HttpStatusCode.SUCCESS, ResponseUrn.SUCCESS);
+              handleResponse(response, HttpStatusCode.CREATED, ResponseUrn.CREATED);
             } else {
               LOGGER.info("insert failed :{}", insertHandler.cause().getMessage());
             }
@@ -389,7 +389,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     response
         .putHeader(CONTENT_TYPE, APPLICATION_JSON)
         .setStatusCode(statusCode)
-        .end(generateResponse(HttpStatusCode.SUCCESS, SUCCESS, result));
+        .end(result.toString());
   }
 
   private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
