@@ -1,6 +1,6 @@
 {
 	"id": "5b8f23ac-3a52-4f68-a066-73037dc6cd8d",
-	"name": "GIS Jenkins Pipeline",
+	"name": "GIS Jenkins Pipeline", 
 	"values": [
 		{
 			"key": "openResourceToken",
