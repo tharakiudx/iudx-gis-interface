@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class CatalogueService {
   private static final Logger LOGGER = LogManager.getLogger(CatalogueService.class);
 
-  private WebClient catWebClient;
+  public static WebClient catWebClient;
   private long cacheGroupTimerId;
   private long cacheResTimerId;
   private static String catHost;
@@ -46,9 +46,12 @@ public class CatalogueService {
 
     WebClientOptions options =
         new WebClientOptions().setTrustAll(true).setVerifyHost(false).setSsl(true);
-    catWebClient = WebClient.create(vertx, options);
+    if (catWebClient==null) {
+      catWebClient = WebClient.create(vertx, options);
+    }
 
-    populateGroupCache(catWebClient).onComplete(handler -> populateResourceCache(catWebClient));
+    //populateGroupCache(catWebClient).onComplete(handler -> populateResourceCache(catWebClient));
+    populateGroupCache(catWebClient);
 
     cacheGroupTimerId = vertx.setPeriodic(TimeUnit.DAYS.toMillis(1), handler -> {
      populateGroupCache(catWebClient);
@@ -94,7 +97,7 @@ public class CatalogueService {
               JsonObject res = (JsonObject) json;
               String id = res.getString("id");
               String groupId = id.substring(0, id.lastIndexOf("/"));
-              idCache.put(id, res.getString("accessPolicy", groupCache.getIfPresent(groupId)));
+              //idCache.put(id, res.getString("accessPolicy", groupCache.getIfPresent(groupId)));
             });
             promise.complete(true);
           } else if (handler.failed()) {
@@ -165,11 +168,12 @@ public class CatalogueService {
             JsonObject responseBody = response.bodyAsJsonObject();
             if (responseBody.getString("type").equalsIgnoreCase("urn:dx:cat:Success")
                 && responseBody.getInteger("totalHits") > 0) {
-              if(responseBody.getJsonArray("results").getJsonObject(0).getJsonArray("type").contains("iudx:Resource")) {
+              promise.complete(responseHandler.succeeded());
+              /*if(responseBody.getJsonArray("results").getJsonObject(0).getJsonArray("type").contains("iudx:Resource")) {
                 promise.complete(true);
               } else {
                 promise.fail(responseHandler.cause());                
-              }
+              }*/
             } else {
               promise.fail(responseHandler.cause());
             }
