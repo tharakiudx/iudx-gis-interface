@@ -1,15 +1,140 @@
 {
 	"info": {
-		"_postman_id": "c048a02c-5647-4f21-9e0c-b42ee48f2e09",
-		"name": "IUDX-GIS-SERVER",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"_postman_id": "cb0c8b1d-7219-47b3-9523-8e4b20889c12",
+		"name": "IUDX-GIS-SERVER-APIs-V3.5",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3868286"
 	},
 	"item": [
+		{
+			"name": "Get token",
+			"item": [
+				{
+					"name": "Get token for accessing an Open Resource",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"openResourceToken\", jsonData.results.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "clientId",
+								"value": "{{clientID}}",
+								"type": "text"
+							},
+							{
+								"key": "clientSecret",
+								"value": "{{clientSecret}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"itemId\": \"rs.iudx.io\",\n  \"itemType\": \"resource_server\",\n  \"role\": \"consumer\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{auth-url}}/auth/v1/token",
+							"protocol": "https",
+							"host": [
+								"{{auth-url}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get ADMIN token for uploading a Resource/Resource Group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"adminToken\", jsonData.results.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "clientId",
+								"value": "{{clientID}}",
+								"type": "text"
+							},
+							{
+								"key": "clientSecret",
+								"value": "{{clientSecret}}",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"itemId\": \"rs.iudx.io\", \n  \"itemType\": \"resource_server\",\n  \"role\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{auth-url}}/auth/v1/token",
+							"protocol": "https",
+							"host": [
+								"{{auth-url}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "/entities",
 			"item": [
 				{
-					"name": "200 (SUCCESS) URL REQUEST",
+					"name": "200 (SUCCESS) Read Query",
 					"event": [
 						{
 							"listen": "test",
@@ -42,17 +167,16 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzEyMTQxNjgsImlhdCI6MTYzMTE3MDk2OCwiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJjb25zdW1lciIsImNvbnMiOnt9fQ.ATXT7FUkuWiEkfQECW4kIjuiGmUbYh51k-8as5-XLUXrWJVFI6LaJnk2JE6gr_RKknNksGEuxodO2rGzkEhfLQ",
+								"value": "{{openResourceToken}}",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
+							"raw": "https://{{base_url}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"ngsi-ld",
 								"v1",
@@ -69,7 +193,7 @@
 					"response": []
 				},
 				{
-					"name": "404 (FAILED) INVALID ID",
+					"name": "404 (FAILED) Invalid / Non-existing ID",
 					"event": [
 						{
 							"listen": "test",
@@ -100,17 +224,16 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzEyMTQxNjgsImlhdCI6MTYzMTE3MDk2OCwiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJjb25zdW1lciIsImNvbnMiOnt9fQ.ATXT7FUkuWiEkfQECW4kIjuiGmUbYh51k-8as5-XLUXrWJVFI6LaJnk2JE6gr_RKknNksGEuxodO2rGzkEhfLQ",
+								"value": "{{openResourceToken}}",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
+							"raw": "https://{{base_url}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/FWR055",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"ngsi-ld",
 								"v1",
@@ -128,7 +251,7 @@
 					"response": []
 				},
 				{
-					"name": "401 (FAILED) INVALID TOKEN",
+					"name": "401 (FAILED) Invalid Token",
 					"event": [
 						{
 							"listen": "test",
@@ -159,17 +282,16 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzEyMzY0MTIsImlhdCI6MTYzMTE5MzIxMiwiaWlkIjoicmc6aWlzYy5hYy5pbi84OWEzNjI3M2Q3N2RhYzRjZjM4MTE0ZmNhMWJiZTY0MzkyNTQ3Zjg2L3JzLml1ZHguaW8vcHVuZS1lbnYtZmxvb2QiLCJyb2xlIjoicHJvdmlkZXIiLCJjb25zIjp7fX0.1Xh6mFOJytFMAGCzHTTKWwoxYP4407SH1VB1BDAthbf1Dy_B_ONtoaaron4IhGp59N_LIlJKS6bbAXoawMXi3A",
+								"value": "{{openResourceToken}}+invalid",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "https://{{host}}:{{port}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
+							"raw": "https://{{base_url}}/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"ngsi-ld",
 								"v1",
@@ -197,7 +319,7 @@
 			"name": "/admin",
 			"item": [
 				{
-					"name": "201 (SUCCESS) OPEN ADMIN_BASE_PATH",
+					"name": "201 (SUCCESS) Create a GIS entry",
 					"event": [
 						{
 							"listen": "test",
@@ -234,13 +356,13 @@
 							},
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"value": "{{adminToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059\",\n    \"server-url\": \"URL\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
+							"raw": "{\n    \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR1059\",\n    \"server-url\": \"https://gis-test.iudx.io/apis\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -248,12 +370,11 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"raw": "https://{{base_url}}/admin/gis/serverInfo",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"admin",
 								"gis",
@@ -264,7 +385,7 @@
 					"response": []
 				},
 				{
-					"name": "409 (CONFLICT) OPEN ADMIN_BASE_PATH",
+					"name": "409 (CONFLICT) GIS entry already existing",
 					"event": [
 						{
 							"listen": "test",
@@ -295,13 +416,13 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"value": "{{adminToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059\",\n    \"server-url\": \"URL\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
+							"raw": "{\n    \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR1059\",\n    \"server-url\": \"https://gis-test.iudx.io/apis\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -309,12 +430,11 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"raw": "https://{{base_url}}/admin/gis/serverInfo",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"admin",
 								"gis",
@@ -325,68 +445,7 @@
 					"response": []
 				},
 				{
-					"name": "201 (SUCCESS) CLOSE ADMIN_BASE_PATH",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 201 (Created)\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n   \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta\",\n   \"server-url\": \"URL\",\n   \"server-port\": 1234,\n   \"isSecure\": false,\n   \"accessInfo\": {\n       \"username\": \"username\",\n       \"password\": \"pass\",\n       \"tokenURL\": \"URL\"\n   }\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "https",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"admin",
-								"gis",
-								"serverInfo"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "400 (FAILED) OPEN ADMIN_BASE_PATH",
+					"name": "400 (FAILED) Invalid JSON object in GIS entry",
 					"event": [
 						{
 							"listen": "test",
@@ -417,13 +476,13 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"value": "{{adminToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": \"open-resource-id\",\n    \"server-url\": \"URL\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
+							"raw": "{\n    \"id123\": \"open-resource-id\",\n    \"server-url\": \"URL\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -431,12 +490,11 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"raw": "https://{{base_url}}/admin/gis/serverInfo",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"admin",
 								"gis",
@@ -447,7 +505,7 @@
 					"response": []
 				},
 				{
-					"name": "401 (FAILED) INVALID TOKEN",
+					"name": "401 (FAILED) Invalid Token",
 					"event": [
 						{
 							"listen": "test",
@@ -478,13 +536,13 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzEyMTQxNjgsImlhdCI6MTYzMTE3MDk2OCwiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJjb25zdW1lciIsImNvbnMiOnt9fQ.ATXT7FUkuWiEkfQECW4kIjuiGmUbYh51k-8as5-XLUXrWJVFI6LaJnk2JE6gr_RKknNksGEuxodO2rGzkEhfLQ",
+								"value": "{{adminToken}}+invalid",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059\",\n    \"server-url\": \"URL\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
+							"raw": "{\n    \"id\": \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR1059\",\n    \"server-url\": \"https://gis-test.iudx.io/apis\",\n    \"server-port\": 1234,\n    \"isSecure\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -492,12 +550,11 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"raw": "https://{{base_url}}/admin/gis/serverInfo",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"admin",
 								"gis",
@@ -508,7 +565,7 @@
 					"response": []
 				},
 				{
-					"name": "200 (SUCCESS) CLOSE ADMIN_BASE_PATH PUT",
+					"name": "200 (SUCCESS) Update GIS entry",
 					"event": [
 						{
 							"listen": "test",
@@ -539,18 +596,19 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"value": "{{adminToken}}",
 								"type": "text"
 							},
 							{
-								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
-								"type": "text"
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"id\" : \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":true,\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
+							"raw": "{\n\"id\" : \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR1059\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":true,\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -558,12 +616,11 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"raw": "https://{{base_url}}/admin/gis/serverInfo",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"admin",
 								"gis",
@@ -574,7 +631,7 @@
 					"response": []
 				},
 				{
-					"name": "400 (FAILED) INVALID ID",
+					"name": "400 (FAILED) Invalid JSON object in GIS entry",
 					"event": [
 						{
 							"listen": "test",
@@ -605,13 +662,13 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"value": "{{adminToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"id\" : \"open-resource-id\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":true,\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
+							"raw": "{\n\"id123\" : \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR1059\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":true,\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -619,12 +676,11 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"raw": "https://{{base_url}}/admin/gis/serverInfo",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"admin",
 								"gis",
@@ -635,7 +691,7 @@
 					"response": []
 				},
 				{
-					"name": "404 (FAILED) ID DOES NOT EXIST",
+					"name": "404 (FAILED) ID not found",
 					"event": [
 						{
 							"listen": "test",
@@ -667,13 +723,13 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"value": "{{adminToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"id\" : \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR058\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":true,\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
+							"raw": "{\n\"id\" : \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR11059\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":true,\n\"accessInfo\":{\n   \"username\": \"username\",\n   \"password\": \"pass\",\n   \"tokenURL\":\"URL\"\n}\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -681,12 +737,11 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
+							"raw": "https://{{base_url}}/admin/gis/serverInfo",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"admin",
 								"gis",
@@ -697,68 +752,7 @@
 					"response": []
 				},
 				{
-					"name": "200 (SUCCESS) OPEN ADMIN_BASE_PATH PUT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 200 (OK)\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\"id\" : \"iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta\",\n\"server-url\":\"URL\",\n\"server-port\":1234,\n\"isSecure\":false\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo",
-							"protocol": "https",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"admin",
-								"gis",
-								"serverInfo"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "200 (SUCCESS) OPEN ADMIN_BASE_PATH DELETE",
+					"name": "200 (SUCCESS) Delete GIS entry",
 					"event": [
 						{
 							"listen": "test",
@@ -788,24 +782,23 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"key": "",
+								"value": "",
 								"type": "text",
 								"disabled": true
 							},
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"value": "{{adminToken}}",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059",
+							"raw": "https://{{base_url}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR1059",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"admin",
 								"gis",
@@ -814,7 +807,7 @@
 							"query": [
 								{
 									"key": "id",
-									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059"
+									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR1059"
 								}
 							]
 						}
@@ -822,7 +815,7 @@
 					"response": []
 				},
 				{
-					"name": "404 (FAILED) ID DOES NOT EXIST",
+					"name": "404 (FAILED) ID not found",
 					"event": [
 						{
 							"listen": "test",
@@ -853,17 +846,16 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"value": "{{adminToken}}",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR050",
+							"raw": "https://{{base_url}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR050",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"admin",
 								"gis",
@@ -880,7 +872,7 @@
 					"response": []
 				},
 				{
-					"name": "400 (FAILED) INVALID ID",
+					"name": "400 (FAILED) Invalid ID format",
 					"event": [
 						{
 							"listen": "test",
@@ -911,17 +903,16 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
+								"value": "{{adminToken}}",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=open-resource-id",
+							"raw": "https://{{base_url}}/admin/gis/serverInfo?id=open-resource-id",
 							"protocol": "https",
 							"host": [
-								"{{host}}"
+								"{{base_url}}"
 							],
-							"port": "{{port}}",
 							"path": [
 								"admin",
 								"gis",
@@ -931,64 +922,6 @@
 								{
 									"key": "id",
 									"value": "open-resource-id"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "200 (SUCCESS) CLOSE ADMIN_BASE_PATH DELETE",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 200 (OK)\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"title\", \"Successful Operation\");  ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "token",
-								"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiI4NDRlMjUxYi01NzRiLTQ2ZTYtOTI0Ny1mNzZmMWY3MGE2MzciLCJpc3MiOiJhdXRodmVydHguaXVkeC5pbyIsImF1ZCI6InJzLml1ZHguaW8iLCJleHAiOjE2MzE4MzYzNjMsImlhdCI6MTYzMTc5MzE2MywiaWlkIjoicnM6cnMuaXVkeC5pbyIsInJvbGUiOiJhZG1pbiIsImNvbnMiOnt9fQ.9En0F3LWkB-6FWwTY0nb_xmgQWhlrkbsqXWRvkQM9qTP4D-2l3ciQIz2r9jJop-lXSk6pMOn7rPls1u0j7E8ew",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "https://{{host}}:{{port}}/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta",
-							"protocol": "https",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"admin",
-								"gis",
-								"serverInfo"
-							],
-							"query": [
-								{
-									"key": "id",
-									"value": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta"
 								}
 							]
 						}

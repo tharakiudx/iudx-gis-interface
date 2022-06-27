@@ -76,9 +76,9 @@ pipeline {
         always{
           node('master') {
             script{
-              archiveZap failHighAlerts: 1, failMediumAlerts: 1, failLowAlerts: 1
+              publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/gis/Newman/report/', reportFiles: 'report.html', reportName: 'HTML Report', reportTitles: '', reportName: 'Integration Test Report'])
+              archiveZap failHighAlerts: 1, failMediumAlerts: 1, failLowAlerts: 2
             }  
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/gis/Newman/report/', reportFiles: 'report.html', reportName: 'HTML Report', reportTitles: '', reportName: 'Integration Test Report'])
           }
           script{
              sh 'docker-compose -f docker-compose.test.yml down --remove-orphans'
