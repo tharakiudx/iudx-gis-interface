@@ -24,39 +24,189 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith({VertxExtension.class, MockitoExtension.class})
 public class CatalogueServiceTest {
     @Mock
-    WebClient webClient;
+    Vertx vertxObj;
+    JsonObject config;
+    CatalogueService catalogueService;
+
     @Mock
     HttpRequest<Buffer> httpRequest;
     @Mock
+    AsyncResult<HttpResponse<Buffer>> asyncResult;
+    @Mock
     HttpResponse<Buffer> httpResponse;
-    @Mock
-    JsonObject json,config;
-
-   // WebClientFactory webClientFactory;
-    @Mock
-    AsyncResult<HttpResponse<Buffer>> asyncResultMock;
-    CatalogueService catalogueService;
-
-    String catSearchPath=Constants.CAT_RSG_PATH;
-    String catItemPath= Constants.CAT_ITEM_PATH;
 
     @BeforeEach
-    public void setup(Vertx vertx){
+    public void setup(VertxTestContext vertxTestContext){
         config = new JsonObject();
-        config.put("catServerPort",12345);
-        config.put("catServerHost","anyhost");
+        config.put("catServerHost","guest");
+        config.put("catServerPort",8443);
+        JsonObject jsonObject = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+        JsonArray jsonArray1 = new JsonArray();
+        JsonObject jsonObject1 = new JsonObject();
 
-        catalogueService= new CatalogueService(vertx,config);
-        WebClientOptions options =
-                new WebClientOptions().setTrustAll(true).setVerifyHost(false).setSsl(true);
-        //webClient = WebClient.create(vertx, options);
+        jsonObject1.put("id", "abcd/abcd/abcd/abcd");
+        jsonObject1.put("iudxResourceAPIs", jsonArray1);
+        jsonArray.add(jsonObject1);
+        jsonObject.put("results", jsonArray);
+        CatalogueService.catWebClient = mock(WebClient.class);
+
+        when(CatalogueService.catWebClient.get(anyInt(),anyString(),anyString())).thenReturn(httpRequest);
+        when(httpRequest.addQueryParam(anyString(),anyString())).thenReturn(httpRequest);
+        when(httpRequest.expect(any())).thenReturn(httpRequest);
+        when(asyncResult.succeeded()).thenReturn(true);
+        when(asyncResult.result()).thenReturn(httpResponse);
+        when(httpResponse.bodyAsJsonObject()).thenReturn(jsonObject);
+        doAnswer(new Answer<AsyncResult<HttpResponse<Buffer>>>() {
+            @Override
+            public AsyncResult<HttpResponse<Buffer>> answer(InvocationOnMock arg0) throws Throwable {
+
+                ((Handler<AsyncResult<HttpResponse<Buffer>>>)arg0.getArgument(0)).handle(asyncResult);
+                return null;
+            }
+        }).when(httpRequest).send(any());
+        catalogueService = new CatalogueService(vertxObj,config);
+        vertxTestContext.completeNow();
     }
+
+    @Test
+    @DisplayName("Testing Success for isItemExist method with String IDs")
+    public void testIsItemExistSuccess(VertxTestContext vertxTestContext)
+    {
+        JsonObject responseJSonObject = new JsonObject();
+        responseJSonObject.put("type","urn:dx:cat:Success");
+        responseJSonObject.put("totalHits", 10);
+        /*responseJSonObject.put("results", "iudx:Resource");*/
+        when(httpResponse.bodyAsJsonObject()).thenReturn(responseJSonObject);
+
+        catalogueService.isItemExist("asd/asd").onComplete(handler -> {
+            if (handler.succeeded())
+            {
+                assertTrue(handler.result());
+                vertxTestContext.completeNow();
+            }
+            else
+            {
+                vertxTestContext.failNow(handler.cause());
+            }
+        });
+        verify(CatalogueService.catWebClient,times(2)).get(anyInt(),anyString(),anyString());
+        verify(httpRequest,times(4)).addQueryParam(anyString(),anyString());
+        verify(httpRequest,times(2)).send(any());
+    }
+    @Test
+    @DisplayName("Testing Failed for isItemExist method with String IDs")
+    public void testIsItemExistFail(VertxTestContext vertxTestContext)
+    {
+
+        JsonObject responseJSonObject = new JsonObject();
+        responseJSonObject.put("type","urn:dx:cat:Success");
+        responseJSonObject.put("totalHits", 0);
+        when(httpResponse.bodyAsJsonObject()).thenReturn(responseJSonObject);
+
+        catalogueService.isItemExist("asd/asd").onComplete(handler -> {
+            if (handler.succeeded())
+            {
+                vertxTestContext.failNow(handler.cause());
+                vertxTestContext.completeNow();
+            }
+            else
+            {
+                vertxTestContext.completeNow();
+            }
+        });
+        verify(CatalogueService.catWebClient,times(2)).get(anyInt(),anyString(),anyString());
+        verify(httpRequest,times(2)).send(any());
+    }
+
+    @Test
+    public void testResourceCache(VertxTestContext vertxTestContext){
+
+        JsonObject jsonObject = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+        JsonArray jsonArray1 = new JsonArray();
+        JsonObject jsonObject1 = new JsonObject();
+
+        jsonObject1.put("id", "abcd/abcd/abcd/abcd");
+        jsonObject1.put("iudxResourceAPIs", jsonArray1);
+        jsonArray.add(jsonObject1);
+        jsonObject.put("results", jsonArray);
+
+        when(CatalogueService.catWebClient.get(anyInt(),anyString(),anyString())).thenReturn(httpRequest);
+        when(httpRequest.addQueryParam(anyString(),anyString())).thenReturn(httpRequest);
+        when(httpRequest.addQueryParam(anyString(),anyString())).thenReturn(httpRequest);
+        when(httpRequest.addQueryParam(anyString(),anyString())).thenReturn(httpRequest);
+        when(httpRequest.expect(any())).thenReturn(httpRequest);
+
+        when(asyncResult.succeeded()).thenReturn(true);
+        when(asyncResult.result()).thenReturn(httpResponse);
+        when(httpResponse.bodyAsJsonObject()).thenReturn(jsonObject);
+
+        doAnswer(new Answer<AsyncResult<HttpResponse<Buffer>>>() {
+            @Override
+            public AsyncResult<HttpResponse<Buffer>> answer(InvocationOnMock arg0) throws Throwable {
+
+                ((Handler<AsyncResult<HttpResponse<Buffer>>>)arg0.getArgument(0)).handle(asyncResult);
+                return null;
+            }
+        }).when(httpRequest).send(any());
+
+        catalogueService.populateResourceCache(CatalogueService.catWebClient).onComplete(handler->{
+                if (handler.succeeded()){
+                    vertxTestContext.completeNow();
+                }
+                else {
+                    handler.failed();
+                }
+                });
+    }
+    /*@Test
+    public void testCallCatalogItemApi(VertxTestContext vertxTestContext){
+
+        JsonObject jsonObject = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+        JsonArray jsonArray1 = new JsonArray();
+        JsonObject jsonObject1 = new JsonObject();
+
+        jsonObject1.put("id", "abcd/abcd/abcd/abcd");
+        jsonObject1.put("iudxResourceAPIs", jsonArray1);
+        jsonArray.add(jsonObject1);
+        jsonObject.put("results", jsonArray);
+
+        when(CatalogueService.catWebClient.get(anyInt(),anyString(),anyString())).thenReturn(httpRequest);
+        when(httpRequest.addQueryParam(anyString(),anyString())).thenReturn(httpRequest);
+
+        when(asyncResult.succeeded()).thenReturn(true);
+        when(asyncResult.result()).thenReturn(httpResponse);
+        when(httpResponse.bodyAsJsonObject()).thenReturn(jsonObject);
+
+        doAnswer(new Answer<AsyncResult<HttpResponse<Buffer>>>() {
+            @Override
+            public AsyncResult<HttpResponse<Buffer>> answer(InvocationOnMock arg0) throws Throwable {
+
+                ((Handler<AsyncResult<HttpResponse<Buffer>>>)arg0.getArgument(0)).handle(asyncResult);
+                return null;
+            }
+        }).when(httpRequest).send(any());
+
+        catalogueService.callCatalogueItemApi("CatalogueService/catWebClient").onComplete(handler->{
+            if (handler.succeeded()){
+                vertxTestContext.completeNow();
+            }
+            else {
+                handler.failed();
+            }
+        });
+    }*/
+
+
 
     /*@Test
     @DisplayName("Populate Group Cache")
@@ -232,25 +382,24 @@ public class CatalogueServiceTest {
         testContext.completeNow();
     }*/
 
-    /*@Test
+   /* @Test
     public void testCallCatalogueItemApi(VertxTestContext vertxTestContext){
-        lenient().when(webClient.get(anyInt(),anyString(),anyString())).thenReturn(httpRequest);
-        lenient().when(httpRequest.addQueryParam(any(),any())).thenReturn(httpRequest);
 
-        AsyncResult<HttpResponse<Buffer>> asyncResult = mock(AsyncResult.class);
-        lenient().when(asyncResult.succeeded()).thenReturn(true);
+        JsonObject responseJSonObject = new JsonObject();
+        responseJSonObject.put("id","accessPolicy");
 
-        Mockito.lenient().doAnswer(new Answer<AsyncResult<HttpResponse<Buffer>>>() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public AsyncResult<HttpResponse<Buffer>> answer(InvocationOnMock arg0) throws Throwable {
-                ((Handler<AsyncResult<HttpResponse<Buffer>>>) arg0.getArgument(0)).handle(asyncResult);
-                return null;
+        //when(httpResponse.bodyAsJsonObject()).thenReturn(responseJSonObject);
+
+
+        catalogueService.callCatalogueItemApi("asd/zxc/qwe/asd").onComplete(handler->{
+            if (handler.succeeded()){
+
+                vertxTestContext.completeNow();
             }
-        }).when(httpRequest).send(any());
-
-        catalogueService.callCatalogueItemApi("asd/zxc/qwe/asd");
+            else
+                vertxTestContext.failNow(handler.cause());
+        });
         vertxTestContext.completeNow();
-    }*/
-
+    }
+*/
 }

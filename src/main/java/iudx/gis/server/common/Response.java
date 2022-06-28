@@ -27,6 +27,14 @@ public class Response {
     this.detail = builder.detail;
   }
 
+  public int getStatus() {
+    return status;
+  }
+
+  public String getDetail() {
+    return detail;
+  }
+
   public JsonObject toJson() {
     JsonObject json = new JsonObject();
 

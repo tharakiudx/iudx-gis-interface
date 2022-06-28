@@ -52,33 +52,10 @@ public class ValidationHandlerTest {
         when(httpServerRequestMock.headers()).thenReturn(multiMapMock);
 
         when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
-        assertFalse(validator.isValid());
+
         validationHandler.handle(routingContextMock);
         verify(routingContextMock,times(1)).next();
         vertxTestContext.completeNow();
     }
-
-    @Test
-    @DisplayName("Validation Failure")
-    public void testHandle2(VertxTestContext vertxTestContext){
-        MultiMap multiMapMock= mock(MultiMap.class);
-        RoutingContext routingContextMock= mock(RoutingContext.class);
-        HttpServerRequest httpServerRequestMock = mock(HttpServerRequest.class);
-        JsonObject jsonObjectMock= mock(JsonObject.class);
-
-        when(routingContextMock.request()).thenReturn(httpServerRequestMock);
-
-        parameters = MultiMap.caseInsensitiveMultiMap();
-        parameters.set(Constants.ID, "asdasd/asdasd");
-        when(httpServerRequestMock.params()).thenReturn(parameters);
-        when(httpServerRequestMock.headers()).thenReturn(multiMapMock);
-
-        validationHandler2 = new ValidationHandler(vertx,RequestType.ENTITY_QUERY);
-
-        assertThrows(Exception.class, ()-> validationHandler.handle(routingContextMock));
-        vertxTestContext.completeNow();
-
-    }
-
 
 }
