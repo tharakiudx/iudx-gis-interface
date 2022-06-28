@@ -34,7 +34,7 @@ pipeline {
           thresholds: [ skipped(failureThreshold: '0'), failed(failureThreshold: '0') ],
           tools: [ JUnit(pattern: 'target/surefire-reports/*.xml') ]
         )
-        jacoco classPattern: 'target/classes', execPattern: 'target/jacoco.exec', sourcePattern: 'src/main/java', exclusionPattern:'iudx/gis/server/apiserver/*.class,**/*VertxEBProxy.class,**/Constants.class,**/*VertxProxyHandler.class,**/*Verticle.class,iudx/gis/server/deploy/*.class,iudx/gis/server/database/util/Util.java,iudx/gis/server/databroker/DataBrokerService.java,iudx/gis/server/databroker/DataBrokerServiceImpl.java,iudx/gis/server/apiserver/validation/types/Validator.java,iudx/gis/server/apiserver/validation/types/IdTypeValidator.java,iudx/gis/server/apiserver/validation/types/JsonSchemaTypeValidator.java,iudx/gis/server/apiserver/validation/types/StringTypeValidator.java'
+        jacoco classPattern: 'target/classes', execPattern: 'target/jacoco.exec', sourcePattern: 'src/main/java', exclusionPattern:'iudx/gis/server/apiserver/*.class,**/*VertxEBProxy.class,**/Constants.class,**/*VertxProxyHandler.class,**/*Verticle.class,iudx/gis/server/deploy/*.class,iudx/gis/server/database/util/Util.java,iudx/gis/server/databroker/DataBrokerService.java,iudx/gis/server/databroker/DataBrokerServiceImpl.java,iudx/gis/server/apiserver/validation/types/Validator.java'
       }
       post{
         failure{
