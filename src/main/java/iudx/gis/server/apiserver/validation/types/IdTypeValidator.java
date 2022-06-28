@@ -35,19 +35,25 @@ public class IdTypeValidator implements Validator {
     String errorMessage = "";
     if (required && (value == null || value.isBlank())) {
       errorMessage = "Validation error : null or blank value for required mandatory field";
+      throw new DxRuntimeException(failureCode(), ResponseUrn.INVALID_ATTR_VALUE, failureMessage());
+
     } else {
       if (value == null) {
         return true;
       }
       if (value.isBlank()) {
         errorMessage = "Validation error :  blank value for passed";
+        throw new DxRuntimeException(failureCode(), ResponseUrn.INVALID_ATTR_VALUE, failureMessage(value));
       }
     }
     if (value!=null && value.length() > maxLength) {
       errorMessage = "Validation error : Value exceed max character limit";
+      throw new DxRuntimeException(failureCode(), ResponseUrn.INVALID_ATTR_VALUE, failureMessage(value));
     }
     if (!isvalidIUDXId(value)) {
       errorMessage = "Validation error : Invalid id";
+      throw new DxRuntimeException(failureCode(), ResponseUrn.INVALID_ATTR_VALUE, failureMessage(value));
+
     }
     if (errorMessage.isBlank()) {
       return true;
