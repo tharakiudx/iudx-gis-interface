@@ -96,6 +96,24 @@ public class MeteringServiceTest {
   }
 
   @Test
+  @DisplayName("Testing Write Query for admin api.")
+  void writeAdminDatas(VertxTestContext vertxTestContext) {
+    JsonObject request = new JsonObject();
+    request.put(USER_ID, "15c7506f-c800-48d6-adeb-0542b03947c6");
+    request.put(IID, "rs.iudx.io");
+    request.put(API, "/admin/gis/serverInfo");
+    meteringService.executeWriteQuery(
+            request,
+            vertxTestContext.succeeding(
+                    response ->
+                            vertxTestContext.verify(
+                                    () -> {
+                                      assertFalse(response.getString("title").equals("Failed"));
+                                      vertxTestContext.completeNow();
+                                    })));
+  }
+
+  @Test
   @DisplayName("Set Type And Title Test")
   public void setTypeAndTitleTest(VertxTestContext vertxTestContext){
     ResponseBuilder responseBuilder= new ResponseBuilder("200");
