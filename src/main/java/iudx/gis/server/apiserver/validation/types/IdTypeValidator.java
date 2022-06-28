@@ -52,7 +52,7 @@ public class IdTypeValidator implements Validator {
     }
     if (!isvalidIUDXId(value)) {
       errorMessage = "Validation error : Invalid id";
-      throw new DxRuntimeException(failureCode(), ResponseUrn.INVALID_ATTR_VALUE, failureMessage(value));
+      throw new DxRuntimeException(failureCode(), ResponseUrn.INVALID_ATTR_VALUE,errorMessage);
 
     }
     if (errorMessage.isBlank()) {
