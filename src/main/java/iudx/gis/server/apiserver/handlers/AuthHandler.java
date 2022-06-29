@@ -33,7 +33,7 @@ public class AuthHandler implements Handler<RoutingContext> {
 
   private static final String AUTH_SERVICE_ADDRESS = "iudx.gis.authentication.service";
   private static final Logger LOGGER = LogManager.getLogger(AuthHandler.class);
-  private static AuthenticationService authenticator;
+  static AuthenticationService authenticator;
   private HttpServerRequest request;
 
   public static AuthHandler create(Vertx vertx) {
