@@ -34,151 +34,160 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith({VertxExtension.class, MockitoExtension.class})
 public class AuthHandlerTest {
-    private static final String AUTH_SERVICE_ADDRESS = "iudx.gis.authentication.service";
-    private static final Logger LOGGER = LogManager.getLogger(AuthHandlerTest.class);
-    AuthHandler authHandler;
-    @Mock
-    RoutingContext routingContextMock;
-    @Mock
-    HttpServerResponse httpServerResponse;
-    @Mock
-    HttpServerRequest httpServerRequest;
-    @BeforeEach
-    public void setUp(VertxTestContext vertxTestContext, Vertx vertx){
-        authHandler= AuthHandler.create(vertx);
-        lenient().doReturn(httpServerRequest).when(routingContextMock).request();
-        lenient().doReturn(httpServerResponse).when(routingContextMock).response();
-        vertxTestContext.completeNow();
-    }
+  private static final String AUTH_SERVICE_ADDRESS = "iudx.gis.authentication.service";
+  private static final Logger LOGGER = LogManager.getLogger(AuthHandlerTest.class);
+  AuthHandler authHandler;
+  @Mock
+  RoutingContext routingContextMock;
+  @Mock
+  HttpServerResponse httpServerResponse;
+  @Mock
+  HttpServerRequest httpServerRequest;
 
-    @Test
-    public void testHandleSuccess(VertxTestContext vertxTestContext){
-        JsonObject jsonObjectMock = new JsonObject().put("id","iddd");
-        MultiMap multiMapMock= mock(MultiMap.class);
-        HttpMethod httpMethodMock= mock(HttpMethod.class);
-        Map map = new HashMap<String,Object>() ;
-        AuthenticationService authenticationServiceMock= mock(AuthenticationService.class);
-        AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
-        when(routingContextMock.request()).thenReturn(httpServerRequest);
-        when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
-        doReturn(NGSILD_ENTITIES_URL).when(httpServerRequest).path();
-        when(httpServerRequest.headers()).thenReturn(multiMapMock);
-        when(multiMapMock.get(HEADER_TOKEN)).thenReturn("asd.asd.sad.sad");
-        when(routingContextMock.request()).thenReturn(httpServerRequest);
-        when(httpServerRequest.method()).thenReturn(httpMethodMock);
-        when(httpMethodMock.toString()).thenReturn("POST");
-        when(httpServerRequest.getParam(ID)).thenReturn("qeret/dfasfa/zxcvvb");
-        JsonObject authinfo = new JsonObject();
-        lenient().when(asyncResult.succeeded()).thenReturn(true);
-        lenient().when(asyncResult.result()).thenReturn(new JsonObject().put(IID,"aasadas")
-                .put(USER_ID,"aasadastyui")
-                .put(EXPIRY,"25 05 2022"));
-        Mockito.lenient().doAnswer(new Answer<AsyncResult<JsonObject>>() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2 )).handle(asyncResult);
-                return null;
-            }
-        }).when(authenticationServiceMock).tokenIntrospect(any(),any(),any());
+  @BeforeEach
+  public void setUp(VertxTestContext vertxTestContext, Vertx vertx) {
+    authHandler = AuthHandler.create(vertx);
+    lenient().doReturn(httpServerRequest).when(routingContextMock).request();
+    lenient().doReturn(httpServerResponse).when(routingContextMock).response();
+    vertxTestContext.completeNow();
+  }
 
-        authHandler.handle(routingContextMock);
-        //verify(routingContextMock, times(1)).next();
+  @Test
+  public void testHandleSuccess(VertxTestContext vertxTestContext) {
+    JsonObject jsonObjectMock = new JsonObject().put("id", "iddd");
+    MultiMap multiMapMock = mock(MultiMap.class);
+    HttpMethod httpMethodMock = mock(HttpMethod.class);
+    Map map = new HashMap<String, Object>();
+    AuthenticationService authenticationServiceMock = mock(AuthenticationService.class);
 
-        vertxTestContext.completeNow();
-    }
-    @Test
-    public void testHandleFail(VertxTestContext vertxTestContext){
-        JsonObject jsonObjectMock = new JsonObject().put("id","iddd");
-        MultiMap multiMapMock= mock(MultiMap.class);
-        HttpMethod httpMethodMock= mock(HttpMethod.class);
-        Map map = new HashMap<String,Object>() ;
-        AuthenticationService authenticationServiceMock= mock(AuthenticationService.class);
-        AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
-        when(routingContextMock.request()).thenReturn(httpServerRequest);
-        when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
-        doReturn(NGSILD_ENTITIES_URL).when(httpServerRequest).path();
-        when(httpServerRequest.headers()).thenReturn(multiMapMock);
-        when(multiMapMock.get(HEADER_TOKEN)).thenReturn("asd.asd.sad.sad");
-        when(routingContextMock.request()).thenReturn(httpServerRequest);
-        when(httpServerRequest.method()).thenReturn(httpMethodMock);
-        when(httpMethodMock.toString()).thenReturn("POST");
-        when(httpServerRequest.getParam(ID)).thenReturn("qeret/dfasfa/zxcvvb");
-        JsonObject authinfo = new JsonObject();
-        lenient().when(asyncResult.succeeded()).thenReturn(false);
-        lenient().when(asyncResult.cause()).thenReturn(new Throwable("fail"));
+    when(routingContextMock.request()).thenReturn(httpServerRequest);
+    when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
+    doReturn(NGSILD_ENTITIES_URL).when(httpServerRequest).path();
+    when(httpServerRequest.headers()).thenReturn(multiMapMock);
+    when(multiMapMock.get(HEADER_TOKEN)).thenReturn("asd.asd.sad.sad");
+    when(routingContextMock.request()).thenReturn(httpServerRequest);
+    when(httpServerRequest.method()).thenReturn(httpMethodMock);
+    when(httpMethodMock.toString()).thenReturn("POST");
+    when(httpServerRequest.getParam(ID)).thenReturn("qeret/dfasfa/zxcvvb");
+    JsonObject authinfo = new JsonObject();
 
-        Mockito.lenient().doAnswer(new Answer<AsyncResult<JsonObject>>() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2)).handle(asyncResult);
-                return null;
-            }
-        }).when(authenticationServiceMock).tokenIntrospect(any(),any(),any());
+    AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
+    lenient().when(asyncResult.succeeded()).thenReturn(true);
+    lenient().when(asyncResult.result()).thenReturn(new JsonObject().put(IID, "aasadas")
+        .put(USER_ID, "aasadastyui")
+        .put(EXPIRY, "25 05 2022"));
 
-        authHandler.handle(routingContextMock);
-        //Mockito.verify(httpServerResponse, times(0)).putHeader(anyString(), anyString());
-        //Mockito.verify(httpServerResponse, times(0)).setStatusCode(anyInt());
-        //Mockito.verify(httpServerResponse, times(0)).end(anyString());
-        vertxTestContext.completeNow();
-    }
 
-    @Test
-    @DisplayName("Process AuthFailure NotFound")
-    public void processAuthFailureNotFound(VertxTestContext vertxTestContext){
-        RoutingContext routingContextMock= mock(RoutingContext.class);
+    Mockito.lenient().doAnswer(new Answer<AsyncResult<JsonObject>>() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
+        ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2)).handle(asyncResult);
+        return null;
+      }
+    }).when(authenticationServiceMock).tokenIntrospect(any(), any(), any());
 
-        HttpServerResponse httpServerResponseMock = mock(HttpServerResponse.class);
-        Future<Void> voidFutureMock = mock(Future.class);
+    authHandler.handle(routingContextMock);
+    // verify(routingContextMock, times(1)).next();
 
-        when(routingContextMock.response()).thenReturn(httpServerResponseMock);
-        when(httpServerResponseMock.putHeader(anyString(),anyString())).thenReturn(httpServerResponseMock);
-        when(httpServerResponseMock.setStatusCode(anyInt())).thenReturn(httpServerResponseMock);
-        when(httpServerResponseMock.end(anyString())).thenReturn(voidFutureMock);
-        authHandler.processAuthFailure(routingContextMock,"Not Found");
+    vertxTestContext.completeNow();
+  }
 
-        verify(httpServerResponseMock, times(1)).setStatusCode(anyInt());
-        verify(httpServerResponseMock, times(1)).putHeader(anyString(),anyString());
-        verify(httpServerResponseMock, times(1)).end(anyString());
+  @Test
+  public void testHandleFail(VertxTestContext vertxTestContext) {
+    JsonObject jsonObjectMock = new JsonObject().put("id", "iddd");
+    MultiMap multiMapMock = mock(MultiMap.class);
+    HttpMethod httpMethodMock = mock(HttpMethod.class);
+    Map map = new HashMap<String, Object>();
+    AuthenticationService authenticationServiceMock = mock(AuthenticationService.class);
+    AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
+    when(routingContextMock.request()).thenReturn(httpServerRequest);
+    when(routingContextMock.getBodyAsJson()).thenReturn(jsonObjectMock);
+    doReturn(NGSILD_ENTITIES_URL).when(httpServerRequest).path();
+    when(httpServerRequest.headers()).thenReturn(multiMapMock);
+    when(multiMapMock.get(HEADER_TOKEN)).thenReturn("asd.asd.sad.sad");
+    when(routingContextMock.request()).thenReturn(httpServerRequest);
+    when(httpServerRequest.method()).thenReturn(httpMethodMock);
+    when(httpMethodMock.toString()).thenReturn("POST");
+    when(httpServerRequest.getParam(ID)).thenReturn("qeret/dfasfa/zxcvvb");
+    JsonObject authinfo = new JsonObject();
+    lenient().when(asyncResult.succeeded()).thenReturn(false);
+    lenient().when(asyncResult.cause()).thenReturn(new Throwable("fail"));
 
-        vertxTestContext.completeNow();
+    Mockito.lenient().doAnswer(new Answer<AsyncResult<JsonObject>>() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
+        ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2)).handle(asyncResult);
+        return null;
+      }
+    }).when(authenticationServiceMock).tokenIntrospect(any(), any(), any());
 
-    }
-    @Test
-    @DisplayName("Process AuthFailure Except Found")
-    public void processAuthFailureExceptFound(VertxTestContext vertxTestContext){
-        RoutingContext routingContextMock= mock(RoutingContext.class);
-        HttpServerResponse httpServerResponseMock = mock(HttpServerResponse.class);
-        Future<Void> voidFutureMock = mock(Future.class);
+    authHandler.handle(routingContextMock);
+    // Mockito.verify(httpServerResponse, times(0)).putHeader(anyString(), anyString());
+    // Mockito.verify(httpServerResponse, times(0)).setStatusCode(anyInt());
+    // Mockito.verify(httpServerResponse, times(0)).end(anyString());
+    vertxTestContext.completeNow();
+  }
 
-        when(routingContextMock.response()).thenReturn(httpServerResponseMock);
-        when(httpServerResponseMock.putHeader(anyString(),anyString())).thenReturn(httpServerResponseMock);
-        when(httpServerResponseMock.setStatusCode(anyInt())).thenReturn(httpServerResponseMock);
-        when(httpServerResponseMock.end(anyString())).thenReturn(voidFutureMock);
-        authHandler.processAuthFailure(routingContextMock,"");
-        verify(httpServerResponseMock, times(1)).setStatusCode(anyInt());
-        verify(httpServerResponseMock, times(1)).putHeader(anyString(),anyString());
-        verify(httpServerResponseMock, times(1)).end(anyString());
+  @Test
+  @DisplayName("Process AuthFailure NotFound")
+  public void processAuthFailureNotFound(VertxTestContext vertxTestContext) {
+    RoutingContext routingContextMock = mock(RoutingContext.class);
 
-        vertxTestContext.completeNow();
+    HttpServerResponse httpServerResponseMock = mock(HttpServerResponse.class);
+    Future<Void> voidFutureMock = mock(Future.class);
 
-    }
+    when(routingContextMock.response()).thenReturn(httpServerResponseMock);
+    when(httpServerResponseMock.putHeader(anyString(), anyString()))
+        .thenReturn(httpServerResponseMock);
+    when(httpServerResponseMock.setStatusCode(anyInt())).thenReturn(httpServerResponseMock);
+    when(httpServerResponseMock.end(anyString())).thenReturn(voidFutureMock);
+    authHandler.processAuthFailure(routingContextMock, "Not Found");
 
-    @Test
-    public void getNormalizedPathTest(VertxTestContext vertxTestContext){
-        String authString= authHandler.getNormalizedPath(NGSILD_ENTITIES_URL);
-        assertEquals(authString , NGSILD_ENTITIES_URL);
-        String authString2= authHandler.getNormalizedPath(ADMIN_BASE_PATH);
-        assertEquals(authString2 , ADMIN_BASE_PATH);
-        vertxTestContext.completeNow();
-    }
-    @Test
-    @DisplayName("Test static method: create")
-    public void testCreate(VertxTestContext vertxTestContext)
-    {
-        AuthHandler res =  AuthHandler.create(Vertx.vertx());
-        assertNotNull(res);
-        vertxTestContext.completeNow();
-    }
+    verify(httpServerResponseMock, times(1)).setStatusCode(anyInt());
+    verify(httpServerResponseMock, times(1)).putHeader(anyString(), anyString());
+    verify(httpServerResponseMock, times(1)).end(anyString());
+
+    vertxTestContext.completeNow();
+
+  }
+
+  @Test
+  @DisplayName("Process AuthFailure Except Found")
+  public void processAuthFailureExceptFound(VertxTestContext vertxTestContext) {
+    RoutingContext routingContextMock = mock(RoutingContext.class);
+    HttpServerResponse httpServerResponseMock = mock(HttpServerResponse.class);
+    Future<Void> voidFutureMock = mock(Future.class);
+
+    when(routingContextMock.response()).thenReturn(httpServerResponseMock);
+    when(httpServerResponseMock.putHeader(anyString(), anyString()))
+        .thenReturn(httpServerResponseMock);
+    when(httpServerResponseMock.setStatusCode(anyInt())).thenReturn(httpServerResponseMock);
+    when(httpServerResponseMock.end(anyString())).thenReturn(voidFutureMock);
+    authHandler.processAuthFailure(routingContextMock, "");
+    verify(httpServerResponseMock, times(1)).setStatusCode(anyInt());
+    verify(httpServerResponseMock, times(1)).putHeader(anyString(), anyString());
+    verify(httpServerResponseMock, times(1)).end(anyString());
+
+    vertxTestContext.completeNow();
+
+  }
+
+  @Test
+  public void getNormalizedPathTest(VertxTestContext vertxTestContext) {
+    String authString = authHandler.getNormalizedPath(NGSILD_ENTITIES_URL);
+    assertEquals(authString, NGSILD_ENTITIES_URL);
+    String authString2 = authHandler.getNormalizedPath(ADMIN_BASE_PATH);
+    assertEquals(authString2, ADMIN_BASE_PATH);
+    vertxTestContext.completeNow();
+  }
+
+  @Test
+  @DisplayName("Test static method: create")
+  public void testCreate(VertxTestContext vertxTestContext) {
+    AuthHandler res = AuthHandler.create(Vertx.vertx());
+    assertNotNull(res);
+    vertxTestContext.completeNow();
+  }
 }

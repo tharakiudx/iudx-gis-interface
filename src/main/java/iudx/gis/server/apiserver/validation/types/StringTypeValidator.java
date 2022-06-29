@@ -30,17 +30,15 @@ public class StringTypeValidator implements Validator {
       }
       if (value.isBlank()) {
         errorMessage = "Validation error :  blank value for passed";
-        throw new DxRuntimeException(failureCode(), ResponseUrn.INVALID_ATTR_VALUE, failureMessage());
+        throw new DxRuntimeException(failureCode(), ResponseUrn.INVALID_ATTR_VALUE,
+            failureMessage());
       }
     }
-    if (value!=null && value.length() > 100) {
+    if (value != null && value.length() > 100) {
       errorMessage = "Validation error : length >100 not allowed";
       throw new DxRuntimeException(failureCode(), ResponseUrn.INVALID_ATTR_VALUE, failureMessage());
     }
-    if (errorMessage.isEmpty()) {
-      return true;
-    }
-    throw new DxRuntimeException(failureCode(), ResponseUrn.INVALID_PAYLOAD_FORMAT, errorMessage);
+    return true;
   }
 
   @Override

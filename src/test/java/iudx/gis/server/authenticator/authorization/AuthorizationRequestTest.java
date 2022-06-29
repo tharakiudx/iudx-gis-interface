@@ -1,4 +1,4 @@
-package iudx.gis.server.authenticate.authorization;
+package iudx.gis.server.authenticator.authorization;
 
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;

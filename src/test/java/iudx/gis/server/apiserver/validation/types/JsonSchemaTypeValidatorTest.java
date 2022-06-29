@@ -1,104 +1,106 @@
 package iudx.gis.server.apiserver.validation.types;
 
-import io.vertx.core.MultiMap;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.json.schema.Schema;
+import io.vertx.json.schema.SchemaParser;
+import io.vertx.json.schema.SchemaRouter;
+import io.vertx.json.schema.SchemaRouterOptions;
 import io.vertx.json.schema.ValidationException;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.gis.server.apiserver.exceptions.DxRuntimeException;
-import iudx.gis.server.apiserver.util.RequestType;
-import iudx.gis.server.apiserver.validation.ValidatorsHandlersFactory;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
-import io.vertx.json.schema.Schema;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(VertxExtension.class)
-@ExtendWith(MockitoExtension.class)
 class JsonSchemaTypeValidatorTest {
-    JsonSchemaTypeValidator jsonSchemaTypeValidator;
-    @Mock
-    Schema schema;
-    @Mock
-    JsonObject jsonObject;
-    @Mock
-    Vertx vertx;
-    @Mock
-    ValidationException validationException;
+
+  JsonSchemaTypeValidator jsonSchemaTypeValidator;
+
+  @Mock
+  ValidationException validationException;
+
+  String jsonSchema;
+  JsonObject json;
+  Schema schema;
 
 
-    @BeforeEach
-    public void setup(Vertx vertx, VertxTestContext testContext){
-        jsonSchemaTypeValidator= new JsonSchemaTypeValidator(jsonObject,schema);
-        testContext.completeNow();
+  @BeforeEach
+  public void setup(Vertx vertx, VertxTestContext testContext) {
+    jsonSchema = "{\n" +
+        "  \"type\": \"object\",\n" +
+        "  \"properties\": {\n" +
+        "    \"id\": {\n" +
+        "      \"type\": \"string\"\n" +
+        "    },\n" +
+        "    \"server-url\": {\n" +
+        "      \"type\": \"string\"\n" +
+        "    },\n" +
+        "    \"server-port\": {\n" +
+        "      \"type\": \"integer\"\n" +
+        "    },\n" +
+        "    \"isSecure\": {\n" +
+        "      \"type\": \"boolean\"\n" +
+        "    }\n" +
+        "  },\n" +
+        "  \"required\": [\n" +
+        "    \"id\",\n" +
+        "    \"server-url\",\n" +
+        "    \"server-port\",\n" +
+        "    \"isSecure\"\n" +
+        "  ]\n" +
+        "}";
+
+    json = new JsonObject().put("id",
+        "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR1059,,")
+        .put("server-url", "www.abc.com")
+        .put("server-port", 1234)
+        .put("isSecure", true);
+
+    SchemaRouter schemaRouter = SchemaRouter.create(vertx, new SchemaRouterOptions());
+    SchemaParser schemaParser = SchemaParser.createOpenAPI3SchemaParser(schemaRouter);
+
+    try {
+      schema = schemaParser.parse(new JsonObject(jsonSchema));
+    } catch (Exception ex) {
+
+      testContext.failNow("fail to create schema from json " + ex);
     }
 
-    @Test
-    public void test(VertxTestContext vertxTestContext){
-        assertTrue(jsonSchemaTypeValidator.isValid());
-        vertxTestContext.completeNow();
-    }
+    testContext.completeNow();
+  }
 
-    @Test
-    public void test2(VertxTestContext vertxTestContext){
-        assertNotNull(jsonSchemaTypeValidator.failureCode());
-        vertxTestContext.completeNow();
-    }
+  @Test
+  public void test(VertxTestContext vertxTestContext) {
+    jsonSchemaTypeValidator = new JsonSchemaTypeValidator(json, schema);
+    assertTrue(jsonSchemaTypeValidator.isValid());
+    vertxTestContext.completeNow();
+  }
 
-    @Test
-    public void test3(VertxTestContext vertxTestContext){
-        assertNotNull(jsonSchemaTypeValidator.failureMessage());
-        vertxTestContext.completeNow();
-    }
-    /*static Stream<Arguments> invalidValues() {
-        // Add any valid value which will pass successfully.
-        String random600Id = RandomStringUtils.random(600);
-        return Stream.of(
-                Arguments.of(false)
-                //,
-                //Arguments.of("  ", true)
-                );
-    }*/
-    /*@ParameterizedTest
-    @MethodSource("invalidValues")*/
-    /*@Test
-    public void test2(VertxTestContext vertxTestContext){
-        JsonObject jsonObject1=new JsonObject().put("asd",null);
-        MultiMap params = MultiMap.caseInsensitiveMultiMap();
-        MultiMap headers = MultiMap.caseInsensitiveMultiMap();
+  @Test
+  public void testInvalidJson(VertxTestContext vertxTestContext) {
+    json.put("server-port", "asdd");
+    jsonSchemaTypeValidator = new JsonSchemaTypeValidator(json, schema);
+    Assertions.assertThrows(DxRuntimeException.class, () -> jsonSchemaTypeValidator.isValid());
+    vertxTestContext.completeNow();
+  }
+  @Test
+  public void checkFailureCode(VertxTestContext vertxTestContext) {
+    jsonSchemaTypeValidator = new JsonSchemaTypeValidator(json, schema);
+    assertEquals(400, jsonSchemaTypeValidator.failureCode());
+    vertxTestContext.completeNow();
+  }
 
-        ValidatorsHandlersFactory validatorsHandlersFactory=new ValidatorsHandlersFactory();
-        validatorsHandlersFactory.build(vertx, RequestType.ADMIN_CRUD_PATH,params,headers,null);
-        assertThrows(ValidationException.class,()->jsonSchemaTypeValidator.isValid());
-        //assertThrows(DxRuntimeException.class,()->jsonSchemaTypeValidator.isValid());
-        vertxTestContext.completeNow();
-    }*/
-    /*@Test
-    public void test2(VertxTestContext vertxTestContext){
-        *//*doAnswer(invocation -> {
-
-        });*//*
-        JsonObject jsonObject1=new JsonObject().put("body",null);
-        MultiMap params = MultiMap.caseInsensitiveMultiMap();
-        MultiMap headers = MultiMap.caseInsensitiveMultiMap();
-
-        ValidatorsHandlersFactory validatorsHandlersFactory=new ValidatorsHandlersFactory();
-        validatorsHandlersFactory.build(vertx, RequestType.ADMIN_CRUD_PATH,params,headers,jsonObject1);
-        //assertThrows(ValidationException.class,()->jsonSchemaTypeValidator.isValid());
-        assertThrows(DxRuntimeException.class,()->jsonSchemaTypeValidator.isValid());
-        vertxTestContext.completeNow();
-    }*/
+  @Test
+  public void checkFailureMessage(VertxTestContext vertxTestContext) {
+    jsonSchemaTypeValidator = new JsonSchemaTypeValidator(json, schema);
+    assertEquals("Invalid json format in post request [schema mismatch]",
+        jsonSchemaTypeValidator.failureMessage());
+    vertxTestContext.completeNow();
+  }
 }
