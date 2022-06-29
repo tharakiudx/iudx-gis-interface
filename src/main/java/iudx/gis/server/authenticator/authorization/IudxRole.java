@@ -4,7 +4,8 @@ import java.util.stream.Stream;
 
 public enum IudxRole {
   
-  CONSUMER("consumer");
+  CONSUMER("consumer"),
+  CONSUMER2("other");
   private final String role;
 
   IudxRole(String role) {

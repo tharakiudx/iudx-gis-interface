@@ -50,6 +50,7 @@ IdTypeValidator idTypeValidator;
         return Stream.of(
                 Arguments.of("", true),
                 Arguments.of("  ", true),
+                Arguments.of("  ", false),
                 Arguments.of(
                         "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information/surat-itms-live-eta/sasd asdd",
                         true),
