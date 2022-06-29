@@ -1,4 +1,4 @@
-package iudx.gis.server.authenticate;
+package iudx.gis.server.authenticator;
 
 public class JwtTokenHelper {
 

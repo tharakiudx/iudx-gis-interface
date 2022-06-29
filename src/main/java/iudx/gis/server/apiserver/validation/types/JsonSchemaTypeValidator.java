@@ -26,10 +26,7 @@ public final class JsonSchemaTypeValidator implements Validator {
   public boolean isValid() {
     try {
       schema.validateSync(value);
-    } catch (ValidationException e) {
-      LOGGER.error("Validation error :" + e.getMessage());
-      throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT, e.getLocalizedMessage());
-    } catch (NoSyncValidationException e) {
+    } catch (Exception e) {
       LOGGER.error("Validation error :" + e.getMessage());
       throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT, e.getLocalizedMessage());
     }

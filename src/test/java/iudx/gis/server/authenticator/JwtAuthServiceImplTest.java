@@ -1,4 +1,4 @@
-package iudx.gis.server.authenticate;
+package iudx.gis.server.authenticator;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

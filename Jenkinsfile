@@ -34,7 +34,7 @@ pipeline {
           thresholds: [ skipped(failureThreshold: '0'), failed(failureThreshold: '0') ],
           tools: [ JUnit(pattern: 'target/surefire-reports/*.xml') ]
         )
-        jacoco classPattern: 'target/classes', execPattern: 'target/jacoco.exec', sourcePattern: 'src/main/java', exclusionPattern:'iudx/gis/server/apiserver/*.class,**/*VertxEBProxy.class,**/Constants.class,**/*VertxProxyHandler.class,**/*Verticle.class,iudx/gis/server/deploy/*.class'
+        jacoco classPattern: 'target/classes', execPattern: 'target/jacoco.exec', sourcePattern: 'src/main/java', exclusionPattern:'iudx/gis/server/apiserver/*.class,**/*VertxEBProxy.class,**/Constants.class,**/*VertxProxyHandler.class,**/*Verticle.class,iudx/gis/server/deploy/*.class,iudx/gis/server/databroker/DataBrokerService.class,iudx/gis/server/databroker/DataBrokerServiceImpl.class,iudx/gis/server/apiserver/validation/types/Validator.class,iudx/gis/server/metering/MeteringService.class,iudx/gis/server/cache/CacheService.class,iudx/gis/server/database/postgres/PostgresService.class,**/*JwtDataConverter.class'
       }
       post{
         failure{

@@ -107,7 +107,7 @@ public class CatalogueService {
     return promise.future();
   }
 
-  public Future<Boolean> isIdPresent(String id) {
+  /*public Future<Boolean> isIdPresent(String id) {
     Promise<Boolean> promise = Promise.promise();
     if (id.equalsIgnoreCase(idCache.getIfPresent(id))) {
       promise.complete(true);
@@ -156,7 +156,7 @@ public class CatalogueService {
     } else {
       return (List<T>) arr.getList();
     }
-  }
+  }*/
   
   public Future<Boolean> isItemExist(String id) {
     LOGGER.trace("isItemExist() started");
