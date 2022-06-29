@@ -51,6 +51,18 @@ class JsonSchemaTypeValidatorTest {
         assertTrue(jsonSchemaTypeValidator.isValid());
         vertxTestContext.completeNow();
     }
+
+    @Test
+    public void test2(VertxTestContext vertxTestContext){
+        assertNotNull(jsonSchemaTypeValidator.failureCode());
+        vertxTestContext.completeNow();
+    }
+
+    @Test
+    public void test3(VertxTestContext vertxTestContext){
+        assertNotNull(jsonSchemaTypeValidator.failureMessage());
+        vertxTestContext.completeNow();
+    }
     /*static Stream<Arguments> invalidValues() {
         // Add any valid value which will pass successfully.
         String random600Id = RandomStringUtils.random(600);

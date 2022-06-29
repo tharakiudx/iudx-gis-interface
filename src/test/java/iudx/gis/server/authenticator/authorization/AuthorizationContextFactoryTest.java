@@ -13,8 +13,13 @@ AuthorizationContextFactory authorizationContextFactory;
 
 @Test
     public void test(VertxTestContext vertxTestContext){
-    assertThrows(IllegalArgumentException.class,()->AuthorizationContextFactory.create(IudxRole.CONSUMER2));
+    assertThrows(IllegalArgumentException.class,()->AuthorizationContextFactory.create(IudxRole.PROVIDER));
     vertxTestContext.completeNow();
 }
 
+    @Test
+    public void test2(VertxTestContext vertxTestContext){
+        assertThrows(IllegalArgumentException.class,()->AuthorizationContextFactory.create(null));
+        vertxTestContext.completeNow();
+    }
 }
