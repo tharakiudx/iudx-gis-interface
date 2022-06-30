@@ -46,11 +46,6 @@ public class CacheServiceTest {
           .put("type", CacheType.REVOKED_CLIENT)
           .put("key", "revoked_client_id_1")
           .put("value", "2020-10-19T14:20:00Z");
-    static JsonObject testJson_2 =
-            new JsonObject()
-                    .put("type", CacheType.NOT_REVOKED_CLIENT)
-                    .put("key", null)
-                    .put("value", null);
 
   @BeforeAll
   public static void setup(Vertx vertx, VertxTestContext testContext) {
@@ -269,23 +264,7 @@ public class CacheServiceTest {
           }
         });
   }
-    @Description("No Cache Passed")
-    @Test
-    public void refreshCacheTest2(Vertx vertx, VertxTestContext testContext) {
-        cacheService.refresh(
-                testJson_2,
-                handler -> {
-                    if (handler.failed()) {
-                        handler.cause();
-                        testContext.completeNow();
-                        // JsonObject json = testJson_0.copy();
-                        // json.remove("value");
-                    }else {
-                        handler.succeeded();
-                        testContext.completeNow();
-                    }
-                });
-    }
+
     @Description("refresh cache without passing key and value.")
     @Test
     public void refreshCacheTest_1(Vertx vertx, VertxTestContext testContext) {
