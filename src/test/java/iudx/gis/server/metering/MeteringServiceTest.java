@@ -106,6 +106,7 @@ public class MeteringServiceTest {
     request.put(USER_ID, "15c7506f-c800-48d6-adeb-0542b03947c6");
     request.put(IID, "rs.iudx.io");
     request.put(API, "/admin/gis/serverInfo");
+    request.put(RESPONSE_SIZE, 0);
     meteringService.executeWriteQuery(
             request,
             vertxTestContext.succeeding(
