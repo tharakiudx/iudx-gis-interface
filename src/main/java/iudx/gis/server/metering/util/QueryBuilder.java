@@ -36,7 +36,7 @@ public class QueryBuilder {
             : resourceId.substring(0, resourceId.indexOf('/', resourceId.indexOf('/') + 1));
     long response_size = request.getLong(RESPONSE_SIZE);
     String databaseTableName = request.getString(TABLE_NAME);
-    ZonedDateTime zst = ZonedDateTime.now();
+    ZonedDateTime zst = ZonedDateTime.now(ZoneId.of("Asia/Kolkata"));
     long time = getEpochTime(zst);
     String isoTime =
         LocalDateTime.now()
@@ -56,6 +56,7 @@ public class QueryBuilder {
                 .replace("$6", isoTime)
                 .replace("$7", providerID)
                 .replace("$8", Long.toString(response_size)));
+    LOGGER.info("query "+query);
     return new JsonObject().put(QUERY_KEY, query);
   }
 
