@@ -2,10 +2,12 @@ package iudx.gis.server.metering;
 
 import static iudx.gis.server.metering.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static iudx.gis.server.metering.util.Constants.API;
+import static iudx.gis.server.metering.util.Constants.ID;
+import static iudx.gis.server.metering.util.Constants.IID;
+import static iudx.gis.server.metering.util.Constants.RESPONSE_SIZE;
+import static iudx.gis.server.metering.util.Constants.USER_ID;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -23,7 +25,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 
 @ExtendWith({VertxExtension.class})
 public class MeteringServiceTest {
@@ -38,6 +39,7 @@ public class MeteringServiceTest {
   private static String databaseName;
   private static String databaseUserName;
   private static String databasePassword;
+  private static String databaseTableName;
   private static int databasePoolSize;
   private static Configuration config;
 
@@ -53,6 +55,7 @@ public class MeteringServiceTest {
     databaseUserName = dbConfig.getString("meteringDatabaseUserName");
     databasePassword = dbConfig.getString("meteringDatabasePassword");
     databasePoolSize = dbConfig.getInteger("meteringPoolSize");
+    databaseTableName = dbConfig.getString("meteringDatabaseTableName");
     meteringService = new MeteringServiceImpl(dbConfig, vertxObj);
     userId = UUID.randomUUID().toString();
     id = "89a36273d77dac4cf38114fca1bbe64392547f86";
@@ -66,6 +69,7 @@ public class MeteringServiceTest {
     request.put(USER_ID, "15c7506f-c800-48d6-adeb-0542b03947c6");
     request.put(ID, "15c7506f-c800-48d6-adeb-0542b03947c6/integration-test-alias/");
     request.put(API, "/ngsi-ld/v1/entities");
+    request.put(RESPONSE_SIZE, 12345);
     meteringService.executeWriteQuery(
         request,
         vertxTestContext.succeeding(
@@ -84,6 +88,7 @@ public class MeteringServiceTest {
     request.put(USER_ID, "15c7506f-c800-48d6-adeb-0542b03947c6");
     request.put(IID, "rs.iudx.io");
     request.put(API, "/admin/gis/serverInfo");
+    request.put(RESPONSE_SIZE, 0);
     meteringService.executeWriteQuery(
         request,
         vertxTestContext.succeeding(
@@ -94,7 +99,6 @@ public class MeteringServiceTest {
                       vertxTestContext.completeNow();
                     })));
   }
-
   @Test
   @DisplayName("Testing Write Query for admin api.")
   void writeAdminDatas(VertxTestContext vertxTestContext) {
@@ -102,6 +106,7 @@ public class MeteringServiceTest {
     request.put(USER_ID, "15c7506f-c800-48d6-adeb-0542b03947c6");
     request.put(IID, "rs.iudx.io");
     request.put(API, "/admin/gis/serverInfo");
+    request.put(RESPONSE_SIZE, 0);
     meteringService.executeWriteQuery(
             request,
             vertxTestContext.succeeding(
@@ -112,7 +117,6 @@ public class MeteringServiceTest {
                                       vertxTestContext.completeNow();
                                     })));
   }
-
   @Test
   @DisplayName("Set Type And Title Test")
   public void setTypeAndTitleTest(VertxTestContext vertxTestContext){
