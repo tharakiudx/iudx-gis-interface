@@ -32,6 +32,7 @@ import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
 import static iudx.gis.server.apiserver.util.Constants.ROUTE_DOC;
 import static iudx.gis.server.apiserver.util.Constants.ROUTE_STATIC_SPEC;
 import static iudx.gis.server.apiserver.util.Constants.USER_ID;
+import static iudx.gis.server.metering.util.Constants.RESPONSE_SIZE;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -259,6 +260,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         ar -> {
           if (ar.succeeded()) {
             LOGGER.debug("Success: Delete operation successful");
+            routingContext.data().put(RESPONSE_SIZE, 0);
             Future.future(fu -> updateAuditTable(routingContext));
             handleSuccessResponse(
                 response, ResponseType.Ok.getCode(), ar.result().getString(JSON_DETAIL));
@@ -280,6 +282,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         ar -> {
           if (ar.succeeded()) {
             LOGGER.debug("Success: Update operation successful");
+            routingContext.data().put(RESPONSE_SIZE, 0);
             Future.future(fu -> updateAuditTable(routingContext));
             handleSuccessResponse(
                 response, ResponseType.Ok.getCode(), ar.result().getString(JSON_DETAIL));
@@ -299,9 +302,9 @@ public class ApiServerVerticle extends AbstractVerticle {
         requestBody,
         ar -> {
           if (ar.succeeded()) {
+            routingContext.data().put(RESPONSE_SIZE, 0);
             Future.future(fu -> updateAuditTable(routingContext));
             LOGGER.debug("Success: Insert operation successful");
-
             handleSuccessResponse(
                 response, ResponseType.Created.getCode(), ar.result().getString(JSON_DETAIL));
           } else {
@@ -339,8 +342,9 @@ public class ApiServerVerticle extends AbstractVerticle {
         handler -> {
           if (handler.succeeded()) {
             LOGGER.debug("Success: Search Success");
-            Future.future(fu -> updateAuditTable(context));
             handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result());
+            context.data().put(RESPONSE_SIZE, response.bytesWritten());
+            Future.future(fu -> updateAuditTable(context));
             LOGGER.debug("CONTEXT " + context);
           } else if (handler.failed()) {
             LOGGER.error("Fail: Search Fail");
@@ -431,6 +435,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     request.put(IID, authInfo.getValue(IID));
     request.put(ID, authInfo.getValue(ID));
     request.put(API, authInfo.getValue(API_ENDPOINT));
+    request.put(RESPONSE_SIZE, context.data().get(RESPONSE_SIZE));
     meteringService.executeWriteQuery(
         request,
         handler -> {
