@@ -13,8 +13,8 @@ consumes:
   - "text/plain"
 
 info:
-  title: "IUDX Resource Server APIs"
-  version: 3.0.0
+  title: "IUDX GIS Interface APIs"
+  version: 3.5.0
   description: |
     # Introduction
     
@@ -82,12 +82,6 @@ paths:
         204:
           description: 'Empty Response'
 
-        400:
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/standardBadRequestErrorResponse"
-          description: 'Bad query'
 
         401:
           content:
@@ -106,9 +100,6 @@ paths:
 
       description: |
         This <b> API </b> is used to get the data of a resource. <br /> It uses the <b> IUDX ID </b> a.k.a `id` to query the resource server. <br />  To get data a <b> valid IUDX Auth token</b> is mandatory.  <br/> The `/entities` end point followed by `id` as a <b>path parameter</b> is used to get the latest data.
-
-      deprecated: false
-
 
   /admin/gis/serverInfo:
     post:
@@ -140,13 +131,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/registerInformation'
+                $ref: '#/components/schemas/standardSuccessResponse'
 
         400:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/postInfoBadRequestErrorResponse"
+                "$ref": "#/components/schemas/InvalidIdPatternErrorResponse"
           description: 'Bad query'
 
         401:
@@ -156,9 +147,15 @@ paths:
                 "$ref": "#/components/schemas/standardInvalidTokenErrorResponse"
           description: 'Unauthorized'
 
+        409:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/resourceAlreadyExistErrorResponse"
+          description: 'Conflict'
+
       description: |
         Post Admin API allows an admin to publish the GIS info into the database. Based on the input provided, the API validates the access control of the user with IUDX Auth server to allow or deny access to the API.
-      deprecated: false
 
     put:
       tags:
@@ -188,21 +185,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/registerInformation'
+                $ref: '#/components/schemas/standardSuccessResponse'
           description: 'Successful query'
 
         400:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/postInfoBadRequestErrorResponse"
+                "$ref": "#/components/schemas/InvalidIdPatternErrorResponse"
           description: 'Bad query'
 
         404:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/putInfoBadRequestErrorResponse"
+                "$ref": "#/components/schemas/InvalidResourceIdErrorResponse"
           description: 'Unauthorized'
 
 
@@ -240,7 +237,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/registerInformation'
+                $ref: '#/components/schemas/standardSuccessResponse'
 
         400:
           content:
@@ -253,7 +250,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/putInfoBadRequestErrorResponse"
+                "$ref": "#/components/schemas/IdDoesNotExistErrorResponse"
           description: 'Resource not found'
 
       description: |
@@ -307,22 +304,6 @@ components:
           type: string
         results:
           type: object
-          properties:
-            id:
-              type: string
-            observationDateTime:
-              type: string
-            trip_id:
-              type: string
-            route_id:
-              type: string
-        limit:
-          type: string
-        offset:
-          type: string
-        totalHits:
-          type: string
-
       example:
         type: urn:dx:rs:success
         title: Successful Operation
@@ -333,16 +314,8 @@ components:
         ]
 
 
-    registerInformation:
-      title: registerInformation
-      required:
-        - username
-        - apiKey
-        - id
-        - URL
-        - port
-        - vHost
-      type: object
+    standardSuccessResponse:
+      title: standardSuccessResponse
       properties:
         type:
           type: string
@@ -357,34 +330,10 @@ components:
               type: string
             id:
               type: string
-            URL:
-              type: string
-            port:
-              type: string
-            vHost:
-              type: string
       example:
         type: urn:dx:rs:success
         title: Successful Operation
         detail: Success
-
-
-
-
-
-    standardBadRequestErrorResponse:
-      title: standardBadRequestErrorResponse
-      properties:
-        type:
-          type: string
-        title:
-          type: string
-        detail:
-          type: string
-      example:
-        type: urn:dx:rs:badRequest
-        title: Bad Request Data
-        detail: Empty response | Missing/Invalid  parameters
 
     standardInvalidTokenErrorResponse:
       title: standardInvalidTokenErrorResponse
@@ -412,11 +361,11 @@ components:
       example:
         type: urn:dx:rs:resourceNotFound
         title: Not Found
-        detail: Resource Not Found
+        detail: Not Found
 
 
-    postInfoBadRequestErrorResponse:
-      title: postInfoBadRequestErrorResponse
+    InvalidIdPatternErrorResponse:
+      title: InvalidIdPatternErrorResponse
       properties:
         type:
           type: string
@@ -425,12 +374,12 @@ components:
         detail:
           type: string
       example:
-        type: urn:dx:gis:invalidPayloadFormat
+        type: urn:dx:rs:invalidPayloadFormat
         title: Bad Request
         detail: provided string should respect pattern ^[a-zA-Z0-9.]{4,100}/{1}[a-zA-Z0-9.]{4,100}/{1}[a-zA-Z.]{4,100}/{1}[a-zA-Z-_.]{4,100}/{1}[a-zA-Z0-9-_.]{4,100}$
 
-    putInfoBadRequestErrorResponse:
-      title: putInfoBadRequestErrorResponse
+    InvalidResourceIdErrorResponse:
+      title: InvalidResourceIdErrorResponse
       properties:
         type:
           type: string
@@ -439,8 +388,8 @@ components:
         detail:
           type: string
       example:
-        type: urn:dx:gis:invalidPayloadFormat
-        title: Bad Request
+        type: urn:dx:rs:resourceNotFound
+        title: Not Found
         detail: Update operation failed because passed resource ID does not exist in DB
 
     deleteInfoBadRequestErrorResponse:
@@ -453,6 +402,34 @@ components:
         detail:
           type: string
       example:
-        type: urn:dx:gis:invalidPayloadFormat
+        type: urn:dx:rs:invalidPayloadFormat
         title: Bad Request
         detail: "Validation error : Invalid id"
+
+    resourceAlreadyExistErrorResponse:
+      title: resourceAlreadyExistErrorResponse
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+      example:
+        type: urn:dx:rs:resourceAlreadyExists
+        title: Conflict
+        detail: Insert operation failed because given resource ID already exists in the DB
+
+    IdDoesNotExistErrorResponse:
+      title: IdDoesNotExistErrorResponse
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+      example:
+        type: urn:dx:rs:resourceNotFound
+        title: Not Found
+        detail: Given resource ID does not exist in DB

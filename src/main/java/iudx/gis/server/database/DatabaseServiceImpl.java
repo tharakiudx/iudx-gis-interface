@@ -151,7 +151,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         .compose(ar -> {
           if (ar.size() < 1) {
             return Future.failedFuture(Util.getResponse(
-                HttpStatusCode.BAD_REQUEST,
+                HttpStatusCode.NOT_FOUND,
                 ResponseUrn.RESOURCE_NOT_FOUND.getUrn(),
                 "Update operation failed because passed resource ID does not exist in DB")
                 .toString()
@@ -181,7 +181,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         .compose(ar -> {
           if (ar.size() < 1) {
             return Future.failedFuture(Util.getResponse(
-                HttpStatusCode.BAD_REQUEST,
+                HttpStatusCode.NOT_FOUND,
                 ResponseUrn.RESOURCE_NOT_FOUND.getUrn(),
                 "Given resource ID does not exist in DB")
                 .toString()

@@ -51,12 +51,7 @@ public class JwtAuthServiceImplTest {
     config = new Configuration();
     authConfig = config.configLoader(1, vertx);
 
-    cacheServiceMock=Mockito.mock(CacheService.class);
-    authenticationVerticle
-        .getJwtPublicKey(vertx, authConfig)
-        .onSuccess(
-            handler -> {
-              String cert = handler;
+    cacheServiceMock = Mockito.mock(CacheService.class);
 
               JWTAuthOptions jwtAuthOptions = new JWTAuthOptions();
               jwtAuthOptions.addPubSecKey(
@@ -72,31 +67,27 @@ public class JwtAuthServiceImplTest {
                   .getJWTOptions()
                   .setIgnoreExpiration(true); // ignore token expiration only for test
 
-              JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
-              jwtAuthenticationService =
+    JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
+    jwtAuthenticationService =
 
-                  new JwtAuthenticationServiceImpl(vertx, jwtAuth, authConfig,cacheServiceMock);
+        new JwtAuthenticationServiceImpl(vertx, jwtAuth, authConfig, cacheServiceMock);
 
-              // since test token doesn't contain valid id's, so forcibly put some dummy id in cache
-              // for test.
+    // since test token doesn't contain valid id's, so forcibly put some dummy id in cache
+    // for test.
 
-              openId =
-                  "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood";
-              closeId =
-                  "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information";
-              invalidId = "example.com/79e7bfa62fad6c765bac69154c2f24c94c95220a/resource-group1";
+    openId =
+        "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood";
+    closeId =
+        "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/surat-itms-realtime-information";
+    invalidId = "example.com/79e7bfa62fad6c765bac69154c2f24c94c95220a/resource-group1";
 
-              jwtAuthenticationService.resourceIdCache.put(openId, "OPEN");
-              jwtAuthenticationService.resourceIdCache.put(closeId, "CLOSED");
-              jwtAuthenticationService.resourceIdCache.put(invalidId, "CLOSED");
+    jwtAuthenticationService.resourceIdCache.put(openId, "OPEN");
+    jwtAuthenticationService.resourceIdCache.put(closeId, "CLOSED");
+    jwtAuthenticationService.resourceIdCache.put(invalidId, "CLOSED");
 
-              LOGGER.info("Auth tests setup complete");
-              testContext.completeNow();
-            })
-        .onFailure(
-            handler -> {
-              testContext.failNow("fail to deploy pg verticle fo JWT verticle test");
-            });
+    LOGGER.info("Auth tests setup complete");
+    testContext.completeNow();
+
   }
 
   @Test
@@ -147,8 +138,8 @@ public class JwtAuthServiceImplTest {
     authInfo.put("method", Method.GET);
 
     JsonObject request = new JsonObject();
-    
-    
+
+
     AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
     when(asyncResult.succeeded()).thenReturn(false);
 
@@ -208,8 +199,8 @@ public class JwtAuthServiceImplTest {
     authInfo.put("token", JwtTokenHelper.AdminToken);
     authInfo.put("apiEndpoint", "/admin/gis/serverInfo");
     authInfo.put("method", Method.POST);
-    
-    
+
+
     AsyncResult<JsonObject> asyncResult = mock(AsyncResult.class);
     when(asyncResult.succeeded()).thenReturn(false);
 

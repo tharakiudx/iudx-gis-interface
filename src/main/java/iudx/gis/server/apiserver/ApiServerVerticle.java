@@ -25,9 +25,12 @@ import static iudx.gis.server.apiserver.util.Constants.JSON_RESULT;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TITLE;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TYPE;
 import static iudx.gis.server.apiserver.util.Constants.MIME_APPLICATION_JSON;
+import static iudx.gis.server.apiserver.util.Constants.MIME_TEXT_HTML;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_ID;
 import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_IDPATTERN;
 import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
+import static iudx.gis.server.apiserver.util.Constants.ROUTE_DOC;
+import static iudx.gis.server.apiserver.util.Constants.ROUTE_STATIC_SPEC;
 import static iudx.gis.server.apiserver.util.Constants.USER_ID;
 import static iudx.gis.server.metering.util.Constants.RESPONSE_SIZE;
 
@@ -85,7 +88,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private HttpServer server;
   private Router router;
   private int port;
-  private boolean isSSL, isProduction;
+  private boolean isSSL;
   private String keystore;
   private String keystorePassword;
   private CatalogueService catalogueService;
@@ -131,39 +134,40 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
 
     router.route().handler(BodyHandler.create());
-    port=config().getInteger("port");
     /* Read ssl configuration. */
     isSSL = config().getBoolean("ssl");
-    /* Read server deployment configuration. */
-    isProduction = config().getBoolean("production");
+
 
     HttpServerOptions serverOptions = new HttpServerOptions();
-
     if (isSSL) {
-      LOGGER.info("Info: Starting HTTPs server");
 
       /* Read the configuration and set the HTTPs server properties. */
 
       keystore = config().getString("keystore");
       keystorePassword = config().getString("keystorePassword");
 
+      /*
+       * Default port when ssl is enabled is 8443. If set through config, then that value is taken
+       */
+      port = config().getInteger("httpPort") == null ? 8443 : config().getInteger("httpPort");
+
       /* Setup the HTTPs server properties, APIs and port. */
 
-      serverOptions
-          .setSsl(true)
+      serverOptions.setSsl(true)
           .setKeyStoreOptions(new JksOptions().setPath(keystore).setPassword(keystorePassword));
+      LOGGER.info("Info: Starting HTTPs server at port" + port);
 
     } else {
-      LOGGER.info("Info: Starting HTTP server");
 
       /* Setup the HTTP server properties, APIs and port. */
 
       serverOptions.setSsl(false);
-      if (isProduction) {
-        port = 80;
-      } else {
-        port = 8080;
-      }
+      /*
+       * Default port when ssl is disabled is 8080. If set through config, then that value is taken
+       */
+      port = config().getInteger("httpPort") == null ? 8080 : config().getInteger("httpPort");
+      LOGGER.info("Info: Starting HTTP server at port" + port);
+
     }
 
     serverOptions.setCompressionSupported(true).setCompressionLevel(5);
@@ -193,9 +197,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationHandler adminCrudPathIdValidationHandler =
         new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH_DELETE);
 
-    router.get(ADMIN_BASE_PATH).handler(this::handleGetAdminPath);
-
-
     router
         .post(ADMIN_BASE_PATH)
         .handler(adminCrudPathValidationHandler)
@@ -216,6 +217,23 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(AuthHandler.create(vertx))
         .handler(this::handleDeleteAdminPath)
         .failureHandler(validationsFailureHandler);
+    router
+        .get(ROUTE_STATIC_SPEC)
+        .produces(MIME_APPLICATION_JSON)
+        .handler(
+            routingContext -> {
+              HttpServerResponse response = routingContext.response();
+              response.sendFile("docs/openapi.yaml");
+            });
+    /* Get redoc */
+    router
+        .get(ROUTE_DOC)
+        .produces(MIME_TEXT_HTML)
+        .handler(
+            routingContext -> {
+              HttpServerResponse response = routingContext.response();
+              response.sendFile("docs/apidoc.html");
+            });
 
     router
         .route()
@@ -230,10 +248,6 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
 
     catalogueService = new CatalogueService(vertx, config());
-  }
-
-  private void handleGetAdminPath(RoutingContext routingContext) {
-    handleResponse(routingContext.response(), HttpStatusCode.METHOD_NOT_ALLOWED, METHOD_NOT_FOUND);
   }
 
   private void handleDeleteAdminPath(RoutingContext routingContext) {
@@ -292,7 +306,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             Future.future(fu -> updateAuditTable(routingContext));
             LOGGER.debug("Success: Insert operation successful");
             handleSuccessResponse(
-                response, ResponseType.Ok.getCode(), ar.result().getString(JSON_DETAIL));
+                response, ResponseType.Created.getCode(), ar.result().getString(JSON_DETAIL));
           } else {
             LOGGER.error("Fail: Insert operation Failed");
             processBackendResponse(response, ar.cause().getMessage());

@@ -38,7 +38,11 @@ In order to connect to the appropriate RabbitMQ instance, required information s
     "dataBrokerVhost": <vHost-name>,
     "dataBrokerUserName": <username-for-rmq>,
     "dataBrokerPassword": <password-for-rmq>,
-    "dataBrokerManagementPort": <management-port-number>,
+Adding default apiserver ports
+
+- Default http port is 8080.
+- Default port when ssl is enabled is 8443.
+- Apiserver port configurable using parameter 'httpPort    "dataBrokerManagementPort": <management-port-number>,
     "connectionTimeout": <time-in-milliseconds>,
     "requestedHeartbeat": <time-in-seconds>,
     "handshakeTimeout": <time-in-milliseconds>,
@@ -208,8 +212,7 @@ In order to connect to the DX catalogue server, required information such as cat
     "verticleInstances": <number-of-verticle-instances>,
     "catServerHost": <catalogue-server-host>,
     "catServerPort": <catalogue-server-port>,
-    "production" : <true | false>,
-    "port" : <port/for/server>
+    "httpPort" : <port/for/server>
 }
 ```
 

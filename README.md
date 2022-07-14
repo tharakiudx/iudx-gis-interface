@@ -1,3 +1,8 @@
+[![Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.iudx.io%2Fjob%2Fiudx%2520gis-interface%2520%28v3.5.0%29%2520pipeline%2F)](https://jenkins.iudx.io/job/iudx%20gis-interface%20(v3.5.0)%20pipeline/lastBuild/)
+[![Jenkins Coverage](https://img.shields.io/jenkins/coverage/jacoco?jobUrl=https%3A%2F%2Fjenkins.iudx.io%2Fjob%2Fiudx%2520gis-interface%2520%28v3.5.0%29%2520pipeline%2F)](https://jenkins.iudx.io/job/iudx%20gis-interface%20(v3.5.0)%20pipeline/lastBuild/jacoco/)
+[![Unit Tests](https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fjenkins.iudx.io%2Fjob%2Fiudx%2520gis-interface%2520%28v3.5.0%29%2520pipeline%2F)](https://jenkins.iudx.io/job/iudx%20gis-interface%20(v3.5.0)%20pipeline/lastBuild/testReport/)
+[![Security Tests](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.iudx.io%2Fjob%2Fiudx%2520gis-interface%2520%28v3.5.0%29%2520pipeline%2F&label=security%20tests)](https://jenkins.iudx.io/job/iudx%20gis-interface%20(v3.5.0)%20pipeline/lastBuild/zap/)
+[![Integration Tests](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.iudx.io%2Fjob%2Fiudx%2520gis-interface%2520%28v3.5.0%29%2520pipeline%2F&label=integration%20tests)](https://jenkins.iudx.io/job/iudx%20gis-interface%20(v3.5.0)%20pipeline/lastBuild/Integration_20Test_20Report/)
 
 ![IUDX](./docs/iudx.png)
 
@@ -108,7 +113,16 @@ $ java $RS_JAVA_OPTS -jar target/iudx.gis.interface-dev-0.0.1-SNAPSHOT-fat.jar .
 2. Run the unit tests and generate a surefire report
    `mvn clean test-compile surefire:test surefire-report:report`
 3. Reports are stored in `./target/`
-
+### Integration tests
+Integration tests are through Postman/Newman whose script can be found from [here](src/test/resources/IUDX_GIS_Server_APIs(v3.5.0).postman_collection.json).
+1. Install prerequisites
+   - [postman](https://www.postman.com/) + [newman](https://www.npmjs.com/package/newman)
+   - [newman reporter-htmlextra](https://www.npmjs.com/package/newman-reporter-htmlextra)
+2. Example Postman environment can be found [here](src/test/resources/gis.iudx.io.postman_environment.json)
+3. Run the server through either docker, maven or redeployer
+4. Run the integration tests and generate the newman report
+   `newman run <postman-collection-path> -e <postman-environment> --insecure -r htmlextra --reporter-htmlextra-export .`
+5. Reports are stored in `./target/`
 
 ## Contributing
 We follow Git Merge based workflow
