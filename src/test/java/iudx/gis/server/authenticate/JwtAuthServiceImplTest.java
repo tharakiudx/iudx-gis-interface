@@ -53,17 +53,19 @@ public class JwtAuthServiceImplTest {
 
     cacheServiceMock = Mockito.mock(CacheService.class);
 
+              JWTAuthOptions jwtAuthOptions = new JWTAuthOptions();
+              jwtAuthOptions.addPubSecKey(
+                  new PubSecKeyOptions()
+                      .setAlgorithm("ES256")
+                      .setBuffer("-----BEGIN PUBLIC KEY-----\n" +
+                          "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8BKf2HZ3wt6wNf30SIsbyjYPkkTS\n" +
+                          "GGyyM2/MGF/zYTZV9Z28hHwvZgSfnbsrF36BBKnWszlOYW0AieyAUKaKdg==\n" +
+                          "-----END PUBLIC KEY-----\n" +
+                          ""));
 
-    JWTAuthOptions jwtAuthOptions = new JWTAuthOptions();
-    jwtAuthOptions.addPubSecKey(
-        new PubSecKeyOptions().setAlgorithm("ES256").setBuffer("-----BEGIN PUBLIC KEY-----\n" +
-            "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8BKf2HZ3wt6wNf30SIsbyjYPkkTS\n" +
-            "GGyyM2/MGF/zYTZV9Z28hHwvZgSfnbsrF36BBKnWszlOYW0AieyAUKaKdg==\n" +
-            "-----END PUBLIC KEY-----\n" +
-            ""));
-    jwtAuthOptions
-        .getJWTOptions()
-        .setIgnoreExpiration(true); // ignore token expiration only for test
+              jwtAuthOptions
+                  .getJWTOptions()
+                  .setIgnoreExpiration(true); // ignore token expiration only for test
 
     JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
     jwtAuthenticationService =
