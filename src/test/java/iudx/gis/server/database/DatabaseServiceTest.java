@@ -55,7 +55,6 @@ public class DatabaseServiceTest {
 
     dbConfig = new Configuration();
     JsonObject config = dbConfig.configLoader(2, vertx);
-
     try {
       databaseIP = config.getString("databaseIP");
       databasePort = config.getInteger("databasePort");
