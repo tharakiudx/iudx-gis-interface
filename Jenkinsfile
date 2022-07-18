@@ -119,10 +119,10 @@ pipeline {
               sh "ssh azureuser@docker-swarm 'docker service update gis_gis --image ghcr.io/datakaveri/gis-depl:4.0-alpha-${env.GIT_HASH}'"
               sh 'sleep 10'
             }
-            post{
-              failure{
-                error "Failed to deploy image in Docker Swarm"
-              }
+          }
+          post{
+            failure{
+              error "Failed to deploy image in Docker Swarm"
             }
           }
         }
