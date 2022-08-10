@@ -283,7 +283,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     LOGGER.trace("Info:handlePutAdminPath method started.;");
     HttpServerResponse response = routingContext.response();
 
-    JsonObject requestBody = routingContext.getBodyAsJson();
+    JsonObject requestBody = routingContext.body().asJsonObject();
 
     String resourceId = requestBody.getString("id");
 
@@ -317,7 +317,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void handlePostAdminPath(RoutingContext routingContext) {
     LOGGER.trace("Info:handlePostAdminPath method started.;");
     HttpServerResponse response = routingContext.response();
-    JsonObject requestBody = routingContext.getBodyAsJson();
+    JsonObject requestBody = routingContext.body().asJsonObject();
 
     String resourceId = requestBody.getString("id");
 
