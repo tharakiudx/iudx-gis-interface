@@ -87,20 +87,68 @@ pipeline {
       }
     }
 
-    stage('Push Image') {
-      when{
-        expression {
-          return env.GIT_BRANCH == 'origin/master';
-        }
-      }
-      steps{
-        script {
-          docker.withRegistry( registryUri, registryCredential ) {
-            devImage.push("4.0-alpha-${env.GIT_HASH}")
-            deplImage.push("4.0-alpha-${env.GIT_HASH}")
+    stage('Continuous Deployment') {
+      when {
+        allOf {
+          anyOf {
+            changeset "docker/**"
+            changeset "docs/**"
+            changeset "pom.xml"
+            changeset "src/main/**"
+            triggeredBy cause: 'UserIdCause'
+          }
+          expression {
+            return env.GIT_BRANCH == 'origin/master';
           }
         }
+      }
+      stages {
+        stage('Push Images') {
+          steps {
+            script {
+              docker.withRegistry( registryUri, registryCredential ) {
+                devImage.push("4.0-alpha-${env.GIT_HASH}")
+                deplImage.push("4.0-alpha-${env.GIT_HASH}")
+              }
+            }
+          }
+        }
+        stage('Docker Swarm deployment') {
+          steps {
+            script {
+              sh "ssh azureuser@docker-swarm 'docker service update gis_gis --image ghcr.io/datakaveri/gis-depl:4.0-alpha-${env.GIT_HASH}'"
+              sh 'sleep 10'
+            }
+          }
+          post{
+            failure{
+              error "Failed to deploy image in Docker Swarm"
+            }
+          }
+        }
+        // stage('Integration test on swarm deployment') {
+        //   steps {
+        //     node('master') {
+        //       script{
+        //         sh 'newman run /var/lib/jenkins/iudx/gis/Newman/IUDX_GIS_Server_APIs_V3.5.postman_collection.json -e /home/ubuntu/configs/cd/gis-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/gis/Newman/report/cd-report.html --reporter-htmlextra-skipSensitiveData'
+        //       }
+        //     }
+        //   }
+        //   post{
+        //     always{
+        //       node('master') {
+        //         script{
+        //           publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/gis/Newman/report/', reportFiles: 'cd-report.html', reportTitles: '', reportName: 'Docker-Swarm Integration Test Report'])
+        //         }
+        //       }
+        //     }
+        //     failure{
+        //       error "Test failure. Stopping pipeline execution!"
+        //     }
+        //   }
+        // }
       }
     }
   }
 }
+
