@@ -48,7 +48,7 @@ tags:
 
 paths:
 
-  /ngsi-ld/v1/entities/{id}:
+  /ngsi-ld/v1/entities:
     get:
       tags:
         - Latest Search
@@ -65,7 +65,7 @@ paths:
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
 
         - name: id
-          in: path
+          in: query
           description: A <b> valid IUDX ID </b> of the resource.
           required: true
           schema:
@@ -99,7 +99,7 @@ paths:
 
 
       description: |
-        This <b> API </b> is used to get the data of a resource. <br /> It uses the <b> IUDX ID </b> a.k.a `id` to query the resource server. <br />  To get data a <b> valid IUDX Auth token</b> is mandatory.  <br/> The `/entities` end point followed by `id` as a <b>path parameter</b> is used to get the latest data.
+        This <b> API </b> is used to get the data of a resource. <br /> It uses the <b> IUDX ID </b> a.k.a `id` to query the resource server. <br />  To get data a <b> valid IUDX Auth token</b> is mandatory.  <br/> The `/entities` end point followed by `id` as a <b>query parameter</b> is used to get the latest data.
 
   /admin/gis/serverInfo:
     post:
@@ -206,7 +206,6 @@ paths:
       description: |
         Put Admin API allows an admin to update the GIS info present. Based on the input provided, the API validates the access control of the user with IUDX Auth server to allow or deny access to the API.
 
-  /admin/gis/serverInfo/{id}:
     delete:
       tags:
         - Admin API
@@ -224,7 +223,7 @@ paths:
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
 
         - name: id
-          in: path
+          in: query
           description: 'id of the Gis information.'
           required: true
           style: simple
@@ -255,7 +254,7 @@ paths:
 
       description: |
         Delete admin API allows an admin to delete Gis information. Based on the input provided, the API validates the access control of the user with IUDX Auth server to allow or deny access to the API. 
-
+    
 
 components:
   schemas:
