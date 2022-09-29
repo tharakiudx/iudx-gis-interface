@@ -25,16 +25,6 @@
       "jwtIgnoreExpiry": true
     },
     {
-      "id": "iudx.gis.server.database.DatabaseVerticle",
-      "verticleInstances": 2,
-      "databaseIP": "",
-      "databasePort": 0,
-      "databaseName": "",
-      "databaseUserName": "",
-      "databasePassword": "",
-      "dbClientPoolSize": 25
-    },
-    {
       "id": "iudx.gis.server.metering.MeteringVerticle",
       "verticleInstances": 1,
       "meteringDatabaseIP": "",
