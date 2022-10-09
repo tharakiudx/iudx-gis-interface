@@ -13,8 +13,8 @@ services:
       - LOG_LEVEL=INFO
       - GIS_JAVA_OPTS=-Xmx1024m
     volumes:
-      - /home/ubuntu/configs/gis-config-test.json:/usr/share/app/configs/config-test.json
-      - /home/ubuntu/configs/keystore-gis.jks:/usr/share/app/configs/keystore.jks
+      - /home/ubuntu/configs/4.0.0/gis-config-test.json:/usr/share/app/configs/config-test.json
+      - /home/ubuntu/configs/4.0.0/keystore-gis.jks:/usr/share/app/configs/keystore.jks
       - ./docker/runTests.sh:/usr/share/app/docker/runTests.sh
       - ./src/:/usr/share/app/src
       - ${WORKSPACE}:/tmp/test
@@ -28,15 +28,14 @@ services:
     command: bash -c "docker/runTests.sh"
 
   integTest:
-    image: ghcr.io/datakaveri/gis-test:latest
+    image: ghcr.io/datakaveri/gis-depl:latest
     environment:
       - RS_URL=https://rs.iudx.org.in
       - LOG_LEVEL=INFO
       - GIS_JAVA_OPTS=-Xmx1024m
     volumes:
-      - /home/ubuntu/configs/gis-config-test.json:/usr/share/app/configs/config-dev.json
-      - /home/ubuntu/configs/keystore-gis.jks:/usr/share/app/configs/keystore.jks
-      - ./src/:/usr/share/app/src
+      - /home/ubuntu/configs/4.0.0/gis-config-test.json:/usr/share/app/configs/config.json
+      - /home/ubuntu/configs/4.0.0/keystore-gis.jks:/usr/share/app/configs/keystore.jks
     ports:
       - "8443:8443"
     networks: 
@@ -46,4 +45,13 @@ services:
          options:
              max-file: "5"
              max-size: "100m"
-    command: bash -c "mvn clean compile exec:java@gis-server"
+    command: bash -c "exec java $$GIS_JAVA_OPTS  -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar ./fatjar.jar  --host $$(hostname) -c configs/config.json"
+    depends_on:
+      - "zookeeper"  
+  
+  zookeeper:
+    image: zookeeper:latest
+    expose: 
+      - "2181"
+    networks:
+      - gis-net
