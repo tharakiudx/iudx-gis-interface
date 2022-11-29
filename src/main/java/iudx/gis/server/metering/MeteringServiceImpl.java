@@ -1,113 +1,58 @@
 package iudx.gis.server.metering;
 
-import static iudx.gis.server.metering.util.Constants.FAILED;
-import static iudx.gis.server.metering.util.Constants.MESSAGE;
-import static iudx.gis.server.metering.util.Constants.QUERY_KEY;
-import static iudx.gis.server.metering.util.Constants.SUCCESS;
-import static iudx.gis.server.metering.util.Constants.TABLE_NAME;
+import static iudx.gis.server.metering.util.Constants.EXCHANGE_NAME;
+import static iudx.gis.server.metering.util.Constants.ROUTING_KEY;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.pgclient.PgPool;
-import io.vertx.sqlclient.PoolOptions;
+import iudx.gis.server.common.Response;
+import iudx.gis.server.databroker.DataBrokerService;
 import iudx.gis.server.metering.util.QueryBuilder;
-import iudx.gis.server.metering.util.ResponseBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class MeteringServiceImpl implements MeteringService {
 
   private static final Logger LOGGER = LogManager.getLogger(MeteringServiceImpl.class);
-  private final Vertx vertx;
   private final QueryBuilder queryBuilder = new QueryBuilder();
-  PgConnectOptions connectOptions;
-  PoolOptions poolOptions;
-  PgPool pool;
-  private JsonObject query = new JsonObject();
-  private String databaseIP;
-  private int databasePort;
-  private String databaseName;
-  private String databaseUserName;
-  private String databasePassword;
-  private String databaseTableName;
-  private int databasePoolSize;
-  private ResponseBuilder responseBuilder;
+  private final DataBrokerService dataBrokerService;
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
-  public MeteringServiceImpl(JsonObject propObj, Vertx vertxInstance) {
+  public MeteringServiceImpl(DataBrokerService dataBrokerService) {
 
-    if (propObj != null && !propObj.isEmpty()) {
-      databaseIP = propObj.getString("meteringDatabaseIP");
-      databasePort = propObj.getInteger("meteringDatabasePort");
-      databaseName = propObj.getString("meteringDatabaseName");
-      databaseUserName = propObj.getString("meteringDatabaseUserName");
-      databasePassword = propObj.getString("meteringDatabasePassword");
-      databasePoolSize = propObj.getInteger("meteringPoolSize");
-      databaseTableName = propObj.getString("meteringDatabaseTableName");
-    }
-
-    this.connectOptions =
-        new PgConnectOptions()
-            .setPort(databasePort)
-            .setHost(databaseIP)
-            .setDatabase(databaseName)
-            .setUser(databaseUserName)
-            .setPassword(databasePassword)
-            .setReconnectAttempts(2)
-            .setReconnectInterval(1000);
-
-    this.poolOptions = new PoolOptions().setMaxSize(databasePoolSize);
-    this.pool = PgPool.pool(vertxInstance, connectOptions, poolOptions);
-    this.vertx = vertxInstance;
+    this.dataBrokerService = dataBrokerService;
   }
 
   @Override
-  public MeteringService executeWriteQuery(
+  public MeteringService insertMeteringValuesInRMQ(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    request.put(TABLE_NAME, databaseTableName);
-    query = queryBuilder.buildWritingQuery(request);
-    Future<JsonObject> result = writeInDatabase(query);
-    result.onComplete(
-        resultHandler -> {
-          if (resultHandler.succeeded()) {
-            handler.handle(Future.succeededFuture(resultHandler.result()));
-          } else if (resultHandler.failed()) {
-            LOGGER.error("failed ::" + resultHandler.cause());
-            handler.handle(Future.failedFuture(resultHandler.cause().getMessage()));
+
+    JsonObject writeMessage = queryBuilder.buildMessageForRMQ(request);
+
+    dataBrokerService.publishMessage(
+        writeMessage,
+        EXCHANGE_NAME,
+        ROUTING_KEY,
+        rmqHandler -> {
+          if (rmqHandler.succeeded()) {
+            handler.handle(Future.succeededFuture());
+          } else {
+            LOGGER.error(rmqHandler.cause());
+            try {
+              Response resp =
+                  objectMapper.readValue(rmqHandler.cause().getMessage(), Response.class);
+              LOGGER.debug("response from rmq " + resp);
+              handler.handle(Future.failedFuture(resp.toString()));
+            } catch (JsonProcessingException e) {
+              LOGGER.error("Failure message not in format [type,title,detail]");
+              handler.handle(Future.failedFuture(e.getMessage()));
+            }
           }
         });
     return this;
-  }
-
-  private Future<JsonObject> writeInDatabase(JsonObject query) {
-    Promise<JsonObject> promise = Promise.promise();
-    JsonObject response = new JsonObject();
-
-    pool.withConnection(connection -> connection.query(query.getString(QUERY_KEY)).execute())
-        .onComplete(
-            rows -> {
-              if (rows.succeeded()) {
-                response.put(MESSAGE, "Table Updated Successfully");
-                responseBuilder =
-                    new ResponseBuilder(SUCCESS)
-                        .setTypeAndTitle(200)
-                        .setMessage(response.getString(MESSAGE));
-                promise.complete(responseBuilder.getResponse());
-              }
-              if (rows.failed()) {
-                LOGGER.error("Info: failed :" + rows.cause());
-                response.put(MESSAGE, rows.cause().getMessage());
-                responseBuilder =
-                    new ResponseBuilder(FAILED)
-                        .setTypeAndTitle(400)
-                        .setMessage(response.getString(MESSAGE));
-                promise.fail(responseBuilder.getResponse().toString());
-              }
-            });
-    return promise.future();
   }
 }

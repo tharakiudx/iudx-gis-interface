@@ -1,13 +1,13 @@
 package iudx.gis.server.apiserver;
 
 import static iudx.gis.server.apiserver.response.ResponseUrn.BACKING_SERVICE_FORMAT;
-import static iudx.gis.server.apiserver.response.ResponseUrn.SUCCESS;
 import static iudx.gis.server.apiserver.response.ResponseUrn.YET_NOT_IMPLEMENTED;
 import static iudx.gis.server.apiserver.util.Constants.ADMIN_BASE_PATH;
 import static iudx.gis.server.apiserver.util.Constants.API;
 import static iudx.gis.server.apiserver.util.Constants.API_ENDPOINT;
 import static iudx.gis.server.apiserver.util.Constants.APPLICATION_JSON;
 import static iudx.gis.server.apiserver.util.Constants.CONTENT_TYPE;
+import static iudx.gis.server.apiserver.util.Constants.EPOCH_TIME;
 import static iudx.gis.server.apiserver.util.Constants.ERROR_MESSAGE;
 import static iudx.gis.server.apiserver.util.Constants.HEADER_ACCEPT;
 import static iudx.gis.server.apiserver.util.Constants.HEADER_ALLOW_ORIGIN;
@@ -17,7 +17,9 @@ import static iudx.gis.server.apiserver.util.Constants.HEADER_HOST;
 import static iudx.gis.server.apiserver.util.Constants.HEADER_ORIGIN;
 import static iudx.gis.server.apiserver.util.Constants.HEADER_REFERER;
 import static iudx.gis.server.apiserver.util.Constants.HEADER_TOKEN;
+import static iudx.gis.server.apiserver.util.Constants.ID;
 import static iudx.gis.server.apiserver.util.Constants.IID;
+import static iudx.gis.server.apiserver.util.Constants.ISO_TIME;
 import static iudx.gis.server.apiserver.util.Constants.JSON_DETAIL;
 import static iudx.gis.server.apiserver.util.Constants.JSON_RESULT;
 import static iudx.gis.server.apiserver.util.Constants.JSON_TITLE;
@@ -34,10 +36,7 @@ import static iudx.gis.server.apiserver.util.Constants.USER_ID;
 import static iudx.gis.server.common.Constants.AUTHENTICATION_SERVICE_ADDRESS;
 import static iudx.gis.server.common.Constants.METERING_SERVICE_ADDRESS;
 import static iudx.gis.server.common.Constants.PG_SERVICE_ADDRESS;
-import java.util.HashSet;
-import java.util.Set;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -66,6 +65,13 @@ import iudx.gis.server.apiserver.util.RequestType;
 import iudx.gis.server.authenticator.AuthenticationService;
 import iudx.gis.server.database.postgres.PostgresService;
 import iudx.gis.server.metering.MeteringService;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.Set;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ApiServerVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(ApiServerVerticle.class);
@@ -172,8 +178,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     server.requestHandler(router).listen(port);
 
     /* Get a handler for the Service Discovery interface. */
-
-    // database = DatabaseService.createProxy(vertx, DATABASE_SERVICE_ADDRESS);
     authenticator = AuthenticationService.createProxy(vertx, AUTHENTICATION_SERVICE_ADDRESS);
     meteringService = MeteringService.createProxy(vertx, METERING_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, PG_SERVICE_ADDRESS);
@@ -381,7 +385,6 @@ public class ApiServerVerticle extends AbstractVerticle {
         handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result());
         context.data().put(RESPONSE_SIZE, response.bytesWritten());
         Future.future(fu -> updateAuditTable(context));
-        LOGGER.debug("CONTEXT " + context);
       } else if (handler.failed()) {
         LOGGER.error("Fail: Search Fail");
         processBackendResponse(response, handler.cause().getMessage());
@@ -447,32 +450,32 @@ public class ApiServerVerticle extends AbstractVerticle {
         .toString();
   }
 
-  private String generateResponse(HttpStatusCode statusCode, ResponseUrn urn, JsonObject message) {
-    return new JsonObject()
-        .put(JSON_TYPE, urn.getUrn())
-        .put(JSON_TITLE, statusCode.getDescription())
-        .put(JSON_RESULT, new JsonArray().add(message))
-        .toString();
-  }
 
   private Future<Void> updateAuditTable(RoutingContext context) {
     Promise<Void> promise = Promise.promise();
     JsonObject authInfo = (JsonObject) context.data().get("authInfo");
 
+    ZonedDateTime zst = ZonedDateTime.now(ZoneId.of("Asia/Kolkata"));
+    long time = zst.toInstant().toEpochMilli();
+    String isoTime = zst.truncatedTo(ChronoUnit.SECONDS).toString();
+
     JsonObject request = new JsonObject();
+    request.put(EPOCH_TIME, time);
+    request.put(ISO_TIME, isoTime);
     request.put(USER_ID, authInfo.getValue(USER_ID));
-    request.put(IID, authInfo.getValue(IID));
-    request.put("id", authInfo.getValue("id"));
+    request.put(IID,authInfo.getValue(IID));
+    request.put(ID, authInfo.getValue(ID));
     request.put(API, authInfo.getValue(API_ENDPOINT));
     request.put(RESPONSE_SIZE, context.data().get(RESPONSE_SIZE));
-    meteringService.executeWriteQuery(
+
+    meteringService.insertMeteringValuesInRMQ(
         request,
         handler -> {
           if (handler.succeeded()) {
-            LOGGER.debug("audit table updated");
+            LOGGER.debug("inserted into rmq");
             promise.complete();
           } else {
-            LOGGER.error("failed to update audit table");
+            LOGGER.error("failed to insert into rmq "+handler.result());
             promise.complete();
           }
         });
