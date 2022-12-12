@@ -37,7 +37,7 @@ public class AuthHandlerTest {
   private static final String AUTH_SERVICE_ADDRESS = "iudx.gis.authentication.service";
   private static final Logger LOGGER = LogManager.getLogger(AuthHandlerTest.class);
   AuthHandler authHandler;
-  JsonObject jsonObject;
+  static JsonObject jsonObject;
   @Mock
   RoutingContext routingContextMock;
   @Mock
@@ -66,6 +66,8 @@ public class AuthHandlerTest {
     jsonObject.put("IID", "Dummy IID value");
     jsonObject.put("USER_ID", "Dummy USER_ID");
     jsonObject.put("EXPIRY", "Dummy EXPIRY");
+    jsonObject.put("basePath","/ngsi-ld/v1");
+    jsonObject.put("adminBasePath","/admin/gis/serverInfo");
     //lenient().doReturn(httpServerRequest).when(routingContextMock).request();
     //lenient().doReturn(httpServerResponse).when(routingContextMock).response();
 
@@ -227,9 +229,10 @@ public class AuthHandlerTest {
 
   @Test
   public void getNormalizedPathTest(VertxTestContext vertxTestContext) {
-    String authString = authHandler.getNormalizedPath(NGSILD_ENTITIES_URL);
-    assertEquals(authString, NGSILD_ENTITIES_URL);
-    String authString2 = authHandler.getNormalizedPath(ADMIN_BASE_PATH);
+    authHandler = AuthHandler.create(Vertx.vertx(),jsonObject);
+    String authString = authHandler.getNormalizedPath(jsonObject.getString("basePath") + NGSILD_ENTITIES_URL);
+    assertEquals(authString, jsonObject.getString("basePath") + NGSILD_ENTITIES_URL);
+    String authString2 = authHandler.getNormalizedPath( ADMIN_BASE_PATH);
     assertEquals(authString2, ADMIN_BASE_PATH);
     vertxTestContext.completeNow();
   }
@@ -237,7 +240,7 @@ public class AuthHandlerTest {
   @Test
   @DisplayName("Test static method: create")
   public void testCreate(VertxTestContext vertxTestContext) {
-    AuthHandler res = AuthHandler.create(Vertx.vertx());
+    AuthHandler res = AuthHandler.create(Vertx.vertx(),jsonObject);
     assertNotNull(res);
     vertxTestContext.completeNow();
   }

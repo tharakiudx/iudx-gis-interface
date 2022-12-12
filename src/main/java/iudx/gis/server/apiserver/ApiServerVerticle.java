@@ -99,7 +99,8 @@ public class ApiServerVerticle extends AbstractVerticle {
   // private DatabaseService database;
   private PostgresService postgresService;
   private AuthenticationService authenticator;
-
+  private String basePath;
+  private String adminBasePath;
   @Override
   public void start() throws Exception {
     Set<String> allowedHeaders = new HashSet<>();
@@ -117,6 +118,9 @@ public class ApiServerVerticle extends AbstractVerticle {
     allowedMethods.add(HttpMethod.POST);
     allowedMethods.add(HttpMethod.PATCH);
     allowedMethods.add(HttpMethod.PUT);
+
+    basePath = config().getString("basePath");
+    adminBasePath = config().getString("adminBasePath");
 
     router = Router.router(vertx);
     router
@@ -187,11 +191,11 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationFailureHandler validationsFailureHandler = new ValidationFailureHandler();
 
     router
-        .get(NGSILD_ENTITIES_URL)
-        .handler(entityQueryValidationHandler)
-        .handler(AuthHandler.create(vertx))
-        .handler(this::handleEntitiesQuery)
-        .failureHandler(validationsFailureHandler);
+            .get(basePath + NGSILD_ENTITIES_URL)
+            .handler(entityQueryValidationHandler)
+            .handler(AuthHandler.create(vertx,config()))
+            .handler(this::handleEntitiesQuery)
+            .failureHandler(validationsFailureHandler);
 
     ValidationHandler adminCrudPathValidationHandler =
         new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH);
@@ -200,25 +204,25 @@ public class ApiServerVerticle extends AbstractVerticle {
         new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH_DELETE);
 
     router
-        .post(ADMIN_BASE_PATH)
-        .handler(adminCrudPathValidationHandler)
-        .handler(AuthHandler.create(vertx))
-        .handler(this::handlePostAdminPath)
-        .failureHandler(validationsFailureHandler);
+            .post(adminBasePath)
+            .handler(adminCrudPathValidationHandler)
+            .handler(AuthHandler.create(vertx,config()))
+            .handler(this::handlePostAdminPath)
+            .failureHandler(validationsFailureHandler);
 
     router
-        .put(ADMIN_BASE_PATH)
-        .handler(adminCrudPathValidationHandler)
-        .handler(AuthHandler.create(vertx))
-        .handler(this::handlePutAdminPath)
-        .failureHandler(validationsFailureHandler);
+            .put(adminBasePath)
+            .handler(adminCrudPathValidationHandler)
+            .handler(AuthHandler.create(vertx,config()))
+            .handler(this::handlePutAdminPath)
+            .failureHandler(validationsFailureHandler);
 
     router
-        .delete(ADMIN_BASE_PATH)
-        .handler(adminCrudPathIdValidationHandler)
-        .handler(AuthHandler.create(vertx))
-        .handler(this::handleDeleteAdminPath)
-        .failureHandler(validationsFailureHandler);
+            .delete(adminBasePath)
+            .handler(adminCrudPathIdValidationHandler)
+            .handler(AuthHandler.create(vertx,config()))
+            .handler(this::handleDeleteAdminPath)
+            .failureHandler(validationsFailureHandler);
     router
         .get(ROUTE_STATIC_SPEC)
         .produces(MIME_APPLICATION_JSON)

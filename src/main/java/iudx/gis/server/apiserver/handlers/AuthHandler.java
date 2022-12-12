@@ -35,9 +35,12 @@ public class AuthHandler implements Handler<RoutingContext> {
   private static final Logger LOGGER = LogManager.getLogger(AuthHandler.class);
   static AuthenticationService authenticator;
   private HttpServerRequest request;
-
-  public static AuthHandler create(Vertx vertx) {
+  private static String basePath;
+  private static String adminBasePath;
+  public static AuthHandler create(Vertx vertx, JsonObject config) {
     authenticator = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
+    basePath = config.getString("basePath");
+    adminBasePath = config.getString("adminBasePath");
     return new AuthHandler();
   }
 
@@ -115,8 +118,10 @@ public class AuthHandler implements Handler<RoutingContext> {
   public String getNormalizedPath(String url) {
     LOGGER.debug("URL : {}", url);
     String path = null;
-    if (url.matches(NGSILD_ENTITIES_URL)) path = NGSILD_ENTITIES_URL;
-    else if (url.matches(ADMIN_BASE_PATH)) path = ADMIN_BASE_PATH;
+    if (url.matches(basePath + NGSILD_ENTITIES_URL))
+      path = basePath + NGSILD_ENTITIES_URL;
+    else if (url.matches(adminBasePath))
+      path = adminBasePath;
     return path;
   }
 
