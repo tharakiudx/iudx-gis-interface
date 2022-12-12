@@ -13,7 +13,9 @@
       "keystorePassword": "",
       "verticleInstances": 2,
       "catServerHost": "",
-      "catServerPort": 0
+      "catServerPort": 0,
+      "basePath": "/ngsi-ld/v1",
+      "adminBasePath": "/admin/gis/serverInfo"
     },
     {
       "id": "iudx.gis.server.authenticator.AuthenticationVerticle",
