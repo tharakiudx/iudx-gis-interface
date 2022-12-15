@@ -4,6 +4,8 @@ public class Constants {
   public static final String API_ENDPOINT = "apiEndpoint";
   public static final String API_METHOD = "method";
   public static final String ID = "id";
+  public static final String EPOCH_TIME = "epochTime";
+  public static final String ISO_TIME = "isoTime";
 
   // NGSI-LD endpoints
   public static final String NGSILD_BASE_PATH = "/ngsi-ld/v1";

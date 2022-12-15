@@ -7,10 +7,15 @@ public class Constants {
   public static final String ADMIN = "rs-admin";
   /* Errors */
   public static final String SUCCESS = "Success";
-  public static final String FAILED = "Failed";
   public static final String DETAIL = "detail";
   public static final String TITLE = "title";
   public static final String RESULTS = "results";
+  public static final String PRIMARY_KEY= "primaryKey";
+  public static final String PROVIDER_ID = "providerID";
+  public static final String ORIGIN = "origin";
+  public static final String ORIGIN_SERVER = "gis-server";
+  public static final String EXCHANGE_NAME = "auditing";
+  public static final String ROUTING_KEY = "#";
 
   // admin API endpoints
   public static final String ADMIN_BASE_PATH = "/admin/gis/serverInfo";

@@ -20,32 +20,13 @@
       "verticleInstances": 1,
       "audience": "",
       "authServerHost": "",
-      "host": "",
       "catServerHost": "",
       "catServerPort": 0,
-      "serverMode": "",
       "jwtIgnoreExpiry": true
     },
     {
-      "id": "iudx.gis.server.database.DatabaseVerticle",
-      "verticleInstances": 2,
-      "databaseIP": "",
-      "databasePort": 0,
-      "databaseName": "",
-      "databaseUserName": "",
-      "databasePassword": "",
-      "dbClientPoolSize": 25
-    },
-    {
       "id": "iudx.gis.server.metering.MeteringVerticle",
-      "verticleInstances": 1,
-      "meteringDatabaseIP": "",
-      "meteringDatabasePort": 0,
-      "meteringDatabaseName": "",
-      "meteringDatabaseUserName": "",
-      "meteringDatabasePassword": "",
-      "meteringDatabaseTableName": "",
-      "meteringPoolSize": 25
+      "verticleInstances": 1
     },
     {
       "id": "iudx.gis.server.database.postgres.PostgresVerticle",
@@ -63,15 +44,16 @@
       "dataBrokerIP": "",
       "dataBrokerPort": 5468,
       "dataBrokerUserName": "",
-      "dataBrokerVhost": "",
       "dataBrokerPassword": "",
-      "dataBrokerManagementPort": 30042,
       "connectionTimeout": 6000,
       "requestedHeartbeat": 60,
       "handshakeTimeout": 6000,
       "requestedChannelMax": 5,
       "networkRecoveryInterval": 500,
-      "automaticRecoveryEnabled": true
+      "automaticRecoveryEnabled": true,
+      "prodVhost": "",
+      "internalVhost": "",
+      "externalVhost": ""
     },
     {
       "id": "iudx.gis.server.cache.CacheVerticle",

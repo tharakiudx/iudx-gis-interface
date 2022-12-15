@@ -54,7 +54,7 @@ pipeline {
     stage('Run GIS interface server'){
       steps{
         script{
-            sh 'scp src/test/resources/IUDX_GIS_Server_APIs_V3.5.postman_collection.json jenkins@jenkins-master:/var/lib/jenkins/iudx/gis/Newman/'
+            sh 'scp src/test/resources/IUDX_GIS_Server_APIs_V4.0.postman_collection.json jenkins@jenkins-master:/var/lib/jenkins/iudx/gis/Newman/'
             sh 'docker-compose -f docker-compose.test.yml up -d integTest'
             sh 'sleep 45'
         }
@@ -63,21 +63,21 @@ pipeline {
 
     stage('Integration Tests & ZAP pen test'){
       steps{
-        node('master') {
+        node('built-in') {
           script{
             startZap ([host: 'localhost', port: 8090, zapHome: '/var/lib/jenkins/tools/com.cloudbees.jenkins.plugins.customtools.CustomTool/OWASP_ZAP/ZAP_2.11.0'])
             sh 'curl http://127.0.0.1:8090/JSON/pscan/action/disableScanners/?ids=10096'
-            sh 'HTTP_PROXY=\'127.0.0.1:8090\' newman run /var/lib/jenkins/iudx/gis/Newman/IUDX_GIS_Server_APIs_V3.5.postman_collection.json -e /home/ubuntu/configs/gis-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/gis/Newman/report/report.html --reporter-htmlextra-skipSensitiveData'
+            sh 'HTTP_PROXY=\'127.0.0.1:8090\' newman run /var/lib/jenkins/iudx/gis/Newman/IUDX_GIS_Server_APIs_V4.0.postman_collection.json -e /home/ubuntu/configs/gis-postman-env.json -n 2 --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/gis/Newman/report/report.html --reporter-htmlextra-skipSensitiveData'
             runZapAttack()
           }
         }
       }
       post{
         always{
-          node('master') {
+          node('built-in') {
             script{
               publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/gis/Newman/report/', reportFiles: 'report.html', reportName: 'HTML Report', reportTitles: '', reportName: 'Integration Test Report'])
-              archiveZap failHighAlerts: 1, failMediumAlerts: 1, failLowAlerts: 2
+              archiveZap failHighAlerts: 1, failMediumAlerts: 1, failLowAlerts: 1
             }  
           }
           script{
@@ -107,8 +107,8 @@ pipeline {
           steps {
             script {
               docker.withRegistry( registryUri, registryCredential ) {
-                devImage.push("4.0-alpha-${env.GIT_HASH}")
-                deplImage.push("4.0-alpha-${env.GIT_HASH}")
+                devImage.push("4.5.0-alpha-${env.GIT_HASH}")
+                deplImage.push("4.5.0-alpha-${env.GIT_HASH}")
               }
             }
           }
@@ -116,7 +116,7 @@ pipeline {
         stage('Docker Swarm deployment') {
           steps {
             script {
-              sh "ssh azureuser@docker-swarm 'docker service update gis_gis --image ghcr.io/datakaveri/gis-depl:4.0-alpha-${env.GIT_HASH}'"
+              sh "ssh azureuser@docker-swarm 'docker service update gis_gis --image ghcr.io/datakaveri/gis-depl:4.5.0-alpha-${env.GIT_HASH}'"
               sh 'sleep 10'
             }
           }
@@ -126,27 +126,27 @@ pipeline {
             }
           }
         }
-        // stage('Integration test on swarm deployment') {
-        //   steps {
-        //     node('master') {
-        //       script{
-        //         sh 'newman run /var/lib/jenkins/iudx/gis/Newman/IUDX_GIS_Server_APIs_V3.5.postman_collection.json -e /home/ubuntu/configs/cd/gis-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/gis/Newman/report/cd-report.html --reporter-htmlextra-skipSensitiveData'
-        //       }
-        //     }
-        //   }
-        //   post{
-        //     always{
-        //       node('master') {
-        //         script{
-        //           publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/gis/Newman/report/', reportFiles: 'cd-report.html', reportTitles: '', reportName: 'Docker-Swarm Integration Test Report'])
-        //         }
-        //       }
-        //     }
-        //     failure{
-        //       error "Test failure. Stopping pipeline execution!"
-        //     }
-        //   }
-        // }
+        stage('Integration test on swarm deployment') {
+          steps {
+            node('built-in') {
+              script{
+                sh 'newman run /var/lib/jenkins/iudx/gis/Newman/IUDX_GIS_Server_APIs_V4.0.postman_collection.json -e /home/ubuntu/configs/cd/gis-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/gis/Newman/report/cd-report.html --reporter-htmlextra-skipSensitiveData'
+              }
+            }
+          }
+          post{
+            always{
+              node('built-in') {
+                script{
+                  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/gis/Newman/report/', reportFiles: 'cd-report.html', reportTitles: '', reportName: 'Docker-Swarm Integration Test Report'])
+                }
+              }
+            }
+            failure{
+              error "Test failure. Stopping pipeline execution!"
+            }
+          }
+        }
       }
     }
   }
