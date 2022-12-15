@@ -14,7 +14,7 @@
       "verticleInstances": 2,
       "catServerHost": "",
       "catServerPort": 0,
-      "basePath": "/ngsi-ld/v1",
+      "ngsildBasePath": "/ngsi-ld/v1",
       "adminBasePath": "/admin/gis/serverInfo"
     },
     {

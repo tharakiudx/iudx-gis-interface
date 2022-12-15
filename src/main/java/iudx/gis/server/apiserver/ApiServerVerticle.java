@@ -99,6 +99,8 @@ public class ApiServerVerticle extends AbstractVerticle {
   // private DatabaseService database;
   private PostgresService postgresService;
   private AuthenticationService authenticator;
+  public static String ngsildBasePath;
+  public static String adminBasePath;
 
   @Override
   public void start() throws Exception {
@@ -117,6 +119,9 @@ public class ApiServerVerticle extends AbstractVerticle {
     allowedMethods.add(HttpMethod.POST);
     allowedMethods.add(HttpMethod.PATCH);
     allowedMethods.add(HttpMethod.PUT);
+
+    ngsildBasePath = config().getString("ngsildBasePath");
+    adminBasePath = config().getString("adminBasePath");
 
     router = Router.router(vertx);
     router
