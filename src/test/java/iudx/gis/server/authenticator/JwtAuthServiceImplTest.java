@@ -49,6 +49,8 @@ public class JwtAuthServiceImplTest {
   static void init(Vertx vertx, VertxTestContext testContext) {
     config = new Configuration();
     authConfig = config.configLoader(1, vertx);
+    authConfig.put("ngsildBasePath","/ngsi-ld/v1");
+    authConfig.put("adminBasePath","/admin/gis/serverInfo");
 
     authConfig.put("audience", "rs.iudx.io");
     authConfig.put("authServerHost", "authvertx.iudx.io");

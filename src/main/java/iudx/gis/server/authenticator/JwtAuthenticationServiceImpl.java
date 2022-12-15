@@ -53,6 +53,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   final String audience;
   final String iss;
   final CacheService cache;
+  final String adminBasePath;
   // resourceIdCache will contain info about resources available(& their ACL) in resource server.
   public Cache<String, String> resourceIdCache =
       CacheBuilder.newBuilder()
@@ -78,6 +79,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     this.port = config.getInteger("catServerPort");
     this.path = Constants.CAT_RSG_PATH;
     this.cache = cacheService;
+    this.adminBasePath = config.getString("adminBasePath");
     WebClientOptions options = new WebClientOptions();
     options.setTrustAll(true).setVerifyHost(false).setSsl(true);
     catWebClient = WebClient.create(vertx, options);
@@ -94,7 +96,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
     ResultContainer result = new ResultContainer();
     LOGGER.debug("endPoint " + endPoint);
-    if (endPoint != null && endPoint.equals(ADMIN_BASE_PATH)) {
+    if (endPoint != null && endPoint.equals(adminBasePath)) {
       jwtDecodeFuture
           .compose(
               decodeHandler -> {
