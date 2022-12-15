@@ -2,37 +2,7 @@ package iudx.gis.server.apiserver;
 
 import static iudx.gis.server.apiserver.response.ResponseUrn.BACKING_SERVICE_FORMAT;
 import static iudx.gis.server.apiserver.response.ResponseUrn.YET_NOT_IMPLEMENTED;
-import static iudx.gis.server.apiserver.util.Constants.ADMIN_BASE_PATH;
-import static iudx.gis.server.apiserver.util.Constants.API;
-import static iudx.gis.server.apiserver.util.Constants.API_ENDPOINT;
-import static iudx.gis.server.apiserver.util.Constants.APPLICATION_JSON;
-import static iudx.gis.server.apiserver.util.Constants.CONTENT_TYPE;
-import static iudx.gis.server.apiserver.util.Constants.EPOCH_TIME;
-import static iudx.gis.server.apiserver.util.Constants.ERROR_MESSAGE;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_ACCEPT;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_ALLOW_ORIGIN;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_CONTENT_LENGTH;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_CONTENT_TYPE;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_HOST;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_ORIGIN;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_REFERER;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_TOKEN;
-import static iudx.gis.server.apiserver.util.Constants.ID;
-import static iudx.gis.server.apiserver.util.Constants.IID;
-import static iudx.gis.server.apiserver.util.Constants.ISO_TIME;
-import static iudx.gis.server.apiserver.util.Constants.JSON_DETAIL;
-import static iudx.gis.server.apiserver.util.Constants.JSON_RESULT;
-import static iudx.gis.server.apiserver.util.Constants.JSON_TITLE;
-import static iudx.gis.server.apiserver.util.Constants.JSON_TYPE;
-import static iudx.gis.server.apiserver.util.Constants.MIME_APPLICATION_JSON;
-import static iudx.gis.server.apiserver.util.Constants.MIME_TEXT_HTML;
-import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_ID;
-import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_IDPATTERN;
-import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
-import static iudx.gis.server.apiserver.util.Constants.RESPONSE_SIZE;
-import static iudx.gis.server.apiserver.util.Constants.ROUTE_DOC;
-import static iudx.gis.server.apiserver.util.Constants.ROUTE_STATIC_SPEC;
-import static iudx.gis.server.apiserver.util.Constants.USER_ID;
+import static iudx.gis.server.apiserver.util.Constants.*;
 import static iudx.gis.server.common.Constants.AUTHENTICATION_SERVICE_ADDRESS;
 import static iudx.gis.server.common.Constants.METERING_SERVICE_ADDRESS;
 import static iudx.gis.server.common.Constants.PG_SERVICE_ADDRESS;
@@ -194,7 +164,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .get(NGSILD_ENTITIES_URL)
         .handler(entityQueryValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx,config()))
         .handler(this::handleEntitiesQuery)
         .failureHandler(validationsFailureHandler);
 
@@ -207,21 +177,21 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(ADMIN_BASE_PATH)
         .handler(adminCrudPathValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx,config()))
         .handler(this::handlePostAdminPath)
         .failureHandler(validationsFailureHandler);
 
     router
         .put(ADMIN_BASE_PATH)
         .handler(adminCrudPathValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx,config()))
         .handler(this::handlePutAdminPath)
         .failureHandler(validationsFailureHandler);
 
     router
         .delete(ADMIN_BASE_PATH)
         .handler(adminCrudPathIdValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx,config()))
         .handler(this::handleDeleteAdminPath)
         .failureHandler(validationsFailureHandler);
     router

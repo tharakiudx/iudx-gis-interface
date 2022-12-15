@@ -24,11 +24,15 @@
       "authServerHost": "",
       "catServerHost": "",
       "catServerPort": 0,
-      "jwtIgnoreExpiry": true
+      "jwtIgnoreExpiry": true,
+      "ngsildBasePath": "/ngsi-ld/v1",
+      "adminBasePath": "/admin/gis/serverInfo"
     },
     {
       "id": "iudx.gis.server.metering.MeteringVerticle",
-      "verticleInstances": 1
+      "verticleInstances": 1,
+      "ngsildBasePath": "/ngsi-ld/v1",
+      "adminBasePath": "/admin/gis/serverInfo"
     },
     {
       "id": "iudx.gis.server.database.postgres.PostgresVerticle",
@@ -38,7 +42,9 @@
       "databaseName": "",
       "databaseUserName": "",
       "databasePassword": "",
-      "poolSize": 25
+      "poolSize": 25,
+      "ngsildBasePath": "/ngsi-ld/v1",
+      "adminBasePath": "/admin/gis/serverInfo"
     },
     {
       "id": "iudx.gis.server.databroker.DataBrokerVerticle",
@@ -55,11 +61,15 @@
       "automaticRecoveryEnabled": true,
       "prodVhost": "",
       "internalVhost": "",
-      "externalVhost": ""
+      "externalVhost": "",
+      "ngsildBasePath": "/ngsi-ld/v1",
+      "adminBasePath": "/admin/gis/serverInfo"
     },
     {
       "id": "iudx.gis.server.cache.CacheVerticle",
-      "verticleInstances": 1
+      "verticleInstances": 1,
+      "ngsildBasePath": "/ngsi-ld/v1",
+      "adminBasePath": "/admin/gis/serverInfo"
     }
   ]
 }

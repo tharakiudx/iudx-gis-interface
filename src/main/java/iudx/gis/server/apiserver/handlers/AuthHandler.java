@@ -2,21 +2,7 @@ package iudx.gis.server.apiserver.handlers;
 
 import static iudx.gis.server.apiserver.response.ResponseUrn.INVALID_TOKEN;
 import static iudx.gis.server.apiserver.response.ResponseUrn.RESOURCE_NOT_FOUND;
-import static iudx.gis.server.apiserver.util.Constants.ADMIN_BASE_PATH;
-import static iudx.gis.server.apiserver.util.Constants.API_ENDPOINT;
-import static iudx.gis.server.apiserver.util.Constants.API_METHOD;
-import static iudx.gis.server.apiserver.util.Constants.APPLICATION_JSON;
-import static iudx.gis.server.apiserver.util.Constants.AUTH_INFO;
-import static iudx.gis.server.apiserver.util.Constants.CONTENT_TYPE;
-import static iudx.gis.server.apiserver.util.Constants.EXPIRY;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_TOKEN;
-import static iudx.gis.server.apiserver.util.Constants.ID;
-import static iudx.gis.server.apiserver.util.Constants.IID;
-import static iudx.gis.server.apiserver.util.Constants.JSON_DETAIL;
-import static iudx.gis.server.apiserver.util.Constants.JSON_TITLE;
-import static iudx.gis.server.apiserver.util.Constants.JSON_TYPE;
-import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
-import static iudx.gis.server.apiserver.util.Constants.USER_ID;
+import static iudx.gis.server.apiserver.util.Constants.*;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -35,9 +21,13 @@ public class AuthHandler implements Handler<RoutingContext> {
   private static final Logger LOGGER = LogManager.getLogger(AuthHandler.class);
   static AuthenticationService authenticator;
   private HttpServerRequest request;
+  private static String ngsildBasePath;
+  private static String adminBasePath;
 
-  public static AuthHandler create(Vertx vertx) {
+  public static AuthHandler create(Vertx vertx, JsonObject config) {
     authenticator = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
+    ngsildBasePath = config.getString("ngsildBasePath");
+    adminBasePath = config.getString("adminBasePath");
     return new AuthHandler();
   }
 
@@ -115,8 +105,8 @@ public class AuthHandler implements Handler<RoutingContext> {
   public String getNormalizedPath(String url) {
     LOGGER.debug("URL : {}", url);
     String path = null;
-    if (url.matches(NGSILD_ENTITIES_URL)) path = NGSILD_ENTITIES_URL;
-    else if (url.matches(ADMIN_BASE_PATH)) path = ADMIN_BASE_PATH;
+    if (url.matches(ngsildBasePath + ENTITIES_URL)) path =  ngsildBasePath + ENTITIES_URL;
+    else if (url.matches(adminBasePath)) path = adminBasePath;
     return path;
   }
 

@@ -57,6 +57,8 @@ public class AuthHandlerTest {
   @Mock
   Future<Void> voidFuture;
 
+  private static String ngsildBasePath;
+  private static String adminBasePath;
   @BeforeEach
   public void setUp(VertxTestContext vertxTestContext, Vertx vertx) {
     //authHandler = AuthHandler.create(vertx);
@@ -66,8 +68,13 @@ public class AuthHandlerTest {
     jsonObject.put("IID", "Dummy IID value");
     jsonObject.put("USER_ID", "Dummy USER_ID");
     jsonObject.put("EXPIRY", "Dummy EXPIRY");
+    jsonObject.put("ngsildBasePath","/ngsi-ld/v1");
+    jsonObject.put("adminBasePath","/admin/gis/serverInfo");
+    ngsildBasePath = "/ngsi-ld/v1";
+    adminBasePath = "/admin/gis/serverInfo";
     //lenient().doReturn(httpServerRequest).when(routingContextMock).request();
     //lenient().doReturn(httpServerResponse).when(routingContextMock).response();
+
 
     lenient().when(httpServerRequest.method()).thenReturn(httpMethodMock);
     lenient().when(httpMethodMock.toString()).thenReturn("GET");
@@ -227,17 +234,18 @@ public class AuthHandlerTest {
 
   @Test
   public void getNormalizedPathTest(VertxTestContext vertxTestContext) {
-    String authString = authHandler.getNormalizedPath(NGSILD_ENTITIES_URL);
-    assertEquals(authString, NGSILD_ENTITIES_URL);
-    String authString2 = authHandler.getNormalizedPath(ADMIN_BASE_PATH);
-    assertEquals(authString2, ADMIN_BASE_PATH);
+    AuthHandler.create(Vertx.vertx(),jsonObject);
+    String authString = authHandler.getNormalizedPath(ngsildBasePath + ENTITIES_URL);
+    assertEquals(authString, ngsildBasePath + ENTITIES_URL);
+    String authString2 = authHandler.getNormalizedPath(adminBasePath);
+    assertEquals(authString2, adminBasePath);
     vertxTestContext.completeNow();
   }
 
   @Test
   @DisplayName("Test static method: create")
   public void testCreate(VertxTestContext vertxTestContext) {
-    AuthHandler res = AuthHandler.create(Vertx.vertx());
+    AuthHandler res = AuthHandler.create(Vertx.vertx(),jsonObject);
     assertNotNull(res);
     vertxTestContext.completeNow();
   }
