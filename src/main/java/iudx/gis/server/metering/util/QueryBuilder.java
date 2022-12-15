@@ -11,30 +11,22 @@ import static iudx.gis.server.metering.util.Constants.PRIMARY_KEY;
 import static iudx.gis.server.metering.util.Constants.PROVIDER_ID;
 import static iudx.gis.server.metering.util.Constants.USER_ID;
 
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import java.util.UUID;
-
-import iudx.gis.server.configuration.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class QueryBuilder {
 
   private static final Logger LOGGER = LogManager.getLogger(QueryBuilder.class);
-  private static Configuration config;
-  private static JsonObject configJson;
-  private static String adminBasePath;
+
   public JsonObject buildMessageForRMQ(JsonObject request) {
-    config = new Configuration();
-    configJson = config.configLoader(0, Vertx.vertx());
-    adminBasePath = configJson.getString("adminBasePath");
     String primaryKey = UUID.randomUUID().toString().replace("-", "");
     String api = request.getString(API);
     String resourceId =
-        api.equals(adminBasePath) ? request.getString(IID) : request.getString(ID);
+        api.equals(ADMIN_BASE_PATH) ? request.getString(IID) : request.getString(ID);
     String providerID =
-        api.equals(adminBasePath)
+        api.equals(ADMIN_BASE_PATH)
             ? ADMIN
             : resourceId.substring(0, resourceId.indexOf('/', resourceId.indexOf('/') + 1));
     request.remove(IID);

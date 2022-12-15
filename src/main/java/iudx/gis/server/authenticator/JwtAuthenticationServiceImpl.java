@@ -37,8 +37,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-
-import iudx.gis.server.configuration.Configuration;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,9 +52,6 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   final String path;
   final String audience;
   final String iss;
-  final String adminBasePath;
-  final Configuration configuration;
-  final JsonObject jsonObjectConfig;
   final CacheService cache;
   // resourceIdCache will contain info about resources available(& their ACL) in resource server.
   public Cache<String, String> resourceIdCache =
@@ -82,9 +77,6 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     this.host = config.getString("catServerHost");
     this.port = config.getInteger("catServerPort");
     this.path = Constants.CAT_RSG_PATH;
-    this.configuration = new Configuration();
-    this.jsonObjectConfig = configuration.configLoader(0,vertx);
-    this.adminBasePath = jsonObjectConfig.getString("adminBasePath");
     this.cache = cacheService;
     WebClientOptions options = new WebClientOptions();
     options.setTrustAll(true).setVerifyHost(false).setSsl(true);
@@ -102,7 +94,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
     ResultContainer result = new ResultContainer();
     LOGGER.debug("endPoint " + endPoint);
-    if (endPoint != null && endPoint.equals(adminBasePath)) {
+    if (endPoint != null && endPoint.equals(ADMIN_BASE_PATH)) {
       jwtDecodeFuture
           .compose(
               decodeHandler -> {
