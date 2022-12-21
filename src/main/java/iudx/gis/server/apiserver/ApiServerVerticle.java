@@ -19,6 +19,7 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.JksOptions;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -33,6 +34,7 @@ import iudx.gis.server.apiserver.service.CatalogueService;
 import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.apiserver.util.RequestType;
 import iudx.gis.server.authenticator.AuthenticationService;
+import iudx.gis.server.common.Api;
 import iudx.gis.server.database.postgres.PostgresService;
 import iudx.gis.server.metering.MeteringService;
 import java.time.ZoneId;
@@ -69,7 +71,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   // private DatabaseService database;
   private PostgresService postgresService;
   private AuthenticationService authenticator;
-  public static String ngsildBasePath;
+  public static String dxApiBasePath;
   public static String adminBasePath;
 
   @Override
@@ -90,8 +92,9 @@ public class ApiServerVerticle extends AbstractVerticle {
     allowedMethods.add(HttpMethod.PATCH);
     allowedMethods.add(HttpMethod.PUT);
 
-    ngsildBasePath = config().getString("ngsildBasePath");
+    dxApiBasePath = config().getString("dxApiBasePath");
     adminBasePath = config().getString("adminBasePath");
+    Api api = new Api(dxApiBasePath,adminBasePath);
 
     router = Router.router(vertx);
     router
@@ -162,7 +165,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationFailureHandler validationsFailureHandler = new ValidationFailureHandler();
 
     router
-        .get(NGSILD_ENTITIES_URL)
+        .get(api.getEntitiesEndpoint())
         .handler(entityQueryValidationHandler)
         .handler(AuthHandler.create(vertx,config()))
         .handler(this::handleEntitiesQuery)
@@ -175,21 +178,21 @@ public class ApiServerVerticle extends AbstractVerticle {
         new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH_DELETE);
 
     router
-        .post(ADMIN_BASE_PATH)
+        .post(adminBasePath)
         .handler(adminCrudPathValidationHandler)
         .handler(AuthHandler.create(vertx,config()))
         .handler(this::handlePostAdminPath)
         .failureHandler(validationsFailureHandler);
 
     router
-        .put(ADMIN_BASE_PATH)
+        .put(adminBasePath)
         .handler(adminCrudPathValidationHandler)
         .handler(AuthHandler.create(vertx,config()))
         .handler(this::handlePutAdminPath)
         .failureHandler(validationsFailureHandler);
 
     router
-        .delete(ADMIN_BASE_PATH)
+        .delete(adminBasePath)
         .handler(adminCrudPathIdValidationHandler)
         .handler(AuthHandler.create(vertx,config()))
         .handler(this::handleDeleteAdminPath)
@@ -225,8 +228,18 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
 
     catalogueService = new CatalogueService(vertx, config());
-  }
 
+    /* Print the deployed endpoints */
+    printDeployedEndpoints(router);
+
+  }
+  private void printDeployedEndpoints(Router router) {
+    for(Route route:router.getRoutes()) {
+      if(route.getPath() != null) {
+        LOGGER.info("API Endpoints deployed : " + route.methods() + " : " + route.getPath());
+      }
+    }
+  }
   private void handleDeleteAdminPath(RoutingContext routingContext) {
     LOGGER.trace("Info:handleDeleteAdminPath method started.;");
     HttpServerResponse response = routingContext.response();

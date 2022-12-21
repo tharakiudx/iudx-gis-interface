@@ -12,6 +12,7 @@ import io.vertx.ext.web.RoutingContext;
 import iudx.gis.server.apiserver.response.ResponseUrn;
 import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.authenticator.AuthenticationService;
+import iudx.gis.server.common.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,13 +22,15 @@ public class AuthHandler implements Handler<RoutingContext> {
   private static final Logger LOGGER = LogManager.getLogger(AuthHandler.class);
   static AuthenticationService authenticator;
   private HttpServerRequest request;
-  private static String ngsildBasePath;
+  private static String dxApiBasePath;
   private static String adminBasePath;
+  private static Api api;
 
   public static AuthHandler create(Vertx vertx, JsonObject config) {
     authenticator = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
-    ngsildBasePath = config.getString("ngsildBasePath");
+    dxApiBasePath = config.getString("dxApiBasePath");
     adminBasePath = config.getString("adminBasePath");
+    api = new Api(dxApiBasePath,adminBasePath);
     return new AuthHandler();
   }
 
@@ -105,7 +108,7 @@ public class AuthHandler implements Handler<RoutingContext> {
   public String getNormalizedPath(String url) {
     LOGGER.debug("URL : {}", url);
     String path = null;
-    if (url.matches(ngsildBasePath + ENTITIES_URL)) path =  ngsildBasePath + ENTITIES_URL;
+    if (url.matches(api.getEntitiesEndpoint())) path =  api.getEntitiesEndpoint();
     else if (url.matches(adminBasePath)) path = adminBasePath;
     return path;
   }

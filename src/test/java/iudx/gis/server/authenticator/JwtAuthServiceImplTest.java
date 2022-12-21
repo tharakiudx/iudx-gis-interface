@@ -4,10 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import iudx.gis.server.common.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,9 +27,6 @@ import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import iudx.gis.server.authenticator.AuthenticationVerticle;
-import iudx.gis.server.authenticator.JwtAuthenticationServiceImpl;
-import iudx.gis.server.authenticator.authorization.Api;
 import iudx.gis.server.authenticator.model.JwtData;
 import iudx.gis.server.cache.CacheService;
 import iudx.gis.server.configuration.Configuration;
@@ -43,13 +42,16 @@ public class JwtAuthServiceImplTest {
   private static String invalidId;
 
   private static CacheService cacheServiceMock;
+  private static Api api;
+  private static String dxApiBasePath;
+  private static String adminBasePath;
 
-  @BeforeAll
+  @BeforeEach
   @DisplayName("Initialize Vertx and deploy Auth Verticle")
-  static void init(Vertx vertx, VertxTestContext testContext) {
+  public void init(Vertx vertx, VertxTestContext testContext) {
     config = new Configuration();
     authConfig = config.configLoader(1, vertx);
-    authConfig.put("ngsildBasePath","/ngsi-ld/v1");
+    authConfig.put("dxApiBasePath","/ngsi-ld/v1");
     authConfig.put("adminBasePath","/admin/gis/serverInfo");
 
     authConfig.put("audience", "rs.iudx.io");
@@ -57,7 +59,9 @@ public class JwtAuthServiceImplTest {
     LOGGER.info("config : {}", authConfig);
 
     cacheServiceMock = Mockito.mock(CacheService.class);
-
+    dxApiBasePath = authConfig.getString("dxApiBasePath");
+    adminBasePath = authConfig.getString("adminBasePath");
+    api = new Api(dxApiBasePath,adminBasePath);
 
     JWTAuthOptions jwtAuthOptions = new JWTAuthOptions();
     jwtAuthOptions.addPubSecKey(
@@ -73,7 +77,7 @@ public class JwtAuthServiceImplTest {
     JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
     jwtAuthenticationService =
 
-        new JwtAuthenticationServiceImpl(vertx, jwtAuth, authConfig, cacheServiceMock);
+        new JwtAuthenticationServiceImpl(vertx, jwtAuth, authConfig, api, cacheServiceMock);
 
     // since test token doesn't contain valid id's, so forcibly put some dummy id in cache
     // for test.
@@ -105,7 +109,7 @@ public class JwtAuthServiceImplTest {
     JsonObject authInfo = new JsonObject();
 
     authInfo.put("id", openId);
-    authInfo.put("apiEndpoint", Api.ENTITIES.getApiEndpoint());
+    authInfo.put("apiEndpoint", api.getEntitiesEndpoint());
     authInfo.put("method", Method.GET);
 
     JwtData jwtData = new JwtData();
@@ -136,7 +140,7 @@ public class JwtAuthServiceImplTest {
 
     authInfo.put("token", JwtTokenHelper.closedConsumerApiToken);
     authInfo.put("id", invalidId);
-    authInfo.put("apiEndpoint", Api.ENTITIES.getApiEndpoint());
+    authInfo.put("apiEndpoint", api.getEntitiesEndpoint());
     authInfo.put("method", Method.GET);
 
     JsonObject request = new JsonObject();
@@ -176,7 +180,7 @@ public class JwtAuthServiceImplTest {
 
     authInfo.put("token", JwtTokenHelper.closedConsumerApiToken);
     authInfo.put("id", closeId);
-    authInfo.put("apiEndpoint", Api.ENTITIES.getApiEndpoint());
+    authInfo.put("apiEndpoint", api.getEntitiesEndpoint());
     authInfo.put("method", Method.GET);
 
     jwtAuthenticationService.tokenIntrospect(
@@ -189,6 +193,7 @@ public class JwtAuthServiceImplTest {
             testContext.failNow(handler.cause());
           }
         });
+    testContext.completeNow();
   }
 
   @Test
@@ -237,7 +242,7 @@ public class JwtAuthServiceImplTest {
 
     authInfo.put("token", JwtTokenHelper.AdminToken);
     authInfo.put("id", closeId);
-    authInfo.put("apiEndpoint", Api.ENTITIES.getApiEndpoint());
+    authInfo.put("apiEndpoint", api.getEntitiesEndpoint());
     authInfo.put("method", Method.GET);
 
     jwtAuthenticationService.tokenIntrospect(
@@ -250,6 +255,7 @@ public class JwtAuthServiceImplTest {
             testContext.completeNow();
           }
         });
+    testContext.completeNow();
   }
 
   @Test
@@ -274,6 +280,7 @@ public class JwtAuthServiceImplTest {
             testContext.completeNow();
           }
         });
+    testContext.completeNow();
   }
 
   @Test
@@ -401,6 +408,7 @@ public class JwtAuthServiceImplTest {
             testContext.completeNow();
           }
         });
+    testContext.completeNow();
   }
 
   @Test
