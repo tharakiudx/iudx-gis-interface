@@ -4,6 +4,10 @@
     "zookeeper"
   ],
   "clusterId": "",
+  "commonConfig" : {
+    "dxApiBasePath": "/ngsi-ld/v1",
+    "adminBasePath": "/admin/gis/serverInfo"
+  },
   "modules": [
     {
       "id": "iudx.gis.server.apiserver.ApiServerVerticle",
@@ -13,9 +17,7 @@
       "keystorePassword": "",
       "verticleInstances": 2,
       "catServerHost": "",
-      "catServerPort": 0,
-      "ngsildBasePath": "/ngsi-ld/v1",
-      "adminBasePath": "/admin/gis/serverInfo"
+      "catServerPort": 0
     },
     {
       "id": "iudx.gis.server.authenticator.AuthenticationVerticle",
@@ -24,15 +26,11 @@
       "authServerHost": "",
       "catServerHost": "",
       "catServerPort": 0,
-      "jwtIgnoreExpiry": true,
-      "ngsildBasePath": "/ngsi-ld/v1",
-      "adminBasePath": "/admin/gis/serverInfo"
+      "jwtIgnoreExpiry": true
     },
     {
       "id": "iudx.gis.server.metering.MeteringVerticle",
-      "verticleInstances": 1,
-      "ngsildBasePath": "/ngsi-ld/v1",
-      "adminBasePath": "/admin/gis/serverInfo"
+      "verticleInstances": 1
     },
     {
       "id": "iudx.gis.server.database.postgres.PostgresVerticle",
@@ -42,9 +40,7 @@
       "databaseName": "",
       "databaseUserName": "",
       "databasePassword": "",
-      "poolSize": 25,
-      "ngsildBasePath": "/ngsi-ld/v1",
-      "adminBasePath": "/admin/gis/serverInfo"
+      "poolSize": 25
     },
     {
       "id": "iudx.gis.server.databroker.DataBrokerVerticle",
@@ -61,15 +57,11 @@
       "automaticRecoveryEnabled": true,
       "prodVhost": "",
       "internalVhost": "",
-      "externalVhost": "",
-      "ngsildBasePath": "/ngsi-ld/v1",
-      "adminBasePath": "/admin/gis/serverInfo"
+      "externalVhost": ""
     },
     {
       "id": "iudx.gis.server.cache.CacheVerticle",
-      "verticleInstances": 1,
-      "ngsildBasePath": "/ngsi-ld/v1",
-      "adminBasePath": "/admin/gis/serverInfo"
+      "verticleInstances": 1
     }
   ]
 }
