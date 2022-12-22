@@ -29,16 +29,21 @@ import java.util.Arrays;
 public class DeployerDev {
   private static final Logger LOGGER = LogManager.getLogger(DeployerDev.class);
 
+  private static JsonObject getConfigForModule(int moduleIndex,JsonObject configurations) {
+    JsonObject commonConfigs=configurations.getJsonObject("commonConfig");
+    JsonObject config = configurations.getJsonArray("modules").getJsonObject(moduleIndex);
+    return config.mergeIn(commonConfigs, true);
+  }
   public static void recursiveDeploy(Vertx vertx, JsonObject configs, int i) {
     if (i >= configs.getJsonArray("modules").size()) {
       LOGGER.info("Deployed all");
       return;
     }
-    JsonObject config = configs.getJsonArray("modules").getJsonObject(i);
-    String moduleName = config.getString("id");
-    int numInstances = config.getInteger("verticleInstances");
+    JsonObject moduleConfiguration = getConfigForModule(i, configs);
+    String moduleName = moduleConfiguration.getString("id");
+    int numInstances = moduleConfiguration.getInteger("verticleInstances");
     vertx.deployVerticle(moduleName,
-        new DeploymentOptions().setInstances(numInstances).setConfig(config), ar -> {
+        new DeploymentOptions().setInstances(numInstances).setConfig(moduleConfiguration), ar -> {
           if (ar.succeeded()) {
             LOGGER.info("Deployed " + moduleName);
             recursiveDeploy(vertx, configs, i + 1);

@@ -19,14 +19,18 @@ import org.apache.logging.log4j.Logger;
 public class QueryBuilder {
 
   private static final Logger LOGGER = LogManager.getLogger(QueryBuilder.class);
+  private static String adminBasePath;
 
-  public JsonObject buildMessageForRMQ(JsonObject request) {
+  public JsonObject buildMessageForRMQ(JsonObject request, JsonObject config) {
     String primaryKey = UUID.randomUUID().toString().replace("-", "");
     String api = request.getString(API);
+
+    adminBasePath = config.getString("adminBasePath");
+
     String resourceId =
-        api.equals(ADMIN_BASE_PATH) ? request.getString(IID) : request.getString(ID);
+        api.equals(adminBasePath) ? request.getString(IID) : request.getString(ID);
     String providerID =
-        api.equals(ADMIN_BASE_PATH)
+        api.equals(adminBasePath)
             ? ADMIN
             : resourceId.substring(0, resourceId.indexOf('/', resourceId.indexOf('/') + 1));
     request.remove(IID);

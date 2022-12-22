@@ -21,17 +21,18 @@ public class MeteringServiceImpl implements MeteringService {
   private final QueryBuilder queryBuilder = new QueryBuilder();
   private final DataBrokerService dataBrokerService;
   private final ObjectMapper objectMapper = new ObjectMapper();
+  private JsonObject config;
 
-  public MeteringServiceImpl(DataBrokerService dataBrokerService) {
-
+  public MeteringServiceImpl(DataBrokerService dataBrokerService, JsonObject config) {
     this.dataBrokerService = dataBrokerService;
+    this.config = config;
   }
 
   @Override
   public MeteringService insertMeteringValuesInRMQ(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    JsonObject writeMessage = queryBuilder.buildMessageForRMQ(request);
+    JsonObject writeMessage = queryBuilder.buildMessageForRMQ(request,config);
 
     dataBrokerService.publishMessage(
         writeMessage,

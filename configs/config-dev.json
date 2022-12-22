@@ -4,6 +4,10 @@
     "zookeeper"
   ],
   "clusterId": "",
+  "commonConfig" : {
+    "dxApiBasePath": "/ngsi-ld/v1",
+    "adminBasePath": "/admin/gis/serverInfo"
+  },
   "modules": [
     {
       "id": "iudx.gis.server.apiserver.ApiServerVerticle",
