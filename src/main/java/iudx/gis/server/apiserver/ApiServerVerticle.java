@@ -71,8 +71,8 @@ public class ApiServerVerticle extends AbstractVerticle {
   // private DatabaseService database;
   private PostgresService postgresService;
   private AuthenticationService authenticator;
-  public static String dxApiBasePath;
-  public static String adminBasePath;
+  public String dxApiBasePath;
+  public String adminBasePath;
 
   @Override
   public void start() throws Exception {

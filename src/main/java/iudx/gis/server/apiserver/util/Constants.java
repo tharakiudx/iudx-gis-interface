@@ -1,6 +1,5 @@
 package iudx.gis.server.apiserver.util;
 
-import iudx.gis.server.apiserver.ApiServerVerticle;
 
 public class Constants {
   public static final String API_ENDPOINT = "apiEndpoint";
@@ -15,8 +14,6 @@ public class Constants {
   // path regex
   public static final String ENTITITES_URL_REGEX = NGSILD_ENTITIES_URL + "(.*)";
 
-  // admin API endpoints
-  public static final String ADMIN_BASE_PATH = ApiServerVerticle.adminBasePath;
   /** API Documentation endpoint */
   public static final String ROUTE_STATIC_SPEC = "/apis/spec";
 
