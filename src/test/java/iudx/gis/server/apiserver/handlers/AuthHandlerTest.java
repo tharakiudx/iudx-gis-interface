@@ -8,10 +8,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import iudx.gis.server.apiserver.handlers.AuthHandler;
-import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.authenticator.AuthenticationService;
-import iudx.gis.server.authenticator.Constants;
 import iudx.gis.server.common.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,15 +17,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static iudx.gis.server.apiserver.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -74,7 +66,7 @@ public class AuthHandlerTest {
     jsonObject.put("adminBasePath","/admin/gis/serverInfo");
     dxApiBasePath = "/ngsi-ld/v1";
     adminBasePath = "/admin/gis/serverInfo";
-    api = new Api(dxApiBasePath,adminBasePath);
+    api = Api.getInstance(dxApiBasePath,adminBasePath);
     //lenient().doReturn(httpServerRequest).when(routingContextMock).request();
     //lenient().doReturn(httpServerResponse).when(routingContextMock).response();
 
@@ -95,7 +87,7 @@ public class AuthHandlerTest {
 
     //when(routingContextMock.request()).thenReturn(httpServerRequest);
     when(routingContextMock.getBodyAsJson()).thenReturn(jsonObject);
-    when(httpServerRequest.path()).thenReturn(api.getEntitesRegex());
+    when(httpServerRequest.path()).thenReturn(api.getEntitiesRegex());
     //doReturn(NGSILD_ENTITIES_URL).when(httpServerRequest).path();
 
     AuthHandler.authenticator = mock(AuthenticationService.class);
@@ -136,7 +128,7 @@ public class AuthHandlerTest {
   public void testHandleFail(VertxTestContext vertxTestContext) {
     //JsonObject jsonObjectMock = new JsonObject().put("id", "iddd");
     authHandler = new AuthHandler();
-    String str = api.getEntitesRegex();
+    String str = api.getEntitiesRegex();
     JsonObject jsonObject = new JsonObject();
     jsonObject.put("Dummy Key", "Dummy Value");
 

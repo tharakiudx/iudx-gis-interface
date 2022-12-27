@@ -19,11 +19,27 @@ public class ConsumerAuthStrategy implements AuthorizationStrategy {
 
   static Map<String, List<AuthorizationRequest>> consumerAuthorizationRules = new HashMap<>();
   static Api api;
-  public ConsumerAuthStrategy(Api apis)
+  private static volatile ConsumerAuthStrategy instance;
+  private ConsumerAuthStrategy(Api apis)
   {
     api = apis;
     buildPermissions(api);
   }
+
+  public static ConsumerAuthStrategy getInstance(Api apis) {
+    if (instance == null)
+    {
+      synchronized (ConsumerAuthStrategy.class)
+      {
+        if (instance == null)
+        {
+          instance = new ConsumerAuthStrategy(apis);
+        }
+      }
+    }
+    return instance;
+  }
+
   private void buildPermissions(Api api) {
     // api access list/rules
     List<AuthorizationRequest> apiAccessList = new ArrayList<>();

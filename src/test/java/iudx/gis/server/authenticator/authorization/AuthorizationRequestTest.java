@@ -23,7 +23,7 @@ public class AuthorizationRequestTest {
     {
         dxApiBasePath = "/ngsi-ld/v1";
         adminBasePath = "/admin/gis/serverInfo";
-        api = new Api(dxApiBasePath,adminBasePath);
+        api = Api.getInstance(dxApiBasePath,adminBasePath);
         vertxTestContext.completeNow();
     }
     @Test

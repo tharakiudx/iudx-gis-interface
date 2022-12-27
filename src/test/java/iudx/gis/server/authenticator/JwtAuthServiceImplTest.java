@@ -61,7 +61,7 @@ public class JwtAuthServiceImplTest {
     cacheServiceMock = Mockito.mock(CacheService.class);
     dxApiBasePath = authConfig.getString("dxApiBasePath");
     adminBasePath = authConfig.getString("adminBasePath");
-    api = new Api(dxApiBasePath,adminBasePath);
+    api = Api.getInstance(dxApiBasePath,adminBasePath);
 
     JWTAuthOptions jwtAuthOptions = new JWTAuthOptions();
     jwtAuthOptions.addPubSecKey(
