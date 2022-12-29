@@ -13,7 +13,7 @@ public class AuthorizationContextFactory {
     }
     switch (role) {
       case CONSUMER: {
-        return new ConsumerAuthStrategy(api);
+        return ConsumerAuthStrategy.getInstance(api);
       }
       default:
         throw new IllegalArgumentException(role + "invalid role.");

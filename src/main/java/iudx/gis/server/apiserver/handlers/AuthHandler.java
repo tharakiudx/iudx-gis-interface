@@ -30,7 +30,7 @@ public class AuthHandler implements Handler<RoutingContext> {
     authenticator = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
     dxApiBasePath = config.getString("dxApiBasePath");
     adminBasePath = config.getString("adminBasePath");
-    api = new Api(dxApiBasePath,adminBasePath);
+    api = Api.getInstance(dxApiBasePath,adminBasePath);
     return new AuthHandler();
   }
 
