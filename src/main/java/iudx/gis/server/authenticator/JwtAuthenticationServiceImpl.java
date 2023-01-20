@@ -98,7 +98,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
     ResultContainer result = new ResultContainer();
     LOGGER.debug("endPoint " + endPoint);
-    if (endPoint != null && endPoint.equals(adminBasePath)) {
+    if (endPoint != null && endPoint.equals(api.getAdminPath())) {
       jwtDecodeFuture
           .compose(
               decodeHandler -> {

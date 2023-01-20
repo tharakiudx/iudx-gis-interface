@@ -63,9 +63,9 @@ public class AuthHandlerTest {
     jsonObject.put("USER_ID", "Dummy USER_ID");
     jsonObject.put("EXPIRY", "Dummy EXPIRY");
     jsonObject.put("dxApiBasePath","/ngsi-ld/v1");
-    jsonObject.put("adminBasePath","/admin/gis/serverInfo");
+    jsonObject.put("adminBasePath","/admin/gis");
     dxApiBasePath = "/ngsi-ld/v1";
-    adminBasePath = "/admin/gis/serverInfo";
+    adminBasePath = "/admin/gis";
     api = Api.getInstance(dxApiBasePath,adminBasePath);
     //lenient().doReturn(httpServerRequest).when(routingContextMock).request();
     //lenient().doReturn(httpServerResponse).when(routingContextMock).response();
@@ -232,8 +232,8 @@ public class AuthHandlerTest {
     AuthHandler.create(Vertx.vertx(),jsonObject);
     String authString = authHandler.getNormalizedPath(api.getEntitiesEndpoint());
     assertEquals(authString,api.getEntitiesEndpoint());
-    String authString2 = authHandler.getNormalizedPath(adminBasePath);
-    assertEquals(authString2, adminBasePath);
+    String authString2 = authHandler.getNormalizedPath(api.getAdminPath());
+    assertEquals(authString2, api.getAdminPath());
     vertxTestContext.completeNow();
   }
 
