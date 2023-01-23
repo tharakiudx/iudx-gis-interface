@@ -13,15 +13,34 @@ consumes:
   - "text/plain"
 
 info:
-  title: "DX GIS Interface APIs"
+  title: "Data Exchange GIS Interface APIs"
   version: 4.0.0
+  x-logo:
+    url: "https://iudx.org.in/wp-content/uploads/2020/12/iudx-ideal.png"
+    backgroundColor: "#FFFFFF"
+    altText: "IUDX logo"
   description: |
     # Introduction
     
     The GIS interface is a resource server which defines the interactions between the consumers interested in GIS data and the upstream GIS Servers.
-    It allows data *admins* to publish gis related info as per the DX .
+    It allows data *admins* to publish gis related info as per the Data Exchange(DX) .
     It enables *Consumers* of datasources to search and query for data using HTTPs APIs.
-
+    
+    
+    # Configurations
+    - **Server**:
+        - In the doc, we display the server url to be https://example-gis.com with the hostname as example-gis.com
+        - This could be configured according to the deployment
+    - **Base path**:
+        - Base path is the path on which API is served, relative to the host
+        - It is the initial part of the API
+        - The base path value could be configured according to the deployment
+        - Currently, `/entities` (Latest search) APIs have `/ngsi-ld/v1` base path and `/serverInfo` (Admin) APIs have `/admin/gis` as base path
+          <br>
+    - **Request Samples**:
+        - The `<tokeValue>` in the header of request sample could be replaced with respective token value [Also refer Tokens section [here](#section/Tokens)]
+        - The `<payload>` in the request sample could be replaced with the payload given adjacent to the request sample
+    
     
     
     # Tokens
@@ -38,9 +57,9 @@ info:
 
 tags:
   - name: Latest Search
-    x-displayName: "Latest URL"
+    x-displayName: "Latest Data"
     description: |
-      A entity search is used by DX Data *Consumers* for querying a resource using a <b>valid IUDX</b> `id`. <br/> 
+      A entity search is used by DX(Data Exchange) Data *Consumers* for querying a resource using a <b>valid DX</b> `id`. <br/> 
 
   - name: Admin API
     x-displayName: "Admin Apis"
@@ -71,11 +90,18 @@ paths:
 
         - name: id
           in: query
-          description: A <b> valid DX ID </b> of the resource.
+          description: A <b> valid DX `ID` </b> of the resource.
           required: true
           schema:
             type: string
             maxLength: 512
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'get latest data'
+          source: |
+            curl --location --request GET 'https://example-gis.com/ngsi-ld/v1/entities?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055' \
+            --header 'token: <tokenValue>'
 
       responses:
         200:
@@ -100,21 +126,21 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/standardResourceNotFoundErrorResponse"
-          description: 'Not Found'
+          description: 'Resource not found'
 
 
       description: |
-        This <b> API </b> is used to get the data of a resource. <br /> It uses the <b> DX ID </b> a.k.a `id` to query the resource server. <br />  To get data a <b> valid DX Auth token</b> is mandatory.  <br/> The `/entities` end point followed by `id` as a <b>query parameter</b> is used to get the latest data.
+        This <b> API </b> is used to get the data of a resource. <br /> It uses the <b> DX(Data Exchange) ID </b> a.k.a `id` to query the resource server. <br />  To get data a <b> valid DX Auth token</b> is mandatory.  <br/> The `/entities` end point followed by `id` as a <b>query parameter</b> is used to get the latest data.
 
   /serverInfo:
+    servers:
+      - url: https://example-gis.com/admin/gis
+        description: Deployment Server
     post:
       tags:
         - Admin API
       summary: Publish GIS information
       operationId: registergisinforequest
-      servers:
-        - url: https://example-gis.com/admin/gis
-          description: Deployment Server
       parameters:
         - name: token
           in: header
@@ -125,6 +151,16 @@ paths:
             type: string
             maxLength: 512
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'create a GIS entry'
+          source: |
+            curl --location --request POST 'https://example-gis.com/admin/gis/serverInfo' \
+            --header 'token: <tokenValue>' \
+            --header 'Content-Type: application/json' \
+            --data-raw '<payload>'
+
 
       requestBody:
         description: ''
@@ -181,6 +217,16 @@ paths:
             maxLength: 512
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
 
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'update GIS entry'
+          source: |
+            curl --location --request PUT 'https://example-gis.com/admin/gis/serverInfo' \
+            --header 'token: <tokenValue>' \
+            --header 'Content-Type: application/json' \
+            --data-raw '<payload>'
+
+
       requestBody:
         description: ''
         content:
@@ -203,12 +249,20 @@ paths:
                 "$ref": "#/components/schemas/InvalidIdPatternErrorResponse"
           description: 'Bad query'
 
+        401:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/standardInvalidTokenErrorResponse"
+          description: 'Unauthorized'
+
+
         404:
           content:
             application/json:
               schema:
                 "$ref": "#/components/schemas/InvalidResourceIdErrorResponse"
-          description: 'Unauthorized'
+          description: 'Resource not found'
 
 
       description: |
@@ -232,12 +286,21 @@ paths:
 
         - name: id
           in: query
-          description: 'id of the Gis information.'
+          description: 'id of the GIS information.'
           required: true
           style: simple
           schema:
             type: string
             maxLength: 512
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'delete GIS entry'
+          source: |
+            curl --location --request DELETE 'https://example-gis.com/admin/gis/serverInfo?id=iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR1059' \
+            --header 'token: <tokenValue>'
+      
+
       responses:
         200:
           description: 'Successful query'
@@ -252,6 +315,14 @@ paths:
               schema:
                 "$ref": "#/components/schemas/deleteInfoBadRequestErrorResponse"
           description: 'Bad query'
+
+        401:
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/standardInvalidTokenErrorResponse"
+          description: 'Unauthorized'
+
 
         404:
           content:
@@ -270,36 +341,69 @@ components:
     registergisinforequest:
       title: registergisinforequest
       required:
-        - entities
+        - id
+        - server
+        - server-port
+        - isSecure
       type: object
       properties:
-        entities:
-          type: array
-          items:
-            type: string
+        id:
+          type: string
+        server:
+          type: string
+        server-port:
+          type: integer
+        isSecure:
+          type: boolean
       example:
         id:
-          'iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059'
-        server: URL
+          "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059"
+        server: "https://example-gis.com/apis"
         server-port: 1234
         isSecure: false
 
     editgisinforequest:
       title: editgisinforequest
       required:
-        - entities
+        - id
+        - server-url
+        - server-port
+        - isSecure
+        - accessInfo
       type: object
       properties:
-        entities:
-          type: array
-          items:
-            type: string
-      example:
         id:
-          'iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR059'
-        server: URL
-        server-port: 1234
-        isSecure: true
+          type: string
+        server-url:
+          type: string
+        server-port:
+          type: integer
+        isSecure:
+          type: boolean
+        accessInfo:
+          type: object
+          properties:
+            username:
+              type: string
+            password:
+              type: string
+            tokenURL:
+              type: string
+          required:
+            - username
+            - password
+            - tokenURL
+      example:
+        "id": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR1059"
+        "server-url": "https://example-gis.com/apis"
+        "server-port": 1234
+        "isSecure": true
+        "accessInfo":
+          {
+            "username": "username",
+            "password": "pass",
+            "tokenURL": "URL"
+          }
 
     entityresponse:
       title: entityresponse
@@ -310,13 +414,21 @@ components:
         title:
           type: string
         results:
-          type: object
+          type: array of fields
       example:
         type: urn:dx:rs:success
         title: Successful Operation
         results: [
           {
-            "URL": "https://map.varanasismartcity.gov.in/varanasismartcity"
+            "iudx_resource_id": "iisc.ac.in/89a36273d77dac4cf38114fca1bbe64392547f86/rs.iudx.io/pune-env-flood/FWR055",
+            "url": "https://map.varanasismartcity.gov.in/varanasismartcity",
+            "isopen": true,
+            "port": 123,
+            "created_at": "2022-03-24T08:31:07.341533",
+            "modified_at": "2022-03-25T12:38:26.975070",
+            "username": "someUsername",
+            "password": "somePassword",
+            "tokenurl": "someTokenurl"
           }
         ]
 
@@ -329,14 +441,7 @@ components:
         title:
           type: string
         results:
-          type: object
-          properties:
-            username:
-              type: string
-            apiKey:
-              type: string
-            id:
-              type: string
+          type: array of fields
       example:
         type: urn:dx:rs:success
         title: Successful Operation

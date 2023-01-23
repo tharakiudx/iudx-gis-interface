@@ -6,7 +6,7 @@
   "clusterId": "",
   "commonConfig" : {
     "dxApiBasePath": "/ngsi-ld/v1",
-    "adminBasePath": "/admin/gis/serverInfo"
+    "adminBasePath": "/admin/gis"
   },
   "modules": [
     {
