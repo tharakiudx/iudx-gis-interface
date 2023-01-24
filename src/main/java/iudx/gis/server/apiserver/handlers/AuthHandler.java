@@ -109,7 +109,7 @@ public class AuthHandler implements Handler<RoutingContext> {
     LOGGER.debug("URL : {}", url);
     String path = null;
     if (url.matches(api.getEntitiesEndpoint())) path =  api.getEntitiesEndpoint();
-    else if (url.matches(adminBasePath)) path = adminBasePath;
+    else if (url.matches(api.getAdminPath())) path = api.getAdminPath();
     return path;
   }
 

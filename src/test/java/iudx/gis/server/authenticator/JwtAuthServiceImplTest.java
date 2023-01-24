@@ -52,7 +52,7 @@ public class JwtAuthServiceImplTest {
     config = new Configuration();
     authConfig = config.configLoader(1, vertx);
     authConfig.put("dxApiBasePath","/ngsi-ld/v1");
-    authConfig.put("adminBasePath","/admin/gis/serverInfo");
+    authConfig.put("adminBasePath","/admin/gis");
 
     authConfig.put("audience", "rs.iudx.io");
     authConfig.put("authServerHost", "authvertx.iudx.io");

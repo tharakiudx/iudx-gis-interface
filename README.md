@@ -27,7 +27,7 @@ The consumers can access data from the gis interface using HTTPs.
 - Hazelcast and Zookeeper based cluster management and service discovery.
 
 ## API Docs
-The api docs can be found [here](https://gis.iudx.org.in/apis).
+The api docs can be found [here](https://gis.iudx.io/apis).
 
 ## Prerequisites
 ### External Dependencies Installation

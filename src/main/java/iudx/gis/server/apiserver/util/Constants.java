@@ -54,4 +54,7 @@ public class Constants {
   public static final int VALIDATION_ID_MAX_LEN = 512;
   /** Accept Headers and CORS */
   public static final String AUTH_INFO = "authInfo";
+
+  // Admin Path
+  public static final String ADMIN_PATH = "/serverInfo";
 }

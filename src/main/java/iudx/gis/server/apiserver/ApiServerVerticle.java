@@ -178,21 +178,21 @@ public class ApiServerVerticle extends AbstractVerticle {
         new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH_DELETE);
 
     router
-        .post(adminBasePath)
+        .post(api.getAdminPath())
         .handler(adminCrudPathValidationHandler)
         .handler(AuthHandler.create(vertx,config()))
         .handler(this::handlePostAdminPath)
         .failureHandler(validationsFailureHandler);
 
     router
-        .put(adminBasePath)
+        .put(api.getAdminPath())
         .handler(adminCrudPathValidationHandler)
         .handler(AuthHandler.create(vertx,config()))
         .handler(this::handlePutAdminPath)
         .failureHandler(validationsFailureHandler);
 
     router
-        .delete(adminBasePath)
+        .delete(api.getAdminPath())
         .handler(adminCrudPathIdValidationHandler)
         .handler(AuthHandler.create(vertx,config()))
         .handler(this::handleDeleteAdminPath)

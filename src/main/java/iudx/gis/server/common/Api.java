@@ -30,11 +30,13 @@ public class Api {
     }
     private StringBuilder entitiesEndpoint;
     private StringBuilder entitiesRegex;
+    private StringBuilder adminPath;
 
 
     public void buildEndpoints() {
         entitiesEndpoint = new StringBuilder(dxApiBasePath).append(NGSILD_ENTITIES_URL);
         entitiesRegex = new StringBuilder(dxApiBasePath).append(ENTITITES_URL_REGEX);
+        adminPath = new StringBuilder(adminBasePath).append(ADMIN_PATH);
     }
 
 
@@ -44,5 +46,10 @@ public class Api {
 
     public String getEntitiesRegex() {
         return entitiesRegex.toString();
+    }
+
+    public String getAdminPath()
+    {
+        return adminPath.toString();
     }
 }
