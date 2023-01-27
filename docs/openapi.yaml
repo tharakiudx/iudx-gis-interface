@@ -15,10 +15,6 @@ consumes:
 info:
   title: "Data Exchange GIS Interface APIs"
   version: 4.0.0
-  x-logo:
-    url: "https://iudx.org.in/wp-content/uploads/2020/12/iudx-ideal.png"
-    backgroundColor: "#FFFFFF"
-    altText: "IUDX logo"
   description: |
     # Introduction
     
@@ -414,7 +410,10 @@ components:
         title:
           type: string
         results:
-          type: array of fields
+          description: An array of objects
+          type: array
+          items:
+            type: object
       example:
         type: urn:dx:rs:success
         title: Successful Operation
@@ -441,7 +440,10 @@ components:
         title:
           type: string
         results:
-          type: array of fields
+          description: An array of objects
+          type: array
+          items:
+            type: object
       example:
         type: urn:dx:rs:success
         title: Successful Operation
