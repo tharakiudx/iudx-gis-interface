@@ -19,6 +19,9 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static iudx.gis.server.authenticator.Constants.CAT_ITEM_PATH;
+import static iudx.gis.server.authenticator.Constants.CAT_SEARCH_PATH;
+
 public class CatalogueService {
   private static final Logger LOGGER = LogManager.getLogger(CatalogueService.class);
 
@@ -26,9 +29,10 @@ public class CatalogueService {
   private long cacheGroupTimerId;
   private long cacheResTimerId;
   private static String catHost;
-  private static int catPort;;
+  private static int catPort;
   private static String catSearchPath;
   private static String catItemPath;
+  private String catBasePath;
   private Vertx vertx;
 
   private final Cache<String, String> idCache = CacheBuilder.newBuilder().maximumSize(1000)
@@ -41,8 +45,9 @@ public class CatalogueService {
     this.vertx = vertx;
     catHost = config.getString("catServerHost");
     catPort = config.getInteger("catServerPort");
-    catSearchPath = Constants.CAT_RSG_PATH;
-    catItemPath = Constants.CAT_ITEM_PATH;
+    catBasePath = config.getString("dxCatalogueBasePath");
+    catItemPath = catBasePath + CAT_ITEM_PATH;
+    catSearchPath = catBasePath + CAT_SEARCH_PATH;
 
     WebClientOptions options =
         new WebClientOptions().setTrustAll(true).setVerifyHost(false).setSsl(true);

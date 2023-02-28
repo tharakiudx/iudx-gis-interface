@@ -73,6 +73,8 @@ public class ApiServerVerticle extends AbstractVerticle {
   private AuthenticationService authenticator;
   public String dxApiBasePath;
   public String adminBasePath;
+  private String dxCatalogueBasePath;
+  private String dxAuthBasePath;
 
   @Override
   public void start() throws Exception {
@@ -94,6 +96,8 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     dxApiBasePath = config().getString("dxApiBasePath");
     adminBasePath = config().getString("adminBasePath");
+    dxCatalogueBasePath = config().getString("dxCatalogueBasePath");
+    dxAuthBasePath = config().getString("dxAuthBasePath");
     Api api = Api.getInstance(dxApiBasePath,adminBasePath);
 
     router = Router.router(vertx);
