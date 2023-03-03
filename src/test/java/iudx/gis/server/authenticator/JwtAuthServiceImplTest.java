@@ -56,11 +56,14 @@ public class JwtAuthServiceImplTest {
 
     authConfig.put("audience", "rs.iudx.io");
     authConfig.put("authServerHost", "authvertx.iudx.io");
+    authConfig.put("dxCatalogueBasePath", "/iudx/cat/v1");
+    authConfig.put("dxAuthBasePath", "/auth/v1");
     LOGGER.info("config : {}", authConfig);
 
     cacheServiceMock = Mockito.mock(CacheService.class);
     dxApiBasePath = authConfig.getString("dxApiBasePath");
     adminBasePath = authConfig.getString("adminBasePath");
+
     api = Api.getInstance(dxApiBasePath,adminBasePath);
 
     JWTAuthOptions jwtAuthOptions = new JWTAuthOptions();

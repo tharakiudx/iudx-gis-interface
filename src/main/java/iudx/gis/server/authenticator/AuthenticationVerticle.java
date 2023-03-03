@@ -1,5 +1,6 @@
 package iudx.gis.server.authenticator;
 
+import static iudx.gis.server.authenticator.Constants.AUTH_CERTIFICATE_PATH;
 import static iudx.gis.server.common.Constants.AUTHENTICATION_SERVICE_ADDRESS;
 import static iudx.gis.server.common.Constants.CACHE_SERVICE_ADDRESS;
 
@@ -118,8 +119,9 @@ public class AuthenticationVerticle extends AbstractVerticle {
   public Future<String> getJwtPublicKey(Vertx vertx, JsonObject config) {
     Promise<String> promise = Promise.promise();
     webClient = createWebClient(vertx, config);
+    String authCert = config.getString("dxAuthBasePath") + AUTH_CERTIFICATE_PATH;
     webClient
-        .get(443, config.getString("authServerHost"), "/auth/v1/cert")
+        .get(443, config.getString("authServerHost"), authCert)
         .send(
             handler -> {
               if (handler.succeeded()) {

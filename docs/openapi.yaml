@@ -31,6 +31,8 @@ info:
         - Base path is the path on which API is served, relative to the host
         - It is the initial part of the API
         - The base path value could be configured according to the deployment
+        - The base path for [DX AAA Server](https://github.com/datakaveri/iudx-aaa-server) is set to `/auth/v1`
+        - The base path for [DX Catalogue Server](https://github.com/datakaveri/iudx-catalogue-server) is set to `/iudx/cat/v1`
         - Currently, `/entities` (Latest search) APIs have `/ngsi-ld/v1` base path and `/serverInfo` (Admin) APIs have `/admin/gis` as base path
           <br>
     - **Request Samples**:

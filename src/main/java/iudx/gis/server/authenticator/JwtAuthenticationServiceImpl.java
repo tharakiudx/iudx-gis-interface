@@ -1,10 +1,5 @@
 package iudx.gis.server.authenticator;
 
-import static iudx.gis.server.authenticator.Constants.JSON_EXPIRY;
-import static iudx.gis.server.authenticator.Constants.JSON_IID;
-import static iudx.gis.server.authenticator.Constants.JSON_USERID;
-import static iudx.gis.server.authenticator.Constants.OPEN_ENDPOINTS;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.vertx.core.AsyncResult;
@@ -40,6 +35,8 @@ import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static iudx.gis.server.authenticator.Constants.*;
+
 public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
   private static final Logger LOGGER = LogManager.getLogger(JwtAuthenticationServiceImpl.class);
@@ -54,6 +51,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   final CacheService cache;
   final String adminBasePath;
   final Api api;
+  final String catBasePath;
   // resourceIdCache will contain info about resources available(& their ACL) in resource server.
   public Cache<String, String> resourceIdCache =
       CacheBuilder.newBuilder()
@@ -78,7 +76,8 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
     this.iss = config.getString("authServerHost");
     this.host = config.getString("catServerHost");
     this.port = config.getInteger("catServerPort");
-    this.path = Constants.CAT_RSG_PATH;
+    this.catBasePath = config.getString("dxCatalogueBasePath");
+    this.path = catBasePath + CAT_SEARCH_PATH;
     this.cache = cacheService;
     this.api = api;
     this.adminBasePath = config.getString("adminBasePath");

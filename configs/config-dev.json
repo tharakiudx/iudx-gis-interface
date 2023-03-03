@@ -6,7 +6,9 @@
   "clusterId": "",
   "commonConfig" : {
     "dxApiBasePath": "/ngsi-ld/v1",
-    "adminBasePath": "/admin/gis"
+    "adminBasePath": "/admin/gis",
+    "dxCatalogueBasePath": "/iudx/cat/v1",
+    "dxAuthBasePath": "/auth/v1"
   },
   "modules": [
     {
