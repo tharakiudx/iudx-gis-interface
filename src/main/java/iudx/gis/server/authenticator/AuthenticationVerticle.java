@@ -1,5 +1,6 @@
 package iudx.gis.server.authenticator;
 
+import static iudx.gis.server.authenticator.Constants.AUTH_CERTIFICATE_PATH;
 import static iudx.gis.server.common.Constants.AUTHENTICATION_SERVICE_ADDRESS;
 import static iudx.gis.server.common.Constants.CACHE_SERVICE_ADDRESS;
 
@@ -16,6 +17,7 @@ import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.serviceproxy.ServiceBinder;
 import iudx.gis.server.cache.CacheService;
+import iudx.gis.server.common.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,6 +41,9 @@ public class AuthenticationVerticle extends AbstractVerticle {
   private MessageConsumer<JsonObject> consumer;
   private WebClient webClient;
   private CacheService cacheService;
+  private Api api;
+  private String dxApiBasePath;
+  private String adminBasePath;
 
   static WebClient createWebClient(Vertx vertx, JsonObject config) {
     return createWebClient(vertx, config, false);
@@ -83,9 +88,13 @@ public class AuthenticationVerticle extends AbstractVerticle {
                 LOGGER.warn(
                     "JWT ignore expiration set to true, do not set IgnoreExpiration in production!!");
               }
-              JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
+                dxApiBasePath = config().getString("dxApiBasePath");
+                adminBasePath = config().getString("adminBasePath");
+                api = Api.getInstance(dxApiBasePath,adminBasePath);
+
+                JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
               cacheService = CacheService.createProxy(vertx, CACHE_SERVICE_ADDRESS);
-              jwtAuthenticationService = new JwtAuthenticationServiceImpl(vertx, jwtAuth, config(),cacheService);
+              jwtAuthenticationService = new JwtAuthenticationServiceImpl(vertx, jwtAuth, config(), api, cacheService);
 
               /* Publish the Authentication service with the Event Bus against an address. */
               consumer =
@@ -110,8 +119,9 @@ public class AuthenticationVerticle extends AbstractVerticle {
   public Future<String> getJwtPublicKey(Vertx vertx, JsonObject config) {
     Promise<String> promise = Promise.promise();
     webClient = createWebClient(vertx, config);
+    String authCert = config.getString("dxAuthBasePath") + AUTH_CERTIFICATE_PATH;
     webClient
-        .get(443, config.getString("authServerHost"), "/auth/v1/cert")
+        .get(443, config.getString("authServerHost"), authCert)
         .send(
             handler -> {
               if (handler.succeeded()) {

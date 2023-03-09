@@ -1,6 +1,6 @@
 {
 	"id": "5b8f23ac-3a52-4f68-a066-73037dc6cd8d",
-	"name": "GIS Jenkins Pipeline", 
+	"name": "GIS Environment",
 	"values": [
 		{
 			"key": "openResourceToken",
@@ -28,8 +28,25 @@
 		},
 		{
 			"key": "base_url",
-			"value": "gis-test.iudx.io",
+			"value": "gis.iudx.io",
 			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "dxApiBasePath",
+			"value": "ngsi-ld/v1",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "adminBasePath",
+			"value": "admin/gis",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "dxAuthBasePath",
+			"value": "auth/v1",
 			"enabled": true
 		},
 		{

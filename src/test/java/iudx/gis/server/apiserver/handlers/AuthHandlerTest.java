@@ -8,10 +8,8 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import iudx.gis.server.apiserver.handlers.AuthHandler;
-import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.authenticator.AuthenticationService;
-import iudx.gis.server.authenticator.Constants;
+import iudx.gis.server.common.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,15 +17,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static iudx.gis.server.apiserver.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -57,6 +50,9 @@ public class AuthHandlerTest {
   @Mock
   Future<Void> voidFuture;
 
+  private static String dxApiBasePath;
+  private static String adminBasePath;
+  private static Api api;
   @BeforeEach
   public void setUp(VertxTestContext vertxTestContext, Vertx vertx) {
     //authHandler = AuthHandler.create(vertx);
@@ -66,8 +62,14 @@ public class AuthHandlerTest {
     jsonObject.put("IID", "Dummy IID value");
     jsonObject.put("USER_ID", "Dummy USER_ID");
     jsonObject.put("EXPIRY", "Dummy EXPIRY");
+    jsonObject.put("dxApiBasePath","/ngsi-ld/v1");
+    jsonObject.put("adminBasePath","/admin/gis");
+    dxApiBasePath = "/ngsi-ld/v1";
+    adminBasePath = "/admin/gis";
+    api = Api.getInstance(dxApiBasePath,adminBasePath);
     //lenient().doReturn(httpServerRequest).when(routingContextMock).request();
     //lenient().doReturn(httpServerResponse).when(routingContextMock).response();
+
 
     lenient().when(httpServerRequest.method()).thenReturn(httpMethodMock);
     lenient().when(httpMethodMock.toString()).thenReturn("GET");
@@ -85,7 +87,7 @@ public class AuthHandlerTest {
 
     //when(routingContextMock.request()).thenReturn(httpServerRequest);
     when(routingContextMock.getBodyAsJson()).thenReturn(jsonObject);
-    when(httpServerRequest.path()).thenReturn(ENTITITES_URL_REGEX);
+    when(httpServerRequest.path()).thenReturn(api.getEntitiesRegex());
     //doReturn(NGSILD_ENTITIES_URL).when(httpServerRequest).path();
 
     AuthHandler.authenticator = mock(AuthenticationService.class);
@@ -126,7 +128,7 @@ public class AuthHandlerTest {
   public void testHandleFail(VertxTestContext vertxTestContext) {
     //JsonObject jsonObjectMock = new JsonObject().put("id", "iddd");
     authHandler = new AuthHandler();
-    String str = ENTITITES_URL_REGEX;
+    String str = api.getEntitiesRegex();
     JsonObject jsonObject = new JsonObject();
     jsonObject.put("Dummy Key", "Dummy Value");
 
@@ -227,17 +229,18 @@ public class AuthHandlerTest {
 
   @Test
   public void getNormalizedPathTest(VertxTestContext vertxTestContext) {
-    String authString = authHandler.getNormalizedPath(NGSILD_ENTITIES_URL);
-    assertEquals(authString, NGSILD_ENTITIES_URL);
-    String authString2 = authHandler.getNormalizedPath(ADMIN_BASE_PATH);
-    assertEquals(authString2, ADMIN_BASE_PATH);
+    AuthHandler.create(Vertx.vertx(),jsonObject);
+    String authString = authHandler.getNormalizedPath(api.getEntitiesEndpoint());
+    assertEquals(authString,api.getEntitiesEndpoint());
+    String authString2 = authHandler.getNormalizedPath(api.getAdminPath());
+    assertEquals(authString2, api.getAdminPath());
     vertxTestContext.completeNow();
   }
 
   @Test
   @DisplayName("Test static method: create")
   public void testCreate(VertxTestContext vertxTestContext) {
-    AuthHandler res = AuthHandler.create(Vertx.vertx());
+    AuthHandler res = AuthHandler.create(Vertx.vertx(),jsonObject);
     assertNotNull(res);
     vertxTestContext.completeNow();
   }

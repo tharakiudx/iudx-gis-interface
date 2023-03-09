@@ -1,6 +1,5 @@
 package iudx.gis.server.authenticator.authorization;
 
-import static iudx.gis.server.authenticator.authorization.Api.ENTITIES;
 import static iudx.gis.server.authenticator.authorization.Method.GET;
 
 import io.vertx.core.json.JsonArray;
@@ -9,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import iudx.gis.server.common.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,11 +18,32 @@ public class ConsumerAuthStrategy implements AuthorizationStrategy {
   private static final Logger LOGGER = LogManager.getLogger(ConsumerAuthStrategy.class);
 
   static Map<String, List<AuthorizationRequest>> consumerAuthorizationRules = new HashMap<>();
+  static Api api;
+  private static volatile ConsumerAuthStrategy instance;
+  private ConsumerAuthStrategy(Api apis)
+  {
+    api = apis;
+    buildPermissions(api);
+  }
 
-  static {
+  public static ConsumerAuthStrategy getInstance(Api apis) {
+    if (instance == null)
+    {
+      synchronized (ConsumerAuthStrategy.class)
+      {
+        if (instance == null)
+        {
+          instance = new ConsumerAuthStrategy(apis);
+        }
+      }
+    }
+    return instance;
+  }
+
+  private void buildPermissions(Api api) {
     // api access list/rules
     List<AuthorizationRequest> apiAccessList = new ArrayList<>();
-    apiAccessList.add(new AuthorizationRequest(GET, ENTITIES));
+    apiAccessList.add(new AuthorizationRequest(GET, api.getEntitiesEndpoint()));
     consumerAuthorizationRules.put(IudxAccess.API.getAccess(), apiAccessList);
   }
 
@@ -32,7 +54,7 @@ public class ConsumerAuthStrategy implements AuthorizationStrategy {
     if (access == null) {
       return result;
     }
-    String endpoint = authRequest.getApi().getApiEndpoint();
+    String endpoint = authRequest.getApi();
     Method method = authRequest.getMethod();
     LOGGER.debug("authorization request for : " + endpoint + " with method : " + method.name());
     LOGGER.debug("allowed access : " + access);

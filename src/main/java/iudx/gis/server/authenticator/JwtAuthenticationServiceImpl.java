@@ -1,11 +1,5 @@
 package iudx.gis.server.authenticator;
 
-import static iudx.gis.server.apiserver.util.Constants.ADMIN_BASE_PATH;
-import static iudx.gis.server.authenticator.Constants.JSON_EXPIRY;
-import static iudx.gis.server.authenticator.Constants.JSON_IID;
-import static iudx.gis.server.authenticator.Constants.JSON_USERID;
-import static iudx.gis.server.authenticator.Constants.OPEN_ENDPOINTS;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.vertx.core.AsyncResult;
@@ -21,7 +15,6 @@ import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.client.predicate.ResponsePredicate;
-import iudx.gis.server.authenticator.authorization.Api;
 import iudx.gis.server.authenticator.authorization.AuthorizationContextFactory;
 import iudx.gis.server.authenticator.authorization.AuthorizationRequest;
 import iudx.gis.server.authenticator.authorization.AuthorizationStrategy;
@@ -34,12 +27,15 @@ import iudx.gis.server.cache.cacheImpl.CacheType;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+
+import iudx.gis.server.common.Api;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static iudx.gis.server.authenticator.Constants.*;
 
 public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
@@ -53,6 +49,9 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
   final String audience;
   final String iss;
   final CacheService cache;
+  final String adminBasePath;
+  final Api api;
+  final String catBasePath;
   // resourceIdCache will contain info about resources available(& their ACL) in resource server.
   public Cache<String, String> resourceIdCache =
       CacheBuilder.newBuilder()
@@ -70,14 +69,18 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
       Vertx vertx,
       final JWTAuth jwtAuth,
       final JsonObject config,
+      final Api api,
       final CacheService cacheService) {
     this.jwtAuth = jwtAuth;
     this.audience = config.getString("audience");
     this.iss = config.getString("authServerHost");
     this.host = config.getString("catServerHost");
     this.port = config.getInteger("catServerPort");
-    this.path = Constants.CAT_RSG_PATH;
+    this.catBasePath = config.getString("dxCatalogueBasePath");
+    this.path = catBasePath + CAT_SEARCH_PATH;
     this.cache = cacheService;
+    this.api = api;
+    this.adminBasePath = config.getString("adminBasePath");
     WebClientOptions options = new WebClientOptions();
     options.setTrustAll(true).setVerifyHost(false).setSsl(true);
     catWebClient = WebClient.create(vertx, options);
@@ -94,7 +97,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
     ResultContainer result = new ResultContainer();
     LOGGER.debug("endPoint " + endPoint);
-    if (endPoint != null && endPoint.equals(ADMIN_BASE_PATH)) {
+    if (endPoint != null && endPoint.equals(api.getAdminPath())) {
       jwtDecodeFuture
           .compose(
               decodeHandler -> {
@@ -229,7 +232,7 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
 
     if (jwtData.getRole().equals("consumer")) {
 
-      if (openResource && OPEN_ENDPOINTS.contains(authInfo.getString("apiEndpoint"))) {
+      if (openResource && checkOpenEndPoints(authInfo.getString("apiEndpoint"))) {
         LOGGER.debug("IS OPEN");
         LOGGER.debug("User access is allowed.");
         JsonObject jsonResponse = new JsonObject();
@@ -239,11 +242,11 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
       }
 
       Method method = Method.valueOf(authInfo.getString("method"));
-      Api api = Api.fromEndpoint(authInfo.getString("apiEndpoint"));
-      AuthorizationRequest authRequest = new AuthorizationRequest(method, api);
+      String apiEndpoint = authInfo.getString("apiEndpoint");
+      AuthorizationRequest authRequest = new AuthorizationRequest(method, apiEndpoint);
 
       IudxRole role = IudxRole.fromRole(jwtData.getRole());
-      AuthorizationStrategy authStrategy = AuthorizationContextFactory.create(role);
+      AuthorizationStrategy authStrategy = AuthorizationContextFactory.create(role,api);
       LOGGER.debug("strategy : " + authStrategy.getClass().getSimpleName());
       JwtAuthorization jwtAuthStrategy = new JwtAuthorization(authStrategy);
       LOGGER.debug("endPoint : " + authInfo.getString("apiEndpoint"));
@@ -270,6 +273,17 @@ public class JwtAuthenticationServiceImpl implements AuthenticationService {
       promise.fail(result.toString());
     }
     return promise.future();
+  }
+
+  private boolean checkOpenEndPoints(String endPoint) {
+    for(String item : OPEN_ENDPOINTS)
+    {
+      if(endPoint.contains(item))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   public Future<Boolean> isValidAudienceValue(JwtData jwtData) {

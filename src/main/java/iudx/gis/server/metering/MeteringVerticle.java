@@ -16,12 +16,15 @@ public class MeteringVerticle extends AbstractVerticle {
   private MessageConsumer<JsonObject> consumer;
   private MeteringService metering;
   private DataBrokerService dataBrokerService;
+  private JsonObject config;
+
 
   @Override
   public void start() {
 
+    config = config();
     dataBrokerService = DataBrokerService.createProxy(vertx,DATABROKER_SERVICE_ADDRESS);
-    metering = new MeteringServiceImpl(dataBrokerService);
+    metering = new MeteringServiceImpl(dataBrokerService,config);
     binder = new ServiceBinder(vertx);
     consumer =
         binder.setAddress(METERING_SERVICE_ADDRESS).register(MeteringService.class, metering);

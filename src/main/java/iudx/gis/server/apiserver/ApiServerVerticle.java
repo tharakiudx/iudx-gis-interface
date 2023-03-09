@@ -2,37 +2,7 @@ package iudx.gis.server.apiserver;
 
 import static iudx.gis.server.apiserver.response.ResponseUrn.BACKING_SERVICE_FORMAT;
 import static iudx.gis.server.apiserver.response.ResponseUrn.YET_NOT_IMPLEMENTED;
-import static iudx.gis.server.apiserver.util.Constants.ADMIN_BASE_PATH;
-import static iudx.gis.server.apiserver.util.Constants.API;
-import static iudx.gis.server.apiserver.util.Constants.API_ENDPOINT;
-import static iudx.gis.server.apiserver.util.Constants.APPLICATION_JSON;
-import static iudx.gis.server.apiserver.util.Constants.CONTENT_TYPE;
-import static iudx.gis.server.apiserver.util.Constants.EPOCH_TIME;
-import static iudx.gis.server.apiserver.util.Constants.ERROR_MESSAGE;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_ACCEPT;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_ALLOW_ORIGIN;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_CONTENT_LENGTH;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_CONTENT_TYPE;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_HOST;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_ORIGIN;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_REFERER;
-import static iudx.gis.server.apiserver.util.Constants.HEADER_TOKEN;
-import static iudx.gis.server.apiserver.util.Constants.ID;
-import static iudx.gis.server.apiserver.util.Constants.IID;
-import static iudx.gis.server.apiserver.util.Constants.ISO_TIME;
-import static iudx.gis.server.apiserver.util.Constants.JSON_DETAIL;
-import static iudx.gis.server.apiserver.util.Constants.JSON_RESULT;
-import static iudx.gis.server.apiserver.util.Constants.JSON_TITLE;
-import static iudx.gis.server.apiserver.util.Constants.JSON_TYPE;
-import static iudx.gis.server.apiserver.util.Constants.MIME_APPLICATION_JSON;
-import static iudx.gis.server.apiserver.util.Constants.MIME_TEXT_HTML;
-import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_ID;
-import static iudx.gis.server.apiserver.util.Constants.NGSILDQUERY_IDPATTERN;
-import static iudx.gis.server.apiserver.util.Constants.NGSILD_ENTITIES_URL;
-import static iudx.gis.server.apiserver.util.Constants.RESPONSE_SIZE;
-import static iudx.gis.server.apiserver.util.Constants.ROUTE_DOC;
-import static iudx.gis.server.apiserver.util.Constants.ROUTE_STATIC_SPEC;
-import static iudx.gis.server.apiserver.util.Constants.USER_ID;
+import static iudx.gis.server.apiserver.util.Constants.*;
 import static iudx.gis.server.common.Constants.AUTHENTICATION_SERVICE_ADDRESS;
 import static iudx.gis.server.common.Constants.METERING_SERVICE_ADDRESS;
 import static iudx.gis.server.common.Constants.PG_SERVICE_ADDRESS;
@@ -49,6 +19,7 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.JksOptions;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -63,6 +34,7 @@ import iudx.gis.server.apiserver.service.CatalogueService;
 import iudx.gis.server.apiserver.util.HttpStatusCode;
 import iudx.gis.server.apiserver.util.RequestType;
 import iudx.gis.server.authenticator.AuthenticationService;
+import iudx.gis.server.common.Api;
 import iudx.gis.server.database.postgres.PostgresService;
 import iudx.gis.server.metering.MeteringService;
 import java.time.ZoneId;
@@ -99,6 +71,10 @@ public class ApiServerVerticle extends AbstractVerticle {
   // private DatabaseService database;
   private PostgresService postgresService;
   private AuthenticationService authenticator;
+  public String dxApiBasePath;
+  public String adminBasePath;
+  private String dxCatalogueBasePath;
+  private String dxAuthBasePath;
 
   @Override
   public void start() throws Exception {
@@ -117,6 +93,12 @@ public class ApiServerVerticle extends AbstractVerticle {
     allowedMethods.add(HttpMethod.POST);
     allowedMethods.add(HttpMethod.PATCH);
     allowedMethods.add(HttpMethod.PUT);
+
+    dxApiBasePath = config().getString("dxApiBasePath");
+    adminBasePath = config().getString("adminBasePath");
+    dxCatalogueBasePath = config().getString("dxCatalogueBasePath");
+    dxAuthBasePath = config().getString("dxAuthBasePath");
+    Api api = Api.getInstance(dxApiBasePath,adminBasePath);
 
     router = Router.router(vertx);
     router
@@ -187,9 +169,9 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationFailureHandler validationsFailureHandler = new ValidationFailureHandler();
 
     router
-        .get(NGSILD_ENTITIES_URL)
+        .get(api.getEntitiesEndpoint())
         .handler(entityQueryValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx,config()))
         .handler(this::handleEntitiesQuery)
         .failureHandler(validationsFailureHandler);
 
@@ -200,23 +182,23 @@ public class ApiServerVerticle extends AbstractVerticle {
         new ValidationHandler(vertx, RequestType.ADMIN_CRUD_PATH_DELETE);
 
     router
-        .post(ADMIN_BASE_PATH)
+        .post(api.getAdminPath())
         .handler(adminCrudPathValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx,config()))
         .handler(this::handlePostAdminPath)
         .failureHandler(validationsFailureHandler);
 
     router
-        .put(ADMIN_BASE_PATH)
+        .put(api.getAdminPath())
         .handler(adminCrudPathValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx,config()))
         .handler(this::handlePutAdminPath)
         .failureHandler(validationsFailureHandler);
 
     router
-        .delete(ADMIN_BASE_PATH)
+        .delete(api.getAdminPath())
         .handler(adminCrudPathIdValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx,config()))
         .handler(this::handleDeleteAdminPath)
         .failureHandler(validationsFailureHandler);
     router
@@ -250,8 +232,18 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
 
     catalogueService = new CatalogueService(vertx, config());
-  }
 
+    /* Print the deployed endpoints */
+    printDeployedEndpoints(router);
+
+  }
+  private void printDeployedEndpoints(Router router) {
+    for(Route route:router.getRoutes()) {
+      if(route.getPath() != null) {
+        LOGGER.info("API Endpoints deployed : " + route.methods() + " : " + route.getPath());
+      }
+    }
+  }
   private void handleDeleteAdminPath(RoutingContext routingContext) {
     LOGGER.trace("Info:handleDeleteAdminPath method started.;");
     HttpServerResponse response = routingContext.response();

@@ -13,20 +13,27 @@ import static iudx.gis.server.metering.util.Constants.USER_ID;
 
 import io.vertx.core.json.JsonObject;
 import java.util.UUID;
+
+import iudx.gis.server.common.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class QueryBuilder {
 
   private static final Logger LOGGER = LogManager.getLogger(QueryBuilder.class);
+  private static String adminBasePath;
 
-  public JsonObject buildMessageForRMQ(JsonObject request) {
+  public JsonObject buildMessageForRMQ(JsonObject request, JsonObject config) {
     String primaryKey = UUID.randomUUID().toString().replace("-", "");
     String api = request.getString(API);
+
+    adminBasePath = config.getString("adminBasePath");
+    Api apiEndpoint = Api.getInstance(config.getString("dxApiBasePath"),adminBasePath);
+
     String resourceId =
-        api.equals(ADMIN_BASE_PATH) ? request.getString(IID) : request.getString(ID);
+        api.equals(apiEndpoint.getAdminPath()) ? request.getString(IID) : request.getString(ID);
     String providerID =
-        api.equals(ADMIN_BASE_PATH)
+        api.equals(apiEndpoint.getAdminPath())
             ? ADMIN
             : resourceId.substring(0, resourceId.indexOf('/', resourceId.indexOf('/') + 1));
     request.remove(IID);
