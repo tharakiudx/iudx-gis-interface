@@ -1,8 +1,11 @@
 package iudx.gis.server.authenticator.authorization;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public final class AuthorizationRequest {
 
-
+  private static final Logger LOGGER = LogManager.getLogger(AuthorizationRequest.class);
   private final Method method;
   private final String api;
 
@@ -37,10 +40,12 @@ public final class AuthorizationRequest {
     if (getClass() != obj.getClass())
       return false;
     AuthorizationRequest other = (AuthorizationRequest) obj;
-    if (api != other.api)
+    if (!api.equals(other.api)) {
       return false;
-    if (method != other.method)
+    }
+    if (method != other.method) {
       return false;
+    }
     return true;
   }
 
