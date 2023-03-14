@@ -37,7 +37,7 @@ public final class AuthorizationRequest {
     if (getClass() != obj.getClass())
       return false;
     AuthorizationRequest other = (AuthorizationRequest) obj;
-    if (api != other.api)
+    if (!api.equals(other.api))
       return false;
     if (method != other.method)
       return false;
