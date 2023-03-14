@@ -263,7 +263,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             if (deleteHandler.succeeded()) {
               handleResponse(response, HttpStatusCode.SUCCESS, ResponseUrn.SUCCESS);
               routingContext.data().put(RESPONSE_SIZE, 0);
-              Future.future(fu -> updateAuditTable(routingContext));
+              //Future.future(fu -> updateAuditTable(routingContext));
             } else {
               LOGGER.info("insert failed :{}", deleteHandler.cause().getMessage());
             }
@@ -298,7 +298,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             if (updateHandler.succeeded()) {
               handleResponse(response, HttpStatusCode.SUCCESS, ResponseUrn.SUCCESS);
               routingContext.data().put(RESPONSE_SIZE, 0);
-              Future.future(fu -> updateAuditTable(routingContext));
+              //Future.future(fu -> updateAuditTable(routingContext));
             } else {
               LOGGER.info("insert failed :{}", updateHandler.cause().getMessage());
             }
@@ -332,7 +332,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             if (insertHandler.succeeded()) {
               handleResponse(response, HttpStatusCode.CREATED, ResponseUrn.CREATED);
               routingContext.data().put(RESPONSE_SIZE, 0);
-              Future.future(fu -> updateAuditTable(routingContext));
+              //Future.future(fu -> updateAuditTable(routingContext));
             } else {
               LOGGER.info("insert failed :{}", insertHandler.cause().getMessage());
             }
@@ -376,7 +376,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         LOGGER.debug("Success: Search Success");
         handleSuccessResponse(response, ResponseType.Ok.getCode(), handler.result());
         context.data().put(RESPONSE_SIZE, response.bytesWritten());
-        Future.future(fu -> updateAuditTable(context));
+        //Future.future(fu -> updateAuditTable(context));
       } else if (handler.failed()) {
         LOGGER.error("Fail: Search Fail");
         processBackendResponse(response, handler.cause().getMessage());
