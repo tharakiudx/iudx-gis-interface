@@ -12,7 +12,6 @@ The Gis Interface connects with various external dependencies namely
 - `PostgreSQL` :  used to store and query data related to
   - Token Invalidation
   - Fetching data
-- `ImmuDB` : used to store metering information
 - `RabbitMQ` : used to receive token invalidation info
 
   
@@ -20,6 +19,7 @@ The Gis Interface connects with various external dependencies namely
 The Gis Interface also connects with various DX dependencies namely
 - Authorization Server : used to download the certificate for token decoding
 - Catalogue Server : used to download the list of resources, access policies and query types supported on a resource.
+- Auditing Server : used to store information of metering in ImmuDB and Postgres.
 
 ----
 ## Setting up RabbitMQ for IUDX Gis Interface
@@ -35,7 +35,6 @@ In order to connect to the appropriate RabbitMQ instance, required information s
     "verticleInstances": <num-of-verticle-instances>,
     "dataBrokerIP": "localhost",
     "dataBrokerPort": <port-number>,
-    "dataBrokerVhost": <vHost-name>,
     "dataBrokerUserName": <username-for-rmq>,
     "dataBrokerPassword": <password-for-rmq>,
 Adding default apiserver ports
@@ -48,7 +47,10 @@ Adding default apiserver ports
     "handshakeTimeout": <time-in-milliseconds>,
     "requestedChannelMax": <num-of-max-channels>,
     "networkRecoveryInterval": <time-in-milliseconds>,
-    "automaticRecoveryEnabled": "true"
+    "automaticRecoveryEnabled": "true",
+    "prodVhost": <prodVhost>,
+    "internalVhost": <internalVhost>,
+    "externalVhost": <externalVhost>
 }
 ```
 ---
@@ -72,29 +74,15 @@ In order to connect to the appropriate Postgres database, required information s
     "databasePassword": <password-for-psql>,
     "poolSize": <pool-size>
 }
-```
-**DatabaseVerticle**
-```
-{
-    "id": "iudx.gis.server.database.DatabaseVerticle",
-    "verticleInstances": <num-of-verticle-instance>,
-    "databaseIP": "localhost",
-    "databasePort": <port-number>,
-    "databaseName": <database-name>,
-    "databaseUserName": <username-for-psql>,
-    "databasePassword": <password-for-psql>,
-    "dbClientPoolSize": <pool-size>
-}
-```
 
-
+```
 #### Schemas for PostgreSQL tables in IUDX Gis Interface
 1. **Token Invalidation Table Schema**
 ```
 CREATE TABLE IF NOT EXISTS revoked_tokens
 (
    _id uuid NOT NULL,
-   expiry timestamp with time zone NOT NULL,
+   expiry timestamp without time zone NOT NULL,
    created_at timestamp without time zone NOT NULL,
    modified_at timestamp without time zone NOT NULL,
    CONSTRAINT revoke_tokens_pk PRIMARY KEY (_id)
@@ -119,10 +107,8 @@ CREATE TABLE IF NOT EXISTS gis
 ```
 ----
 
-## Setting up ImmuDB for IUDX Gis Interface
-- Refer to the docker files available [here](https://github.com/datakaveri/iudx-deployment/blob/master/Docker-Swarm-deployment/single-node/immudb) to setup ImmuDB.
-- Refer [this](https://github.com/datakaveri/iudx-deployment/blob/master/Docker-Swarm-deployment/single-node/immudb/docker/immudb-config-generator/immudb-config-generator.py) to create table/user.
-- In order to connect to the appropriate ImmuDB database, required information such as meteringDatabaseIP, meteringDatabasePort etc. should be updated in the MeteringVerticle module available in [config-example.json](configs/config-example.json).
+## Setting up Metering for IUDX Gis Interface
+- In Metering Verticle we are pushing data in Auditing Verticle through RabbitMQ. [config-example.json](configs/config-example.json).
 
 **MeteringVerticle**
 
@@ -130,36 +116,13 @@ CREATE TABLE IF NOT EXISTS gis
 {
     "id": "iudx.gis.server.metering.MeteringVerticle",
     "verticleInstances": <num-of-verticle-instances>,
-    "meteringDatabaseIP": "localhost",
-    "meteringDatabasePort": <port-number>,
-    "meteringDatabaseName": <database-name>,
-    "meteringDatabaseUserName": <username-for-immudb>,
-    "meteringDatabasePassword": <password-for-immudb>,
-    "meteringDatabaseTableName": <table-name-for-immudb>
-    "meteringPoolSize": <pool-size>
 }
-```
-
-**Metering Table Schema**
-```
-CREATE TABLE IF NOT EXISTS gisaudit (
-    id VARCHAR[128] NOT NULL, 
-    api VARCHAR[128], 
-    userid VARCHAR[128],
-    epochtime INTEGER,
-    resourceid VARCHAR[200],
-    isotime VARCHAR[128],
-    providerid VARCHAR[128],
-    size INTEGER,
-    PRIMARY KEY id
-);
 ```
 
 ----
 
 ## Setting up RabbitMQ for IUDX Gis Interface
 - Refer to the docker files available [here](https://github.com/datakaveri/iudx-deployment/blob/master/Docker-Swarm-deployment/single-node/databroker) to setup RMQ.
-
 
 In order to connect to the appropriate RabbitMQ instance, required information such as dataBrokerIP, dataBrokerPort etc. should be updated in the DataBrokerVerticle module available in [config-example.json](configs/config-example.json).
 
@@ -170,16 +133,18 @@ In order to connect to the appropriate RabbitMQ instance, required information s
     "verticleInstances": <num-of-verticle-instances>,
     "dataBrokerIP": "localhost",
     "dataBrokerPort": <port-number>,
-    "dataBrokerVhost": <vHost-name>,
     "dataBrokerUserName": <username-for-rmq>,
     "dataBrokerPassword": <password-for-rmq>,
-    "dataBrokerManagementPort": <management-port-number>,
     "connectionTimeout": <time-in-milliseconds>,
     "requestedHeartbeat": <time-in-seconds>,
     "handshakeTimeout": <time-in-milliseconds>,
     "requestedChannelMax": <num-of-max-channels>,
     "networkRecoveryInterval": <time-in-milliseconds>,
-    "automaticRecoveryEnabled": <true | false>
+    "automaticRecoveryEnabled": <true | false>,
+    "prodVhost": <prodVhost>,
+    "internalVhost": <internalVhost>,
+    "externalVhost": <externalVhost>
+    
 }
 ```
 
