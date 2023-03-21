@@ -22,38 +22,6 @@ The Gis Interface also connects with various DX dependencies namely
 - Auditing Server : used to store information of metering in ImmuDB and Postgres.
 
 ----
-## Setting up RabbitMQ for IUDX Gis Interface
-- Refer to the docker files available [here](https://github.com/datakaveri/iudx-deployment/blob/master/Docker-Swarm-deployment/single-node/databroker) to setup RMQ.
-
-
-In order to connect to the appropriate RabbitMQ instance, required information such as dataBrokerIP, dataBrokerPort etc. should be updated in the DataBrokerVerticle module available in [config-example.json](configs/config-example.json).
-
-**DataBrokerVerticle**
-```
-{
-    id": "iudx.gis.server.databroker.DataBrokerVerticle",
-    "verticleInstances": <num-of-verticle-instances>,
-    "dataBrokerIP": "localhost",
-    "dataBrokerPort": <port-number>,
-    "dataBrokerUserName": <username-for-rmq>,
-    "dataBrokerPassword": <password-for-rmq>,
-Adding default apiserver ports
-
-- Default http port is 8080.
-- Default port when ssl is enabled is 8443.
-- Apiserver port configurable using parameter 'httpPort    "dataBrokerManagementPort": <management-port-number>,
-    "connectionTimeout": <time-in-milliseconds>,
-    "requestedHeartbeat": <time-in-seconds>,
-    "handshakeTimeout": <time-in-milliseconds>,
-    "requestedChannelMax": <num-of-max-channels>,
-    "networkRecoveryInterval": <time-in-milliseconds>,
-    "automaticRecoveryEnabled": "true",
-    "prodVhost": <prodVhost>,
-    "internalVhost": <internalVhost>,
-    "externalVhost": <externalVhost>
-}
-```
----
 
 ## Setting up PostgreSQL for IUDX Gis Interface
 -  Refer to the docker files available [here](https://github.com/datakaveri/iudx-deployment/blob/master/Docker-Swarm-deployment/single-node/postgres) to setup PostgreSQL
