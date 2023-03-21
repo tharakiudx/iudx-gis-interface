@@ -34,7 +34,6 @@ The api docs can be found [here](https://gis.iudx.io/apis).
 
 The Gis-interface Server connects with various external dependencies namely
 - PostgreSQL
-- ImmuDB
 - RabbitMQ
 
 Find the installations of the above along with the configurations to modify the database url, port and associated credentials in the appropriate sections
